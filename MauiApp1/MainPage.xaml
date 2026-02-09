@@ -1,36 +1,50 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp1.MainPage">
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="MauiApp1.MainPage"
+    Title="MainPage">
 
-    <ScrollView>
+    <Grid>
         <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
-            <Image
-                Source="dotnet_bot.png"
-                HeightRequest="185"
-                Aspect="AspectFit"
-                SemanticProperties.Description="dot net bot in a hovercraft number nine" />
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            Spacing="20">
 
-            <Label
-                Text="Hello, World!"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" />
+            <!-- Заголовок страницы -->
+            <Label Text="Главная страница"
+               FontSize="32"
+               HorizontalOptions="Center"
+               VerticalOptions="Center" />
 
-            <Label
-                Text="Welcome to &#10;.NET Multi-platform App UI"
-                Style="{StaticResource SubHeadline}"
-                SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
+            <!-- Кнопка для начала тренировки -->
+            <Button Text="Начать тренировку"
+                BackgroundColor="DodgerBlue"
+                TextColor="White"
+                Clicked="OnStartTrainingClicked"/>
 
-            <Button
-                x:Name="CounterBtn"
-                Text="Тыкни" 
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
-                HorizontalOptions="Fill" />
+            <!-- Кнопка для перехода к статистике -->
+            <Button Text="Статистика"
+                BackgroundColor="Green"
+                TextColor="White"
+                Clicked="OnViewStatisticsClicked"/>
+
+            <!-- Кнопка для выхода -->
+            <Button Text="Выйти"
+                BackgroundColor="Red"
+                TextColor="White"
+                Clicked="OnExitClicked"/>
+
+            <!-- Кнопка "Авторизация" в верхнем правом углу -->
+            <Button x:Name="AuthButton"
+                Text="Авторизация"
+                HorizontalOptions="End"
+                VerticalOptions="Start"
+                BackgroundColor="Blue"
+                TextColor="White"
+                Clicked="OnAuthButtonClicked"
+                Margin="10"/>
         </VerticalStackLayout>
-    </ScrollView>
+    </Grid>
 
 </ContentPage>

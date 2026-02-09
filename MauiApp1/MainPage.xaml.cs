@@ -1,24 +1,34 @@
-﻿namespace MauiApp1
+﻿using MauiApp1.Trainings;
+
+namespace MauiApp1;
+
+public partial class MainPage : ContentPage
 {
-    public partial class MainPage : ContentPage
+    public MainPage()
     {
-        int count = 0;
-
-        public MainPage()
-        {
-            InitializeComponent();
-        }
-
-        private void OnCounterClicked(object? sender, EventArgs e)
-        {
-            count++;
-
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
-
-            SemanticScreenReader.Announce(CounterBtn.Text);
-        }
+        InitializeComponent();
     }
+
+    private async void OnStartTrainingClicked(object sender, EventArgs e)
+    {
+        // Логика для начала тренировки
+        await Navigation.PushAsync(new ExerciseSelectionPage());
+    }
+    private async void OnViewStatisticsClicked(object sender, EventArgs e)
+    {
+
+    }
+
+    // Обработчик для кнопки "Выйти"
+    private void OnExitClicked(object sender, EventArgs e)
+    {
+        // Логика для выхода из приложения
+        System.Environment.Exit(0);
+    }
+
+    private async void OnAuthButtonClicked(object sender, EventArgs e)
+    {
+
+    }
+
 }
