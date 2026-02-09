@@ -1,4 +1,5 @@
 ﻿using MauiApp1.Trainings;
+using MauiApp1.Statistics;
 
 namespace MauiApp1;
 
@@ -16,7 +17,7 @@ public partial class MainPage : ContentPage
     }
     private async void OnViewStatisticsClicked(object sender, EventArgs e)
     {
-
+        await Navigation.PushAsync(new SelectionStatisticsPage());
     }
 
     // Обработчик для кнопки "Выйти"
