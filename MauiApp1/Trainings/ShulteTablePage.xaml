@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiApp1.Trainings.ShulteTablePage"
+             Title="ShulteTablePage">
+    <VerticalStackLayout>
+        <!-- Заголовок -->
+        <Label Text="Таблица Шульте"
+                   FontSize="32"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
+        <!-- Надпись для следующего числа -->
+        <Label x:Name="NextNumberLabel"
+                   Text="Найди: 1"
+                   FontSize="24"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
+        <!-- Таймер -->
+        <Label x:Name="TimerLabel"
+                   FontSize="24"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
+        <!-- Таблица Шульте -->
+        <Grid x:Name="ShulteTableGrid"
+                  RowSpacing="10"
+                  ColumnSpacing="10"/>
+
+        <!-- Кнопка для завершения тренировки -->
+        <Button Text="Завершить тренировку"
+                    BackgroundColor="Red"
+                    TextColor="White"
+                    Clicked="OnFinishTrainingClicked"/>
+    </VerticalStackLayout>
+</ContentPage>

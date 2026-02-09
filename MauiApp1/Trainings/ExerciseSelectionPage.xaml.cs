@@ -10,8 +10,8 @@ public partial class ExerciseSelectionPage : ContentPage
     // Обработчик для кнопки "Таблица Шульте"
     private async void OnShulteTableClicked(object sender, EventArgs e)
     {
-        // Переход на страницу тренажера Таблица Шульте
-        //await Navigation.PushAsync(new ShulteTablePage()); // Updated to use the correct namespace
+        //Переход на страницу тренажера Таблица Шульте
+        await Navigation.PushAsync(new ShulteTablePage()); // Updated to use the correct namespace
     }
 
     // Обработчик для кнопки "Бегущие слова"
