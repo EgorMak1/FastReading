@@ -8,7 +8,10 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
+
     }
+
+
 
     private async void OnStartTrainingClicked(object sender, EventArgs e)
     {
