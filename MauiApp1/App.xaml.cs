@@ -9,7 +9,13 @@
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell());
+            // Получаем MainPage из контейнера зависимостей
+            var mainPage = MauiProgram
+                .CreateMauiApp()
+                .Services
+                .GetService<MainPage>();
+
+            return new Window(mainPage);
         }
     }
 }
