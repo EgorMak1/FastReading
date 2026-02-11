@@ -44,7 +44,7 @@ namespace MauiApp1
             try
             {
                 // Выполняем GET-запрос к вашему API
-                var response = await client.GetAsync("weatherforecast");
+                var response = await client.GetAsync("api/health");
 
                 if (response.IsSuccessStatusCode)
                 {
