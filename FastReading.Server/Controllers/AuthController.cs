@@ -34,37 +34,62 @@ namespace FastReading.Server.Controllers
                 return BadRequest("Пароль обязателен.");
             }
 
-            // Упрощение на старте:
-            // - пока используем Email как Username
-            // - чтобы не менять контракт и UI прямо сейчас
-            // Важно: Username ограничен 50 символами в настройке EF.
-            if (request.Email.Length > 50)
-            {
-                return BadRequest("Email слишком длинный (максимум 50 символов на текущем этапе).");
-            }
-
-            // Нормализуем email (чтобы не было дублей вида Test@Mail и test@mail)
+            // Нормализуем email:
+            // - убираем пробелы по краям
+            // - приводим к нижнему регистру
+            // Это нужно, чтобы не было дублей вида Test@Mail.com и test@mail.com
             var email = request.Email.Trim().ToLowerInvariant();
 
-            // Проверяем, нет ли уже такого пользователя
+            // Проверяем, нет ли уже пользователя с таким Email
+            // (Email — уникальный бизнес-идентификатор)
             var exists = await _db.Users.AnyAsync(x => x.Email.ToLower() == email);
             if (exists)
             {
                 return Conflict("Пользователь с таким Email уже существует.");
             }
 
+            // Генерируем username автоматически.
+            // Почему так:
+            // - сейчас пользователь вводит только Email и Password
+            // - Username в БД обязателен (IsRequired) и должен быть уникальным (IsUnique)
+            // Формат: user_XXXXXXXX (8 символов), чтобы уложиться в лимит 50 символов.
+            string? username = null;
+
+            for (var i = 0; i < 5; i++)
+            {
+                // Кандидат username
+                var candidate = "user_" + Guid.NewGuid().ToString("N")[..8];
+
+                // Проверяем уникальность username
+                var usernameExists = await _db.Users.AnyAsync(x => x.Username == candidate);
+                if (!usernameExists)
+                {
+                    username = candidate;
+                    break;
+                }
+            }
+
+            // Если за несколько попыток не смогли сгенерировать уникальный username — отдаём 500
+            // (на практике вероятность очень низкая, но обработка обязана быть)
+            if (username == null)
+            {
+                return StatusCode(500, "Не удалось сгенерировать уникальное имя пользователя. Повторите попытку.");
+            }
+
             // Хешируем пароль (в базу НИКОГДА не сохраняем пароль в открытом виде)
             var passwordHash = PasswordHashing.HashPassword(request.Password);
 
+            // Создаём пользователя
             var user = new User
             {
                 Id = Guid.NewGuid(),
                 Email = email,
-                Username = email, // временно
+                Username = username, // автогенерированное уникальное имя пользователя
                 PasswordHash = passwordHash,
                 CreatedAt = DateTime.UtcNow
             };
 
+            // Сохраняем в базу
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
 
@@ -76,6 +101,7 @@ namespace FastReading.Server.Controllers
                 user.Username
             });
         }
+
 
         // Внутренний helper для хеширования пароля через PBKDF2
         // Формат хранения: base64(salt):base64(hash)
