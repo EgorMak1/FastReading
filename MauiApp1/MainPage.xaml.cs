@@ -38,7 +38,7 @@ namespace MauiApp1
             System.Environment.Exit(0);
         }
 
-        private async void OnAuthButtonClicked(object sender, EventArgs e)
+        private async void OnRegisterButtonClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new MauiApp1.Auth.RegisterPage());
         }

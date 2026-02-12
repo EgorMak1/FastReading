@@ -35,14 +35,14 @@
                 TextColor="White"
                 Clicked="OnExitClicked"/>
 
-            <!-- Кнопка "Авторизация" в верхнем правом углу -->
-            <Button x:Name="AuthButton"
-                Text="Авторизация"
+            <!-- Кнопка "Регистрация" в верхнем правом углу -->
+            <Button x:Name="RegisterButton"
+                Text="Регистрация"
                 HorizontalOptions="End"
                 VerticalOptions="Start"
                 BackgroundColor="Blue"
                 TextColor="White"
-                Clicked="OnAuthButtonClicked"
+                Clicked="OnRegisterButtonClicked"
                 Margin="10"/>
         </VerticalStackLayout>
     </Grid>
