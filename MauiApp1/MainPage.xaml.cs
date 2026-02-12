@@ -2,6 +2,8 @@
 using MauiApp1.Statistics;
 using System.Net.Http;
 
+using MauiApp1.Auth;
+
 namespace MauiApp1
 {
     public partial class MainPage : ContentPage
@@ -38,31 +40,9 @@ namespace MauiApp1
 
         private async void OnAuthButtonClicked(object sender, EventArgs e)
         {
-            // Создаём HttpClient с именем, которое зарегистрировали в MauiProgram
-            var client = _httpClientFactory.CreateClient("FastReadingApi");
-
-            try
-            {
-                // Выполняем GET-запрос к вашему API
-                var response = await client.GetAsync("api/health");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-
-                    // Показываем ответ сервера
-                    await DisplayAlert("Ответ сервера", content, "OK");
-                }
-                else
-                {
-                    await DisplayAlert("Ошибка", $"Код: {response.StatusCode}", "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                // Если сервер недоступен или другая ошибка
-                await DisplayAlert("Исключение", ex.Message, "OK");
-            }
+            await Navigation.PushAsync(new MauiApp1.Auth.RegisterPage());
         }
+
+
     }
 }

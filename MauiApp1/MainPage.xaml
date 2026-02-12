@@ -13,9 +13,9 @@
 
             <!-- Заголовок страницы -->
             <Label Text="Главная страница"
-               FontSize="32"
-               HorizontalOptions="Center"
-               VerticalOptions="Center" />
+                FontSize="32"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
 
             <!-- Кнопка для начала тренировки -->
             <Button Text="Начать тренировку"

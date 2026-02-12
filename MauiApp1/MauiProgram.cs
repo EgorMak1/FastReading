@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MauiApp1.Auth;
+using MauiApp1.Statistics;
+using MauiApp1.Trainings;
+using Microsoft.Extensions.Logging;
 
 namespace MauiApp1
 {
@@ -23,11 +26,19 @@ namespace MauiApp1
             // Регистрируем HttpClient для работы с FastReading.Server (Production VPS)
             builder.Services.AddHttpClient("FastReadingApi", client =>
             {
-                client.BaseAddress = new Uri("http://158.160.172.156:5242/");
+                client.BaseAddress = new Uri("http://158.160.179.55:5242/");
             });
 
-            // Регистрируем MainPage в контейнере зависимостей
-            builder.Services.AddTransient<MainPage>();
+            // Регистрация страниц в DI
+
+            // Главная страница — одна на всё приложение
+            builder.Services.AddSingleton<MainPage>();
+
+            // Остальные страницы создаются при переходе
+            builder.Services.AddTransient<ExerciseSelectionPage>();
+            builder.Services.AddTransient<SelectionStatisticsPage>();
+            builder.Services.AddTransient<RegisterPage>();
+
 
 #if DEBUG
             // Логирование в режиме Debug (только при локальной отладке)
