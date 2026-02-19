@@ -4,6 +4,13 @@ using System.Threading.Tasks;
 
 namespace MauiApp1.Services
 {
+    public sealed class RegisterResponse
+    {
+        public Guid UserId { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
+    }
+
     public class AuthService
     {
         private const string TokenKey = "access_token";
@@ -71,7 +78,7 @@ namespace MauiApp1.Services
             public string AccessToken { get; set; } = string.Empty;
         }
 
-        public async Task<bool> RegisterAsync(string email, string password)
+        public async Task<RegisterResponse?> RegisterAsync(string email, string password)
         {
             var response = await _api.Http.PostAsJsonAsync("api/auth/register", new
             {
@@ -79,7 +86,12 @@ namespace MauiApp1.Services
                 password
             });
 
-            return response.IsSuccessStatusCode;
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            return await response.Content.ReadFromJsonAsync<RegisterResponse>();
         }
     }
 }

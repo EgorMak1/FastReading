@@ -25,15 +25,15 @@ namespace MauiApp1.Auth
 
             try
             {
-                var success = await _auth.RegisterAsync(email, password);
+                var result = await _auth.RegisterAsync(email, password);
 
-                if (!success)
+                if (result == null)
                 {
                     await DisplayAlert("Ошибка", "Пользователь уже существует или сервер недоступен.", "OK");
                     return;
                 }
 
-                await DisplayAlert("Успех", "Регистрация выполнена.", "OK");
+                await DisplayAlert("Успех", $"Регистрация выполнена.\nUsername: {result.Username}", "OK");
                 await Navigation.PopAsync();
             }
             catch (Exception ex)
