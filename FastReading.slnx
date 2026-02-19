@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
   <Project Path="FastReading.Server/FastReading.Server.csproj" Id="f3d90495-7202-4bb1-b62d-80759bbb2c15" />
   <Project Path="MauiApp1/MauiApp1.csproj" />
 </Solution>

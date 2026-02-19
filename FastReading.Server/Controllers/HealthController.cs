@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace FastReading.Server.Controllers
 {
@@ -20,5 +22,14 @@ namespace FastReading.Server.Controllers
                 environment = "Production"
             });
         }
+
+        // GET /api/health/secure
+        [Authorize]
+        [HttpGet("secure")]
+        public IActionResult Secure()
+        {
+            return Ok(new { status = "ok", secure = true });
+        }
+
     }
 }

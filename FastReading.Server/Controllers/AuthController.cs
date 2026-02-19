@@ -4,20 +4,30 @@ using Microsoft.EntityFrameworkCore;
 using FastReading.Server.Contracts.Auth;
 using FastReading.Server.Data;
 using FastReading.Server.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 namespace FastReading.Server.Controllers
 {
     // Контроллер для авторизации/регистрации
     [ApiController]
     [Route("api/[controller]")]
+
     public class AuthController : ControllerBase
     {
         private readonly AppDbContext _db;
+        private readonly IConfiguration _config;
 
-        public AuthController(AppDbContext db)
+
+        public AuthController(AppDbContext db, IConfiguration config)
         {
             _db = db;
+            _config = config;
         }
+
 
         // POST /api/auth/register
         [HttpPost("register")]
@@ -102,6 +112,68 @@ namespace FastReading.Server.Controllers
             });
         }
 
+        // POST /api/auth/login
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email) ||
+                string.IsNullOrWhiteSpace(request.Password))
+            {
+                return BadRequest("Email и пароль обязательны.");
+            }
+
+            var email = request.Email.Trim().ToLowerInvariant();
+
+            var user = await _db.Users
+                .FirstOrDefaultAsync(x => x.Email.ToLower() == email);
+
+            if (user == null)
+            {
+                return Unauthorized("Неверный email или пароль.");
+            }
+
+            var isValid = PasswordHashing.VerifyPassword(request.Password, user.PasswordHash);
+
+            if (!isValid)
+            {
+                return Unauthorized("Неверный email или пароль.");
+            }
+
+            var jwt = _config.GetSection("Jwt");
+            var key = jwt["Key"]!;
+            var issuer = jwt["Issuer"]!;
+            var audience = jwt["Audience"]!;
+            var expiresMinutes = int.Parse(jwt["ExpiresMinutes"]!);
+
+            var claims = new[]
+            {
+    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+    new Claim("username", user.Username)
+};
+
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(expiresMinutes),
+                signingCredentials: creds);
+
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return Ok(new
+            {
+                accessToken,
+                userId = user.Id,
+                user.Email,
+                user.Username
+            });
+
+        }
+
 
         // Внутренний helper для хеширования пароля через PBKDF2
         // Формат хранения: base64(salt):base64(hash)
@@ -123,6 +195,29 @@ namespace FastReading.Server.Controllers
 
                 return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
             }
+
+            public static bool VerifyPassword(string password, string storedHash)
+            {
+                var parts = storedHash.Split(':');
+                if (parts.Length != 2)
+                {
+                    return false;
+                }
+
+                var salt = Convert.FromBase64String(parts[0]);
+                var expectedHash = Convert.FromBase64String(parts[1]);
+
+                using var pbkdf2 = new Rfc2898DeriveBytes(
+                    password: password,
+                    salt: salt,
+                    iterations: 100_000,
+                    hashAlgorithm: HashAlgorithmName.SHA256);
+
+                var actualHash = pbkdf2.GetBytes(32);
+
+                return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
+            }
+
         }
     }
 }
