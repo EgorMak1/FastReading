@@ -12,7 +12,6 @@ namespace MauiApp1.Auth
             _auth = auth;
         }
 
-
         private async void OnRegisterClicked(object sender, EventArgs e)
         {
             var email = EmailEntry.Text?.Trim();
@@ -26,21 +25,15 @@ namespace MauiApp1.Auth
 
             try
             {
-                var token = await _auth.LoginAsync(email, password);
+                var success = await _auth.RegisterAsync(email, password);
 
-                if (string.IsNullOrWhiteSpace(token))
+                if (!success)
                 {
-                    await DisplayAlert("Ошибка", "Неверный email или пароль (или сервер недоступен).", "OK");
+                    await DisplayAlert("Ошибка", "Пользователь уже существует или сервер недоступен.", "OK");
                     return;
                 }
 
-                await DisplayAlert("Успех", "Токен получен и сохранён.", "OK");
-               
-
-                await _auth.ApplyTokenIfExistsAsync();
-                await DisplayAlert("Token applied", "Authorization header установлен", "OK");
-
-
+                await DisplayAlert("Успех", "Регистрация выполнена.", "OK");
                 await Navigation.PopAsync();
             }
             catch (Exception ex)
@@ -48,6 +41,5 @@ namespace MauiApp1.Auth
                 await DisplayAlert("Исключение", ex.Message, "OK");
             }
         }
-
     }
 }

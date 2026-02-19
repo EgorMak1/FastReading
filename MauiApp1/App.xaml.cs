@@ -15,10 +15,12 @@
         protected override Window CreateWindow(IActivationState? activationState)
         {
             // Получаем MainPage из DI
-            var mainPage = _services.GetRequiredService<MainPage>();
+            // Стартуем с LoginPage
+            var loginPage = _services.GetRequiredService<Auth.LoginPage>();
 
             // Включаем навигацию, чтобы работал PushAsync
-            return new Window(new NavigationPage(mainPage));
+            return new Window(new NavigationPage(loginPage));
+
         }
     }
 }

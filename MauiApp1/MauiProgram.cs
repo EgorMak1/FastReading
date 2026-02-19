@@ -47,6 +47,9 @@ namespace MauiApp1
 
             builder.Services.AddSingleton<ApiClient>();
             builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<RegisterPage>();
+
 
             return builder.Build();
 

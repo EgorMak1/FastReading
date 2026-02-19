@@ -71,5 +71,15 @@ namespace MauiApp1.Services
             public string AccessToken { get; set; } = string.Empty;
         }
 
+        public async Task<bool> RegisterAsync(string email, string password)
+        {
+            var response = await _api.Http.PostAsJsonAsync("api/auth/register", new
+            {
+                email,
+                password
+            });
+
+            return response.IsSuccessStatusCode;
+        }
     }
 }
