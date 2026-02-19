@@ -40,7 +40,9 @@ namespace MauiApp1
 
         private async void OnRegisterButtonClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new MauiApp1.Auth.RegisterPage());
+            var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<RegisterPage>();
+            await Navigation.PushAsync(page);
+
         }
 
 

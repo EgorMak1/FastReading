@@ -1,7 +1,10 @@
 ﻿using MauiApp1.Auth;
+using MauiApp1.Services;
 using MauiApp1.Statistics;
 using MauiApp1.Trainings;
 using Microsoft.Extensions.Logging;
+
+
 
 namespace MauiApp1
 {
@@ -23,11 +26,7 @@ namespace MauiApp1
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            // Регистрируем HttpClient для работы с FastReading.Server (Production VPS)
-            builder.Services.AddHttpClient("FastReadingApi", client =>
-            {
-                client.BaseAddress = new Uri("http://158.160.179.55:5242/");
-            });
+            
 
             // Регистрация страниц в DI
 
@@ -41,12 +40,16 @@ namespace MauiApp1
 
 
 #if DEBUG
-            // Логирование в режиме Debug (только при локальной отладке)
             builder.Logging.AddDebug();
 #endif
 
-            // Сборка приложения
+            builder.Services.AddHttpClient();
+
+            builder.Services.AddSingleton<ApiClient>();
+            builder.Services.AddSingleton<AuthService>();
+
             return builder.Build();
+
         }
     }
 }
