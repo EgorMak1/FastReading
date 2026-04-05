@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
+using MauiApp1.Services;
 using System.Diagnostics;
-using System.Linq;
-using Microsoft.Maui.Controls;
 
-namespace MauiApp1.Trainings   
+namespace MauiApp1.Trainings
 {
     public partial class ShulteTablePage : ContentPage
     {
@@ -13,20 +10,20 @@ namespace MauiApp1.Trainings
         private readonly List<Button> _buttons = new();
         private int _errors = 0;
         private bool _timerRunning;
+        private readonly StatisticsService _statisticsService;
 
-        public ShulteTablePage()
+        public ShulteTablePage(StatisticsService statisticsService)
         {
             InitializeComponent();
+            _statisticsService = statisticsService;
             InitializeTable();
         }
 
         private void InitializeTable()
         {
             const int gridSize = 5;
-
             _currentNumber = 1;
             _errors = 0;
-
             ShulteTableGrid.RowDefinitions.Clear();
             ShulteTableGrid.ColumnDefinitions.Clear();
             ShulteTableGrid.Children.Clear();
@@ -53,23 +50,19 @@ namespace MauiApp1.Trainings
                         FontSize = 20,
                         BackgroundColor = Color.FromArgb("#D3D3D3")
                     };
-
                     button.Clicked += OnButtonClicked;
-
                     _buttons.Add(button);
                     ShulteTableGrid.Add(button, col, row);
                 }
             }
 
             NextNumberLabel.Text = $"Найди: {_currentNumber}";
-
             _startTime = DateTime.Now;
             _timerRunning = true;
 
             Dispatcher.StartTimer(TimeSpan.FromSeconds(1), () =>
             {
                 if (!_timerRunning) return false;
-
                 TimerLabel.Text = $"Время: {DateTime.Now - _startTime:hh\\:mm\\:ss}";
                 return true;
             });
@@ -87,7 +80,6 @@ namespace MauiApp1.Trainings
                 button.BackgroundColor = Colors.Green;
                 _currentNumber++;
                 NextNumberLabel.Text = $"Найди: {_currentNumber}";
-
                 Debug.WriteLine($"Текущее число: {_currentNumber}");
 
                 if (_currentNumber > 25)
@@ -109,8 +101,11 @@ namespace MauiApp1.Trainings
         private async Task FinishTrainingAsync()
         {
             _timerRunning = false;
-
             var timeSpent = DateTime.Now - _startTime;
+            var durationSeconds = (int)timeSpent.TotalSeconds;
+
+            // Сохраняем результат на сервер
+            await _statisticsService.SaveResultAsync("ShulteTable", durationSeconds);
 
             await DisplayAlert(
                 "Тренировка завершена",
@@ -119,6 +114,7 @@ namespace MauiApp1.Trainings
 
             await Navigation.PopAsync();
         }
+
         private async void OnFinishTrainingClicked(object sender, EventArgs e)
         {
             await FinishTrainingAsync();
