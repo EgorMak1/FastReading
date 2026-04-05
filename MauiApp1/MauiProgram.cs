@@ -1,10 +1,8 @@
-﻿using LiveChartsCore.SkiaSharpView.Maui;
-using MauiApp1.Auth;
+﻿using MauiApp1.Auth;
 using MauiApp1.Services;
 using MauiApp1.Statistics;
 using MauiApp1.Trainings;
 using Microsoft.Extensions.Logging;
-using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace MauiApp1
 {
@@ -15,8 +13,6 @@ namespace MauiApp1
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-                .UseSkiaSharp()
-                
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
