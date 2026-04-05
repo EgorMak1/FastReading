@@ -3,6 +3,7 @@ using MauiApp1.Services;
 using MauiApp1.Statistics;
 using MauiApp1.Trainings;
 using Microsoft.Extensions.Logging;
+using OxyPlot.Maui.Skia;
 
 
 
@@ -18,7 +19,8 @@ namespace MauiApp1
             builder
                 // Указываем главный класс приложения
                 .UseMauiApp<App>()
-
+                //Подключаем оксиплот
+                .UseOxyPlotSkia()
                 // Подключаем шрифты
                 .ConfigureFonts(fonts =>
                 {
