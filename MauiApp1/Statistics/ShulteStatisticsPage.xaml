@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:oxy="clr-namespace:OxyPlot.Maui.Skia;assembly=OxyPlot.Maui.Skia"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
              x:Class="MauiApp1.Statistics.ShulteStatisticsPage"
              Title="Статистика Таблицы Шульте">
-
     <VerticalStackLayout Padding="20" Spacing="15">
 
         <Label Text="Моя статистика"
@@ -16,22 +15,18 @@
                HorizontalOptions="Center"
                TextColor="Gray" />
 
-        <!-- График -->
-        <oxy:PlotView x:Name="PlotView"
-                      HeightRequest="300"
-                      HorizontalOptions="Fill" />
+        <lvc:CartesianChart x:Name="Chart"
+                            HeightRequest="300"
+                            HorizontalOptions="Fill" />
 
-        <!-- Лучший результат -->
         <Label x:Name="BestResultLabel"
                FontSize="16"
                HorizontalOptions="Center" />
 
-        <!-- Среднее время -->
         <Label x:Name="AverageResultLabel"
                FontSize="16"
                HorizontalOptions="Center" />
 
-        <!-- Количество тренировок -->
         <Label x:Name="TotalTrainingsLabel"
                FontSize="16"
                HorizontalOptions="Center" />

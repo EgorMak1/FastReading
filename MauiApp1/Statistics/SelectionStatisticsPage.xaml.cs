@@ -14,7 +14,7 @@ public partial class SelectionStatisticsPage : ContentPage
 
     private async void OnShulteStatisticsClicked(object sender, EventArgs e)
     {
-        var page = new ShulteStatisticsPage(_statisticsService);
+        var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<ShulteStatisticsPage>();
         await Navigation.PushAsync(page);
     }
 }

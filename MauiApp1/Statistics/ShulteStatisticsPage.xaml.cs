@@ -1,7 +1,9 @@
+using LiveChartsCore;
+using LiveChartsCore.Defaults;
+using LiveChartsCore.SkiaSharpView;
+using Axis = LiveChartsCore.SkiaSharpView.Axis;
 using MauiApp1.Services;
-using OxyPlot;
-using OxyPlot.Axes;
-using OxyPlot.Series;
+
 
 namespace MauiApp1.Statistics;
 
@@ -23,10 +25,8 @@ public partial class ShulteStatisticsPage : ContentPage
 
     private async Task LoadStatisticsAsync()
     {
-        // Получаем данные с сервера
         var results = await _statisticsService.GetResultsAsync();
 
-        // Фильтруем только результаты Таблицы Шульте
         var shulteResults = results
             .Where(r => r.ExerciseType == "ShulteTable")
             .OrderBy(r => r.CompletedAt)
@@ -38,53 +38,41 @@ public partial class ShulteStatisticsPage : ContentPage
             return;
         }
 
-        // Считаем статистику
         var best = shulteResults.Min(r => r.DurationSeconds);
         var average = shulteResults.Average(r => r.DurationSeconds);
         var total = shulteResults.Count;
 
-        BestResultLabel.Text = $" Лучший результат: {best} сек";
-        AverageResultLabel.Text = $" Среднее время: {average:F1} сек";
-        TotalTrainingsLabel.Text = $" Всего тренировок: {total}";
+        BestResultLabel.Text = $"Лучший результат: {best} сек";
+        AverageResultLabel.Text = $"Среднее время: {average:F1} сек";
+        TotalTrainingsLabel.Text = $"Всего тренировок: {total}";
 
-        // Строим график
-        var model = new PlotModel { Title = "Прогресс" };
+        var values = shulteResults
+            .Select(r => new DateTimePoint(r.CompletedAt.ToLocalTime(), r.DurationSeconds))
+            .ToArray();
+        var cartesianChart = (LiveChartsCore.SkiaSharpView.Maui.CartesianChart)Chart;
 
-        // Ось X — дата
-        model.Axes.Add(new DateTimeAxis
+        cartesianChart.Series = new ISeries[]
         {
-            Position = AxisPosition.Bottom,
-            StringFormat = "dd.MM",
-            Title = "Дата",
-            IntervalType = DateTimeIntervalType.Days
-        });
-
-        // Ось Y — время в секундах
-        model.Axes.Add(new LinearAxis
+        new LineSeries<DateTimePoint>
         {
-            Position = AxisPosition.Left,
-            Title = "Секунды",
-            Minimum = 0
-        });
-
-        // Линия прогресса
-        var series = new LineSeries
-        {
-            Title = "Время",
-            Color = OxyColors.DodgerBlue,
-            MarkerType = MarkerType.Circle,
-            MarkerSize = 5,
-            MarkerFill = OxyColors.DodgerBlue
+            Values = values,
+            Name = "Время (сек)"
+        }
         };
 
-        foreach (var result in shulteResults)
+        cartesianChart.XAxes = new[]
         {
-            series.Points.Add(new DataPoint(
-                DateTimeAxis.ToDouble(result.CompletedAt.ToLocalTime()),
-                result.DurationSeconds));
+        new Axis
+        {
+            Labeler = value => new DateTime((long)value).ToString("dd.MM"),
+            Name = "Дата"
         }
+    };
 
-        model.Series.Add(series);
-        PlotView.Model = model;
+        cartesianChart.YAxes = new[]
+        {
+        new Axis { Name = "Секунды", MinLimit = 0 }
+    };
     }
 }
+    
