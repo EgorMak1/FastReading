@@ -38,7 +38,9 @@ namespace MauiApp1
             // Остальные страницы создаются при переходе
             builder.Services.AddTransient<ExerciseSelectionPage>();
             builder.Services.AddTransient<SelectionStatisticsPage>();
+            builder.Services.AddTransient<ShulteStatisticsPage>();
             builder.Services.AddTransient<RegisterPage>();
+
 
 
 #if DEBUG
