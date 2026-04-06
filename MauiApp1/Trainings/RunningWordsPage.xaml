@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Trainings.RunningWordsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Бегущие слова">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="20"
+            Spacing="20">
+
+            <Label
+                FontSize="28"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"
+                Text="Бегущие слова" />
+
+            <Frame
+                Padding="20"
+                BorderColor="LightGray"
+                CornerRadius="12">
+
+                <VerticalStackLayout Spacing="12">
+
+                    <Label
+                        FontSize="16"
+                        Text="Здесь будет отображаться текущее слово"
+                        HorizontalOptions="Center" />
+
+                    <Label
+                        FontSize="14"
+                        Text="После показа слов пользователь должен выбрать последнее слово"
+                        HorizontalOptions="Center"
+                        HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label
+                FontSize="18"
+                FontAttributes="Bold"
+                Text="Варианты ответа:" />
+
+            <Button Text="Вариант 1" />
+            <Button Text="Вариант 2" />
+            <Button Text="Вариант 3" />
+            <Button Text="Вариант 4" />
+
+            <Button
+                Margin="0,20,0,0"
+                Text="Начать упражнение" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
