@@ -19,6 +19,8 @@ public partial class RunningWordsPage : ContentPage
     {
         InitializeComponent();
         InitializeExerciseData();
+        UpdateAnswerButtons();
+        SetInitialState();
     }
 
     private void InitializeExerciseData()
@@ -40,5 +42,47 @@ public partial class RunningWordsPage : ContentPage
         };
 
         _correctAnswer = "река";
+    }
+
+    private void SetInitialState()
+    {
+        CurrentWordLabel.Text = "Нажмите кнопку, чтобы начать";
+        StatusLabel.Text = "После показа слов нужно выбрать последнее слово";
+
+        SetAnswerButtonsEnabled(false);
+    }
+
+    private void UpdateAnswerButtons()
+    {
+        if (_answerOptions.Count >= 4)
+        {
+            AnswerButton1.Text = _answerOptions[0];
+            AnswerButton2.Text = _answerOptions[1];
+            AnswerButton3.Text = _answerOptions[2];
+            AnswerButton4.Text = _answerOptions[3];
+        }
+    }
+
+    private void SetAnswerButtonsEnabled(bool isEnabled)
+    {
+        AnswerButton1.IsEnabled = isEnabled;
+        AnswerButton2.IsEnabled = isEnabled;
+        AnswerButton3.IsEnabled = isEnabled;
+        AnswerButton4.IsEnabled = isEnabled;
+    }
+
+    private void OnStartClicked(object sender, EventArgs e)
+    {
+        CurrentWordLabel.Text = "Упражнение скоро будет запускаться";
+        StatusLabel.Text = "Логика показа слов будет добавлена на следующем шаге";
+    }
+
+    private void OnAnswerClicked(object sender, EventArgs e)
+    {
+        if (sender is Button button)
+        {
+            _selectedAnswer = button.Text;
+            StatusLabel.Text = $"Вы выбрали: {_selectedAnswer}";
+        }
     }
 }

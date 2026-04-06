@@ -24,15 +24,18 @@
                 <VerticalStackLayout Spacing="12">
 
                     <Label
-                        FontSize="16"
-                        Text="Здесь будет отображаться текущее слово"
-                        HorizontalOptions="Center" />
+                        x:Name="CurrentWordLabel"
+                        FontSize="24"
+                        FontAttributes="Bold"
+                        HorizontalOptions="Center"
+                        Text="Нажмите кнопку, чтобы начать" />
 
                     <Label
+                        x:Name="StatusLabel"
                         FontSize="14"
-                        Text="После показа слов пользователь должен выбрать последнее слово"
                         HorizontalOptions="Center"
-                        HorizontalTextAlignment="Center" />
+                        HorizontalTextAlignment="Center"
+                        Text="После показа слов нужно выбрать последнее слово" />
                 </VerticalStackLayout>
             </Frame>
 
@@ -41,14 +44,16 @@
                 FontAttributes="Bold"
                 Text="Варианты ответа:" />
 
-            <Button Text="Вариант 1" />
-            <Button Text="Вариант 2" />
-            <Button Text="Вариант 3" />
-            <Button Text="Вариант 4" />
+            <Button x:Name="AnswerButton1" Text="Вариант 1" Clicked="OnAnswerClicked" />
+            <Button x:Name="AnswerButton2" Text="Вариант 2" Clicked="OnAnswerClicked" />
+            <Button x:Name="AnswerButton3" Text="Вариант 3" Clicked="OnAnswerClicked" />
+            <Button x:Name="AnswerButton4" Text="Вариант 4" Clicked="OnAnswerClicked" />
 
             <Button
+                x:Name="StartButton"
                 Margin="0,20,0,0"
-                Text="Начать упражнение" />
+                Text="Начать упражнение"
+                Clicked="OnStartClicked" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
