@@ -71,10 +71,39 @@ public partial class RunningWordsPage : ContentPage
         AnswerButton4.IsEnabled = isEnabled;
     }
 
-    private void OnStartClicked(object sender, EventArgs e)
+    private async Task ShowWordsSequentiallyAsync()
     {
-        CurrentWordLabel.Text = "”пражнение скоро будет запускатьс€";
-        StatusLabel.Text = "Ћогика показа слов будет добавлена на следующем шаге";
+        foreach (var word in _words)
+        {
+            CurrentWordLabel.Text = word;
+            await Task.Delay(_wordDisplayMilliseconds);
+        }
+
+        _correctAnswer = _words.Last();
+
+        _isShowingWords = false;
+        _isAnswerSelection = true;
+
+        CurrentWordLabel.Text = "?";
+        StatusLabel.Text = "¬ыберите последнее показанное слово";
+
+        SetAnswerButtonsEnabled(true);
+        StartButton.IsEnabled = false;
+    }
+
+    private async void OnStartClicked(object sender, EventArgs e)
+    {
+        _isShowingWords = true;
+        _isAnswerSelection = false;
+        _isExerciseFinished = false;
+        _selectedAnswer = string.Empty;
+
+        StartButton.IsEnabled = false;
+        SetAnswerButtonsEnabled(false);
+
+        StatusLabel.Text = "—мотрите на слова и запоминайте последнее";
+
+        await ShowWordsSequentiallyAsync();
     }
 
     private void OnAnswerClicked(object sender, EventArgs e)
