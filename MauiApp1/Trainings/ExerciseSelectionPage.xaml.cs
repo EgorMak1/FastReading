@@ -20,6 +20,6 @@ public partial class ExerciseSelectionPage : ContentPage
 
     private async void OnRunningWordsClicked(object sender, EventArgs e)
     {
-        // await Navigation.PushAsync(new RunningWordsPage());
+        await Navigation.PushAsync(new RunningWordsPage());
     }
 }
