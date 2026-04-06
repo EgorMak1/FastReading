@@ -17,4 +17,10 @@ public partial class SelectionStatisticsPage : ContentPage
         var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<ShulteStatisticsPage>();
         await Navigation.PushAsync(page);
     }
+
+    private async void OnRunningWordsStatisticsClicked(object sender, EventArgs e)
+    {
+        var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<RunningWordsStatisticsPage>();
+        await Navigation.PushAsync(page);
+    }
 }

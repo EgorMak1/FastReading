@@ -9,7 +9,7 @@ namespace FastReading.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // все endpoints требуют JWT токен
+    [Authorize]
     public class StatisticsController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -19,12 +19,9 @@ namespace FastReading.Server.Controllers
             _db = db;
         }
 
-        // POST /api/statistics
-        // Сохраняем результат тренировки
         [HttpPost]
         public async Task<IActionResult> SaveResult([FromBody] SaveResultRequest request)
         {
-            // Получаем ID пользователя из JWT токена
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
                            ?? User.FindFirst("sub");
 
@@ -50,8 +47,6 @@ namespace FastReading.Server.Controllers
             return Ok(new { result.Id, result.CompletedAt });
         }
 
-        // GET /api/statistics
-        // Получаем статистику текущего пользователя
         [HttpGet]
         public async Task<IActionResult> GetResults()
         {
@@ -79,9 +74,72 @@ namespace FastReading.Server.Controllers
 
             return Ok(results);
         }
+
+        [HttpPost("running-words")]
+        public async Task<IActionResult> SaveRunningWordsResult([FromBody] RunningWordsResult request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
+                           ?? User.FindFirst("sub");
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var result = new RunningWordsResult
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                TotalAttempts = request.TotalAttempts,
+                CorrectAnswers = request.CorrectAnswers,
+                WrongAnswers = request.WrongAnswers,
+                AccuracyPercent = request.AccuracyPercent,
+                FinalLevel = request.FinalLevel,
+                FinalSpeedMilliseconds = request.FinalSpeedMilliseconds,
+                CompletedAt = DateTime.UtcNow
+            };
+
+            _db.RunningWordsResults.Add(result);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { result.Id, result.CompletedAt });
+        }
+
+        [HttpGet("running-words")]
+        public async Task<IActionResult> GetRunningWordsResults()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
+                           ?? User.FindFirst("sub");
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var results = await _db.RunningWordsResults
+                .Where(x => x.UserId == userId)
+                .OrderBy(x => x.CompletedAt)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.TotalAttempts,
+                    x.CorrectAnswers,
+                    x.WrongAnswers,
+                    x.AccuracyPercent,
+                    x.FinalLevel,
+                    x.FinalSpeedMilliseconds,
+                    x.CompletedAt
+                })
+                .ToListAsync();
+
+            return Ok(results);
+        }
     }
 
-    // Модель запроса для сохранения результата
     public class SaveResultRequest
     {
         public string ExerciseType { get; set; } = string.Empty;

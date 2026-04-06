@@ -14,6 +14,10 @@
                 FontSize="18"
                 HorizontalOptions="Fill"
                 Clicked="OnShulteStatisticsClicked" />
+        <Button Text="Бегущие слова"
+                FontSize="18"
+                HorizontalOptions="Fill"
+                Clicked="OnRunningWordsStatisticsClicked" />
 
     </VerticalStackLayout>
 </ContentPage>
