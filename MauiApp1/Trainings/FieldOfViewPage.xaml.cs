@@ -106,7 +106,7 @@ public partial class FieldOfViewPage : ContentPage
                         HorizontalOptions = LayoutOptions.Center,
                         HorizontalTextAlignment = TextAlignment.Center,
                         Text = GetRandomLetter().ToString(),
-                        TextColor = Color.FromArgb("#B8C0CC"),
+                        TextColor = Colors.Black,
                         VerticalOptions = LayoutOptions.Center,
                         VerticalTextAlignment = TextAlignment.Center
                     };
