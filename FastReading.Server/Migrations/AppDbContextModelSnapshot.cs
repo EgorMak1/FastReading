@@ -22,6 +22,49 @@ namespace FastReading.Server.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("FastReading.Server.Models.FieldOfViewResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("AccuracyPercent")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CorrectRounds")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DetectedMismatchCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FalseAlarmCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FinalIntervalMilliseconds")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FinalLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MissedMismatchCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalRounds")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FieldOfViewResults");
+                });
+
             modelBuilder.Entity("FastReading.Server.Models.RunningWordsResult", b =>
                 {
                     b.Property<Guid>("Id")
@@ -118,6 +161,15 @@ namespace FastReading.Server.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("FastReading.Server.Models.FieldOfViewResult", b =>
+                {
+                    b.HasOne("FastReading.Server.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("FastReading.Server.Models.RunningWordsResult", b =>

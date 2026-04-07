@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Json;
+using System.Net.Http.Json;
 
 namespace MauiApp1.Services
 {
@@ -13,21 +13,19 @@ namespace MauiApp1.Services
             _auth = auth;
         }
 
-        // Сохраняем результат тренировки Шульте
         public async Task<bool> SaveResultAsync(string exerciseType, int durationSeconds)
         {
             await _auth.ApplyTokenIfExistsAsync();
 
-            var response = await _api.Http.PostAsJsonAsync("api/statistics", new
+            var response = await _api.Http.PostAsJsonAsync("api/statistics", new SaveResultRequest
             {
-                exerciseType,
-                durationSeconds
+                ExerciseType = exerciseType,
+                DurationSeconds = durationSeconds
             });
 
             return response.IsSuccessStatusCode;
         }
 
-        // Получаем список результатов Шульте
         public async Task<List<TrainingResultDto>> GetResultsAsync()
         {
             await _auth.ApplyTokenIfExistsAsync();
@@ -44,8 +42,7 @@ namespace MauiApp1.Services
             return results ?? new List<TrainingResultDto>();
         }
 
-        // Сохраняем результат "Бегущих слов"
-        public async Task<bool> SaveRunningWordsResultAsync(object result)
+        public async Task<bool> SaveRunningWordsResultAsync(RunningWordsResultRequest result)
         {
             await _auth.ApplyTokenIfExistsAsync();
 
@@ -54,7 +51,6 @@ namespace MauiApp1.Services
             return response.IsSuccessStatusCode;
         }
 
-        // Получаем результаты "Бегущих слов"
         public async Task<List<RunningWordsResultDto>> GetRunningWordsResultsAsync()
         {
             await _auth.ApplyTokenIfExistsAsync();
@@ -70,9 +66,39 @@ namespace MauiApp1.Services
 
             return results ?? new List<RunningWordsResultDto>();
         }
+
+        public async Task<bool> SaveFieldOfViewResultAsync(FieldOfViewResultRequest result)
+        {
+            await _auth.ApplyTokenIfExistsAsync();
+
+            var response = await _api.Http.PostAsJsonAsync("api/statistics/field-of-view", result);
+
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<List<FieldOfViewResultDto>> GetFieldOfViewResultsAsync()
+        {
+            await _auth.ApplyTokenIfExistsAsync();
+
+            var response = await _api.Http.GetAsync("api/statistics/field-of-view");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<FieldOfViewResultDto>();
+            }
+
+            var results = await response.Content.ReadFromJsonAsync<List<FieldOfViewResultDto>>();
+
+            return results ?? new List<FieldOfViewResultDto>();
+        }
     }
 
-    // DTO для статистики Шульте
+    public class SaveResultRequest
+    {
+        public string ExerciseType { get; set; } = string.Empty;
+        public int DurationSeconds { get; set; }
+    }
+
     public class TrainingResultDto
     {
         public Guid Id { get; set; }
@@ -81,7 +107,16 @@ namespace MauiApp1.Services
         public DateTime CompletedAt { get; set; }
     }
 
-    // DTO для статистики "Бегущих слов"
+    public class RunningWordsResultRequest
+    {
+        public int TotalAttempts { get; set; }
+        public int CorrectAnswers { get; set; }
+        public int WrongAnswers { get; set; }
+        public double AccuracyPercent { get; set; }
+        public int FinalLevel { get; set; }
+        public int FinalSpeedMilliseconds { get; set; }
+    }
+
     public class RunningWordsResultDto
     {
         public Guid Id { get; set; }
@@ -91,6 +126,32 @@ namespace MauiApp1.Services
         public double AccuracyPercent { get; set; }
         public int FinalLevel { get; set; }
         public int FinalSpeedMilliseconds { get; set; }
+        public DateTime CompletedAt { get; set; }
+    }
+
+    public class FieldOfViewResultRequest
+    {
+        public int TotalRounds { get; set; }
+        public int CorrectRounds { get; set; }
+        public int DetectedMismatchCount { get; set; }
+        public int MissedMismatchCount { get; set; }
+        public int FalseAlarmCount { get; set; }
+        public double AccuracyPercent { get; set; }
+        public int FinalLevel { get; set; }
+        public int FinalIntervalMilliseconds { get; set; }
+    }
+
+    public class FieldOfViewResultDto
+    {
+        public Guid Id { get; set; }
+        public int TotalRounds { get; set; }
+        public int CorrectRounds { get; set; }
+        public int DetectedMismatchCount { get; set; }
+        public int MissedMismatchCount { get; set; }
+        public int FalseAlarmCount { get; set; }
+        public double AccuracyPercent { get; set; }
+        public int FinalLevel { get; set; }
+        public int FinalIntervalMilliseconds { get; set; }
         public DateTime CompletedAt { get; set; }
     }
 }

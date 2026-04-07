@@ -1,4 +1,4 @@
-﻿using FastReading.Server.Models;
+using FastReading.Server.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FastReading.Server.Data
@@ -11,12 +11,9 @@ namespace FastReading.Server.Data
         }
 
         public DbSet<User> Users { get; set; }
-
-        // Таблица для статистики таблицы Шульте
         public DbSet<TrainingResult> TrainingResults { get; set; }
-
-        // Таблица для статистики упражнения "Бегущие слова"
         public DbSet<RunningWordsResult> RunningWordsResults { get; set; }
+        public DbSet<FieldOfViewResult> FieldOfViewResults { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -83,6 +80,43 @@ namespace FastReading.Server.Data
                       .IsRequired();
 
                 entity.Property(x => x.FinalSpeedMilliseconds)
+                      .IsRequired();
+
+                entity.Property(x => x.CompletedAt)
+                      .IsRequired();
+
+                entity.HasOne<User>()
+                      .WithMany()
+                      .HasForeignKey(x => x.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<FieldOfViewResult>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.TotalRounds)
+                      .IsRequired();
+
+                entity.Property(x => x.CorrectRounds)
+                      .IsRequired();
+
+                entity.Property(x => x.DetectedMismatchCount)
+                      .IsRequired();
+
+                entity.Property(x => x.MissedMismatchCount)
+                      .IsRequired();
+
+                entity.Property(x => x.FalseAlarmCount)
+                      .IsRequired();
+
+                entity.Property(x => x.AccuracyPercent)
+                      .IsRequired();
+
+                entity.Property(x => x.FinalLevel)
+                      .IsRequired();
+
+                entity.Property(x => x.FinalIntervalMilliseconds)
                       .IsRequired();
 
                 entity.Property(x => x.CompletedAt)

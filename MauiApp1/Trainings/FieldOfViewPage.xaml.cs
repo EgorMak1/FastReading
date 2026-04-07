@@ -1,3 +1,4 @@
+﻿using MauiApp1.Services;
 using Microsoft.Maui.Controls.Shapes;
 
 namespace MauiApp1.Trainings;
@@ -11,6 +12,7 @@ public partial class FieldOfViewPage : ContentPage
     private readonly Random _random = new();
     private readonly int[] _speedLevels = { 1800, 1500, 1200, 900, 700 };
     private readonly char[] _letters = "АБВГДЕЖЗИКЛМНОПРСТУФХ".ToCharArray();
+    private readonly StatisticsService _statisticsService;
 
     private CancellationTokenSource? _exerciseCancellation;
 
@@ -26,10 +28,12 @@ public partial class FieldOfViewPage : ContentPage
     private bool _isRunning;
     private bool _currentRoundHasMismatch;
     private bool _currentRoundScored;
+    private bool _statisticsSaved;
 
-    public FieldOfViewPage()
+    public FieldOfViewPage(StatisticsService statisticsService)
     {
         InitializeComponent();
+        _statisticsService = statisticsService;
         BuildFieldGrid();
         ResetBoard();
         UpdateStatsText();
@@ -77,8 +81,7 @@ public partial class FieldOfViewPage : ContentPage
                         VerticalTextAlignment = TextAlignment.Center
                     };
                 }
-
-                if (IsEdgeCenter(row, col))
+                else if (IsEdgeCenter(row, col))
                 {
                     var label = new Label
                     {
@@ -93,6 +96,20 @@ public partial class FieldOfViewPage : ContentPage
 
                     border.Content = label;
                     _edgeLabels[GetEdgeIndex(row, col)] = label;
+                }
+                else
+                {
+                    border.Content = new Label
+                    {
+                        FontAttributes = FontAttributes.Bold,
+                        FontSize = 24,
+                        HorizontalOptions = LayoutOptions.Center,
+                        HorizontalTextAlignment = TextAlignment.Center,
+                        Text = GetRandomLetter().ToString(),
+                        TextColor = Color.FromArgb("#B8C0CC"),
+                        VerticalOptions = LayoutOptions.Center,
+                        VerticalTextAlignment = TextAlignment.Center
+                    };
                 }
 
                 FieldGrid.Add(border, col, row);
@@ -114,13 +131,19 @@ public partial class FieldOfViewPage : ContentPage
         int middle = GridSize / 2;
 
         if (row == 0 && col == middle)
+        {
             return 0;
+        }
 
         if (row == middle && col == GridSize - 1)
+        {
             return 1;
+        }
 
         if (row == GridSize - 1 && col == middle)
+        {
             return 2;
+        }
 
         return 3;
     }
@@ -148,6 +171,7 @@ public partial class FieldOfViewPage : ContentPage
         _consecutiveCorrectRounds = 0;
         _currentRoundHasMismatch = false;
         _currentRoundScored = false;
+        _statisticsSaved = false;
 
         UpdateSpeedByLevel();
         ResetBoard();
@@ -183,7 +207,7 @@ public partial class FieldOfViewPage : ContentPage
         _roundsCount++;
         _currentRoundScored = false;
 
-        char baseLetter = _letters[_random.Next(_letters.Length)];
+        char baseLetter = GetRandomLetter();
         bool hasMismatch = _random.NextDouble() < 0.3;
         int mismatchIndex = hasMismatch ? _random.Next(_edgeLabels.Length) : -1;
 
@@ -191,13 +215,7 @@ public partial class FieldOfViewPage : ContentPage
 
         for (int i = 0; i < _edgeLabels.Length; i++)
         {
-            char currentLetter = baseLetter;
-
-            if (i == mismatchIndex)
-            {
-                currentLetter = GetDifferentLetter(baseLetter);
-            }
-
+            char currentLetter = i == mismatchIndex ? GetDifferentLetter(baseLetter) : baseLetter;
             _edgeLabels[i].Text = currentLetter.ToString();
             _edgeLabels[i].TextColor = Colors.Black;
         }
@@ -212,16 +230,23 @@ public partial class FieldOfViewPage : ContentPage
 
         do
         {
-            newLetter = _letters[_random.Next(_letters.Length)];
+            newLetter = GetRandomLetter();
         } while (newLetter == sourceLetter);
 
         return newLetter;
     }
 
+    private char GetRandomLetter()
+    {
+        return _letters[_random.Next(_letters.Length)];
+    }
+
     private void FinalizeCurrentRound()
     {
         if (_currentRoundScored)
+        {
             return;
+        }
 
         if (_currentRoundHasMismatch)
         {
@@ -276,7 +301,9 @@ public partial class FieldOfViewPage : ContentPage
     private async void OnStartClicked(object sender, EventArgs e)
     {
         if (_isRunning)
+        {
             return;
+        }
 
         ResetSession();
 
@@ -301,15 +328,17 @@ public partial class FieldOfViewPage : ContentPage
         }
     }
 
-    private void OnStopClicked(object sender, EventArgs e)
+    private async void OnStopClicked(object sender, EventArgs e)
     {
-        StopExercise("Тренировка остановлена.");
+        await StopAndSaveAsync("Тренировка остановлена.");
     }
 
     private void OnErrorClicked(object sender, EventArgs e)
     {
         if (!_isRunning || _currentRoundScored)
+        {
             return;
+        }
 
         if (_currentRoundHasMismatch)
         {
@@ -333,16 +362,40 @@ public partial class FieldOfViewPage : ContentPage
         }
     }
 
-    private void StopExercise(string message)
+    private async Task SaveStatisticsAsync()
     {
-        _exerciseCancellation?.Cancel();
-        StatusLabel.Text = message;
-        ResetBoard();
+        if (_statisticsSaved || _roundsCount == 0)
+        {
+            return;
+        }
+
+        var request = new FieldOfViewResultRequest
+        {
+            TotalRounds = _roundsCount,
+            CorrectRounds = _correctRoundsCount,
+            DetectedMismatchCount = _detectedMismatchCount,
+            MissedMismatchCount = _missedMismatchCount,
+            FalseAlarmCount = _falseAlarmCount,
+            AccuracyPercent = (double)_correctRoundsCount / _roundsCount * 100,
+            FinalLevel = _currentLevel,
+            FinalIntervalMilliseconds = _currentIntervalMilliseconds
+        };
+
+        _statisticsSaved = await _statisticsService.SaveFieldOfViewResultAsync(request);
     }
 
-    protected override void OnDisappearing()
+    private async Task StopAndSaveAsync(string message)
     {
-        StopExercise("Тренировка остановлена.");
+        _exerciseCancellation?.Cancel();
+        _isRunning = false;
+        StatusLabel.Text = message;
+        ResetBoard();
+        await SaveStatisticsAsync();
+    }
+
+    protected override async void OnDisappearing()
+    {
+        await StopAndSaveAsync("Тренировка остановлена.");
         base.OnDisappearing();
     }
 }

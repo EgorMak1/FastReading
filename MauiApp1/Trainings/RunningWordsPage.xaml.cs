@@ -1,28 +1,29 @@
-using MauiApp1.Services;
+п»їusing MauiApp1.Services;
+
 namespace MauiApp1.Trainings;
 
 public partial class RunningWordsPage : ContentPage
 {
-    private List<string> _words = new();
+    private readonly List<string> _words = new();
+    private readonly List<string> _distractorWords = new();
+    private readonly List<int> _speedLevels = new() { 700, 600, 500, 400, 300 };
+    private readonly StatisticsService _statisticsService;
+
     private List<string> _answerOptions = new();
-    private List<string> _distractorWords = new();
+    private CancellationTokenSource? _displayCancellation;
 
     private string _correctAnswer = string.Empty;
     private string _selectedAnswer = string.Empty;
 
-    private readonly List<int> _speedLevels = new() { 700, 600, 500, 400, 300 };
     private int _currentSpeedLevel = 1;
     private int _wordDisplayMilliseconds = 700;
+    private int _correctAnswersCount;
+    private int _totalAttempts;
+    private int _wrongAnswersCount;
 
-    private int _correctAnswersCount = 0;
-    private int _totalAttempts = 0;
-    private int _wrongAnswersCount = 0;
-
-    private bool _isShowingWords = false;
-    private bool _isAnswerSelection = false;
-    private bool _isExerciseFinished = false;
-
-    private readonly StatisticsService _statisticsService;
+    private bool _isShowingWords;
+    private bool _isAnswerSelection;
+    private bool _statisticsSaved;
 
     public RunningWordsPage(StatisticsService statisticsService)
     {
@@ -30,31 +31,13 @@ public partial class RunningWordsPage : ContentPage
         _statisticsService = statisticsService;
         InitializeExerciseData();
         UpdateSpeedByLevel();
-        UpdateAnswerButtons();
         SetInitialState();
     }
 
     private void InitializeExerciseData()
     {
-        _words = new List<string>
-        {
-            "дом",
-            "лес",
-            "река",
-            "мост"
-        };
-
-        _distractorWords = new List<string>
-        {
-            "стол",
-            "окно",
-            "мяч",
-            "снег",
-            "книга",
-            "лампа",
-            "кошка",
-            "дерево"
-        };
+        _words.AddRange(new[] { "РґРѕРј", "Р»РµСЃ", "СЂРµРєР°", "РјРѕСЃС‚" });
+        _distractorWords.AddRange(new[] { "СЃС‚РѕР»", "РѕРєРЅРѕ", "РјСЏС‡", "СЃРЅРµРі", "РєРЅРёРіР°", "Р»Р°РјРїР°", "РєРѕС€РєР°", "РґРµСЂРµРІРѕ" });
     }
 
     private void UpdateSpeedByLevel()
@@ -85,44 +68,41 @@ public partial class RunningWordsPage : ContentPage
         _correctAnswer = _words.Last();
 
         var random = new Random();
-
         var distractors = _distractorWords
             .Where(word => word != _correctAnswer)
-            .OrderBy(x => random.Next())
+            .OrderBy(_ => random.Next())
             .Take(3)
             .ToList();
 
-        _answerOptions = new List<string>(distractors)
-        {
-            _correctAnswer
-        };
-
-        _answerOptions = _answerOptions
-            .OrderBy(x => random.Next())
+        _answerOptions = new List<string>(distractors) { _correctAnswer }
+            .OrderBy(_ => random.Next())
             .ToList();
     }
 
-    
-
     private void SetInitialState()
     {
-        CurrentWordLabel.Text = "Нажмите кнопку, чтобы начать";
-        StatusLabel.Text = $"После показа слов нужно выбрать последнее слово. " +
-                   $"Уровень: {_currentSpeedLevel}, скорость: {_wordDisplayMilliseconds} мс. " +
-                   $"Правильных ответов: {_correctAnswersCount} из {_totalAttempts}";
-
+        CurrentWordLabel.Text = "РќР°Р¶РјРёС‚Рµ РєРЅРѕРїРєСѓ, С‡С‚РѕР±С‹ РЅР°С‡Р°С‚СЊ";
         SetAnswerButtonsEnabled(false);
+        UpdateStatusText("РџРѕСЃР»Рµ РїРѕРєР°Р·Р° СЃР»РѕРІ РЅСѓР¶РЅРѕ РІС‹Р±СЂР°С‚СЊ РїРѕСЃР»РµРґРЅРµРµ СЃР»РѕРІРѕ.");
+    }
+
+    private void UpdateStatusText(string message)
+    {
+        StatusLabel.Text = $"{message} РЈСЂРѕРІРµРЅСЊ: {_currentSpeedLevel}, СЃРєРѕСЂРѕСЃС‚СЊ: {_wordDisplayMilliseconds} РјСЃ. " +
+                           $"РџСЂР°РІРёР»СЊРЅС‹С… РѕС‚РІРµС‚РѕРІ: {_correctAnswersCount} РёР· {_totalAttempts}";
     }
 
     private void UpdateAnswerButtons()
     {
-        if (_answerOptions.Count >= 4)
+        if (_answerOptions.Count < 4)
         {
-            AnswerButton1.Text = _answerOptions[0];
-            AnswerButton2.Text = _answerOptions[1];
-            AnswerButton3.Text = _answerOptions[2];
-            AnswerButton4.Text = _answerOptions[3];
+            return;
         }
+
+        AnswerButton1.Text = _answerOptions[0];
+        AnswerButton2.Text = _answerOptions[1];
+        AnswerButton3.Text = _answerOptions[2];
+        AnswerButton4.Text = _answerOptions[3];
     }
 
     private void SetAnswerButtonsEnabled(bool isEnabled)
@@ -133,54 +113,63 @@ public partial class RunningWordsPage : ContentPage
         AnswerButton4.IsEnabled = isEnabled;
     }
 
-    private async Task ShowWordsSequentiallyAsync()
+    private async Task ShowWordsSequentiallyAsync(CancellationToken cancellationToken)
     {
         foreach (var word in _words)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             CurrentWordLabel.Text = word;
-            await Task.Delay(_wordDisplayMilliseconds);
+            await Task.Delay(_wordDisplayMilliseconds, cancellationToken);
         }
 
         _isShowingWords = false;
         _isAnswerSelection = true;
 
         CurrentWordLabel.Text = "?";
-        StatusLabel.Text = $"Выберите последнее показанное слово. Уровень: {_currentSpeedLevel}, скорость: {_wordDisplayMilliseconds} мс";
-
+        UpdateStatusText("Р’С‹Р±РµСЂРёС‚Рµ РїРѕСЃР»РµРґРЅРµРµ РїРѕРєР°Р·Р°РЅРЅРѕРµ СЃР»РѕРІРѕ.");
         SetAnswerButtonsEnabled(true);
         StartButton.IsEnabled = false;
     }
 
     private async void OnStartClicked(object sender, EventArgs e)
     {
+        if (_isShowingWords)
+        {
+            return;
+        }
+
         GenerateAnswerOptions();
         UpdateAnswerButtons();
 
+        _displayCancellation?.Cancel();
+        _displayCancellation = new CancellationTokenSource();
         _isShowingWords = true;
         _isAnswerSelection = false;
-        _isExerciseFinished = false;
         _selectedAnswer = string.Empty;
+        _statisticsSaved = false;
 
         StartButton.IsEnabled = false;
         SetAnswerButtonsEnabled(false);
+        UpdateStatusText("РЎРјРѕС‚СЂРёС‚Рµ РЅР° СЃР»РѕРІР° Рё Р·Р°РїРѕРјРёРЅР°Р№С‚Рµ РїРѕСЃР»РµРґРЅРµРµ.");
 
-        StatusLabel.Text = $"Смотрите на слова и запоминайте последнее. " +
-                   $"Уровень: {_currentSpeedLevel}, скорость: {_wordDisplayMilliseconds} мс. " +
-                   $"Правильных ответов: {_correctAnswersCount} из {_totalAttempts}";
-
-        await ShowWordsSequentiallyAsync();
+        try
+        {
+            await ShowWordsSequentiallyAsync(_displayCancellation.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            _isShowingWords = false;
+        }
     }
 
     private void OnAnswerClicked(object sender, EventArgs e)
     {
-        if (!_isAnswerSelection)
+        if (!_isAnswerSelection || sender is not Button button)
+        {
             return;
-
-        if (sender is not Button button)
-            return;
+        }
 
         _selectedAnswer = button.Text;
-
         bool isCorrect = _selectedAnswer == _correctAnswer;
 
         _totalAttempts++;
@@ -188,62 +177,58 @@ public partial class RunningWordsPage : ContentPage
         if (isCorrect)
         {
             _correctAnswersCount++;
-        }
-        else
-        {
-            _wrongAnswersCount++;
-        }
-
-        _isAnswerSelection = false;
-        _isExerciseFinished = true;
-
-        if (isCorrect)
-        {
             IncreaseSpeedLevel();
         }
         else
         {
+            _wrongAnswersCount++;
             DecreaseSpeedLevel();
         }
 
+        _isAnswerSelection = false;
+
         SetAnswerButtonsEnabled(false);
         StartButton.IsEnabled = true;
-
         CurrentWordLabel.Text = _correctAnswer;
 
         if (isCorrect)
         {
-            StatusLabel.Text = $"Верно! Вы правильно выбрали последнее слово. " +
-                               $"Новый уровень: {_currentSpeedLevel}, новая скорость: {_wordDisplayMilliseconds} мс. " +
-                               $"Правильных ответов: {_correctAnswersCount} из {_totalAttempts}";
+            UpdateStatusText("Р’РµСЂРЅРѕ! Р’С‹ РїСЂР°РІРёР»СЊРЅРѕ РІС‹Р±СЂР°Р»Рё РїРѕСЃР»РµРґРЅРµРµ СЃР»РѕРІРѕ.");
         }
         else
         {
-            StatusLabel.Text = $"Неверно. Правильный ответ: {_correctAnswer}. " +
-                               $"Новый уровень: {_currentSpeedLevel}, новая скорость: {_wordDisplayMilliseconds} мс. " +
-                               $"Правильных ответов: {_correctAnswersCount} из {_totalAttempts}";
+            UpdateStatusText($"РќРµРІРµСЂРЅРѕ. РџСЂР°РІРёР»СЊРЅС‹Р№ РѕС‚РІРµС‚: {_correctAnswer}.");
         }
     }
-    protected override async void OnDisappearing()
+
+    private async Task SaveStatisticsAsync()
     {
-        base.OnDisappearing();
-
-        // если пользователь ничего не сделал — не сохраняем
-        if (_totalAttempts == 0)
+        if (_statisticsSaved || _totalAttempts == 0)
+        {
             return;
+        }
 
-        double accuracy = (double)_correctAnswersCount / _totalAttempts * 100;
-
-        var result = new
+        var request = new RunningWordsResultRequest
         {
             TotalAttempts = _totalAttempts,
             CorrectAnswers = _correctAnswersCount,
             WrongAnswers = _wrongAnswersCount,
-            AccuracyPercent = accuracy,
+            AccuracyPercent = (double)_correctAnswersCount / _totalAttempts * 100,
             FinalLevel = _currentSpeedLevel,
             FinalSpeedMilliseconds = _wordDisplayMilliseconds
         };
 
-        await _statisticsService.SaveRunningWordsResultAsync(result);
+        _statisticsSaved = await _statisticsService.SaveRunningWordsResultAsync(request);
+    }
+
+    protected override async void OnDisappearing()
+    {
+        _displayCancellation?.Cancel();
+        _isShowingWords = false;
+        _isAnswerSelection = false;
+        SetAnswerButtonsEnabled(false);
+
+        await SaveStatisticsAsync();
+        base.OnDisappearing();
     }
 }
