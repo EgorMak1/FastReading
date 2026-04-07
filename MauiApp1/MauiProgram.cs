@@ -27,6 +27,7 @@ namespace MauiApp1
             builder.Services.AddTransient<RegisterPage>();
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RunningWordsPage>();
+            builder.Services.AddTransient<FieldOfViewPage>();
 
             builder.Services.AddHttpClient();
             builder.Services.AddSingleton<ApiClient>();

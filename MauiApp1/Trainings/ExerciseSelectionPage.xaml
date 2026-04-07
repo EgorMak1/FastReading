@@ -22,5 +22,7 @@
         <!-- Добавили кнопку для нового упражнения -->
         <Button Text="Бегущие слова" 
                 Clicked="OnRunningWordsClicked" />
+        <Button Text="Поле зрения"
+                Clicked="OnFieldOfViewClicked" />
     </VerticalStackLayout>
 </ContentPage>

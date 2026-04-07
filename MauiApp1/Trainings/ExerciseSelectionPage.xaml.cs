@@ -23,4 +23,10 @@ public partial class ExerciseSelectionPage : ContentPage
         var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<RunningWordsPage>();
         await Navigation.PushAsync(page);
     }
+
+    private async void OnFieldOfViewClicked(object sender, EventArgs e)
+    {
+        var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<FieldOfViewPage>();
+        await Navigation.PushAsync(page);
+    }
 }
