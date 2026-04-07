@@ -3,6 +3,7 @@ using System;
 using FastReading.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FastReading.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260406130504_AddRunningWordsResults")]
+    partial class AddRunningWordsResults
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,49 +24,6 @@ namespace FastReading.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("FastReading.Server.Models.FieldOfViewResult", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<double>("AccuracyPercent")
-                        .HasColumnType("double precision");
-
-                    b.Property<DateTime>("CompletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("CorrectRounds")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("DetectedMismatchCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FalseAlarmCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FinalIntervalMilliseconds")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FinalLevel")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("MissedMismatchCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TotalRounds")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("FieldOfViewResults");
-                });
 
             modelBuilder.Entity("FastReading.Server.Models.RunningWordsResult", b =>
                 {
@@ -161,15 +121,6 @@ namespace FastReading.Server.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("FastReading.Server.Models.FieldOfViewResult", b =>
-                {
-                    b.HasOne("FastReading.Server.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("FastReading.Server.Models.RunningWordsResult", b =>

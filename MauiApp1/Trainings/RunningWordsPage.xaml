@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Trainings.RunningWordsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Бегущие слова">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="20"
+            Spacing="20">
+
+            <Label
+                FontSize="28"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"
+                Text="Бегущие слова" />
+
+            <Frame
+                Padding="20"
+                BorderColor="LightGray"
+                CornerRadius="12">
+
+                <VerticalStackLayout Spacing="12">
+
+                    <Label
+                        x:Name="CurrentWordLabel"
+                        FontSize="24"
+                        FontAttributes="Bold"
+                        HorizontalOptions="Center"
+                        Text="Нажмите кнопку, чтобы начать" />
+
+                    <Label
+                        x:Name="StatusLabel"
+                        FontSize="14"
+                        HorizontalOptions="Center"
+                        HorizontalTextAlignment="Center"
+                        Text="После показа слов нужно выбрать последнее слово" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label
+                FontSize="18"
+                FontAttributes="Bold"
+                Text="Варианты ответа:" />
+
+            <Button x:Name="AnswerButton1" Text="Вариант 1" Clicked="OnAnswerClicked" />
+            <Button x:Name="AnswerButton2" Text="Вариант 2" Clicked="OnAnswerClicked" />
+            <Button x:Name="AnswerButton3" Text="Вариант 3" Clicked="OnAnswerClicked" />
+            <Button x:Name="AnswerButton4" Text="Вариант 4" Clicked="OnAnswerClicked" />
+
+            <Button
+                x:Name="StartButton"
+                Margin="0,20,0,0"
+                Text="Начать упражнение"
+                Clicked="OnStartClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

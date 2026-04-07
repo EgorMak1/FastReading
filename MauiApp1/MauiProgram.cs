@@ -23,18 +23,17 @@ namespace MauiApp1
             builder.Services.AddTransient<ExerciseSelectionPage>();
             builder.Services.AddTransient<SelectionStatisticsPage>();
             builder.Services.AddTransient<ShulteStatisticsPage>();
+            builder.Services.AddTransient<RunningWordsStatisticsPage>();
+            builder.Services.AddTransient<FieldOfViewStatisticsPage>();
             builder.Services.AddTransient<RegisterPage>();
-
-#if DEBUG
-            builder.Logging.AddDebug();
-#endif
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<RunningWordsPage>();
+            builder.Services.AddTransient<FieldOfViewPage>();
 
             builder.Services.AddHttpClient();
             builder.Services.AddSingleton<ApiClient>();
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<StatisticsService>();
-            builder.Services.AddTransient<LoginPage>();
-            builder.Services.AddTransient<RegisterPage>();
 
             return builder.Build();
         }

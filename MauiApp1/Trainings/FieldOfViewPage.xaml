@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Trainings.FieldOfViewPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Поле зрения">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="20"
+            Spacing="16">
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="28"
+                HorizontalOptions="Center"
+                Text="Поле зрения" />
+
+            <Label
+                x:Name="InstructionLabel"
+                FontSize="14"
+                HorizontalTextAlignment="Center"
+                Text="Если одна буква отличается, нажмите «Ошибка». Если все буквы одинаковые, ничего не нажимайте."
+                TextColor="Gray" />
+
+            <Frame
+                Padding="12"
+                BorderColor="LightGray"
+                CornerRadius="12"
+                HorizontalOptions="Center">
+
+                <Grid
+                    x:Name="FieldGrid"
+                    ColumnSpacing="4"
+                    HeightRequest="320"
+                    RowSpacing="4"
+                    WidthRequest="320" />
+            </Frame>
+
+            <Label
+                x:Name="StatusLabel"
+                FontAttributes="Bold"
+                FontSize="16"
+                HorizontalTextAlignment="Center"
+                Text="Нажмите «Начать», чтобы запустить тренировку." />
+
+            <Label
+                x:Name="StatsLabel"
+                FontSize="14"
+                HorizontalTextAlignment="Center"
+                Text="Уровень: 1, интервал: 1800 мс. Раундов: 0, правильных: 0." />
+
+            <HorizontalStackLayout
+                HorizontalOptions="Center"
+                Spacing="12">
+
+                <Button
+                    x:Name="StartButton"
+                    Clicked="OnStartClicked"
+                    Text="Начать" />
+
+                <Button
+                    x:Name="StopButton"
+                    Clicked="OnStopClicked"
+                    IsEnabled="False"
+                    Text="Стоп" />
+            </HorizontalStackLayout>
+
+            <Button
+                x:Name="ErrorButton"
+                BackgroundColor="#D9534F"
+                Clicked="OnErrorClicked"
+                IsEnabled="False"
+                Text="Ошибка"
+                TextColor="White" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
