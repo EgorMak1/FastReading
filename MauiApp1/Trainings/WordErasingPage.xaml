@@ -4,7 +4,6 @@
              x:Class="MauiApp1.Trainings.WordErasingPage"
              Title="Затирание слов">
     <Grid Padding="20">
-
         <VerticalStackLayout x:Name="PreparationLayout"
                              Spacing="16">
             <Label Text="Затирание слов"
@@ -53,7 +52,6 @@
                 <Button Grid.Column="2"
                         x:Name="ReadyButton"
                         Text="Готово"
-                        IsEnabled="False"
                         Clicked="OnReadyClicked" />
             </Grid>
 

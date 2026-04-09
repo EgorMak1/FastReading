@@ -48,15 +48,11 @@ public partial class WordErasingStatisticsPage : ContentPage
             LastAttemptLabel.Text = $"Последняя попытка: {last.CorrectAnswers}/{last.TotalQuestions} ({last.AccuracyPercent:F0}%), тип завершения: {GetCompletionText(last.CompletionType)}";
         }
 
-        string speedDeltaText = last.SpeedDelta > 0
-            ? $"+{last.SpeedDelta}"
-            : last.SpeedDelta.ToString();
-
+        string speedDeltaText = last.SpeedDelta > 0 ? $"+{last.SpeedDelta}" : last.SpeedDelta.ToString();
         SpeedChangeLabel.Text = $"Изменение скорости: {last.SpeedBeforeWpm} -> {last.SpeedAfterWpm} ({speedDeltaText})";
         NextSpeedLabel.Text = $"Следующее упражнение будет на скорости {last.SpeedAfterWpm} WPM";
 
-        ChartView.Drawable = new WordErasingWpmChartDrawable(
-            orderedResults.Select(r => r.SpeedAfterWpm).ToList());
+        ChartView.Drawable = new WordErasingWpmChartDrawable(orderedResults.Select(r => r.SpeedAfterWpm).ToList());
         ChartView.Invalidate();
     }
 

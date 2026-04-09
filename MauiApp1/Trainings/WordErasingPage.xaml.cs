@@ -60,10 +60,7 @@ public partial class WordErasingPage : ContentPage
             results = [];
         }
 
-        _currentWpm = results.Count > 0
-            ? results.Last().SpeedAfterWpm
-            : DefaultWpm;
-
+        _currentWpm = results.Count > 0 ? results.Last().SpeedAfterWpm : DefaultWpm;
         _currentTextIndex = results.Count % _texts.Count;
         _currentText = _texts[_currentTextIndex];
         _tokens.Clear();
@@ -276,14 +273,9 @@ public partial class WordErasingPage : ContentPage
         _readingCancellation?.Cancel();
         _isReading = false;
 
-        int speedDelta = questionsSkipped
-            ? -15
-            : CalculateSpeedDelta(correctAnswers);
-
+        int speedDelta = questionsSkipped ? -15 : CalculateSpeedDelta(correctAnswers);
         int speedAfter = Math.Clamp(_speedBeforeAttempt + speedDelta, MinWpm, MaxWpm);
-        double accuracyPercent = questionsSkipped
-            ? 0
-            : correctAnswers / (double)QuestionCount * 100d;
+        double accuracyPercent = questionsSkipped ? 0 : correctAnswers / (double)QuestionCount * 100d;
 
         var request = new WordErasingResultRequest
         {
@@ -302,7 +294,6 @@ public partial class WordErasingPage : ContentPage
         };
 
         await _statisticsService.SaveWordErasingResultAsync(request);
-
         _currentWpm = speedAfter;
 
         var statisticsPage = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<WordErasingStatisticsPage>();
