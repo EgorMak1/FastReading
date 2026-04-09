@@ -187,6 +187,77 @@ namespace FastReading.Server.Controllers
             return Ok(results);
         }
 
+        [HttpPost("word-erasing")]
+        public async Task<IActionResult> SaveWordErasingResult([FromBody] WordErasingResultRequest request)
+        {
+            if (!TryGetCurrentUserId(out var userId))
+            {
+                return Unauthorized();
+            }
+
+            if (request.SpeedBeforeWpm <= 0 || request.SpeedAfterWpm <= 0)
+            {
+                return BadRequest("Speed values must be greater than 0.");
+            }
+
+            var result = new WordErasingResult
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                TextId = request.TextId,
+                TextTitle = request.TextTitle,
+                SpeedBeforeWpm = request.SpeedBeforeWpm,
+                SpeedAfterWpm = request.SpeedAfterWpm,
+                SpeedDelta = request.SpeedDelta,
+                CompletionType = request.CompletionType,
+                CorrectAnswers = request.CorrectAnswers,
+                TotalQuestions = request.TotalQuestions,
+                QuestionsSkipped = request.QuestionsSkipped,
+                AccuracyPercent = request.AccuracyPercent,
+                ErasedWords = request.ErasedWords,
+                TotalWords = request.TotalWords,
+                CompletedAt = DateTime.UtcNow
+            };
+
+            _db.WordErasingResults.Add(result);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { result.Id, result.CompletedAt });
+        }
+
+        [HttpGet("word-erasing")]
+        public async Task<IActionResult> GetWordErasingResults()
+        {
+            if (!TryGetCurrentUserId(out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var results = await _db.WordErasingResults
+                .Where(x => x.UserId == userId)
+                .OrderBy(x => x.CompletedAt)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.TextId,
+                    x.TextTitle,
+                    x.SpeedBeforeWpm,
+                    x.SpeedAfterWpm,
+                    x.SpeedDelta,
+                    x.CompletionType,
+                    x.CorrectAnswers,
+                    x.TotalQuestions,
+                    x.QuestionsSkipped,
+                    x.AccuracyPercent,
+                    x.ErasedWords,
+                    x.TotalWords,
+                    x.CompletedAt
+                })
+                .ToListAsync();
+
+            return Ok(results);
+        }
+
         private bool TryGetCurrentUserId(out Guid userId)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
@@ -222,5 +293,21 @@ namespace FastReading.Server.Controllers
         public double AccuracyPercent { get; set; }
         public int FinalLevel { get; set; }
         public int FinalIntervalMilliseconds { get; set; }
+    }
+
+    public class WordErasingResultRequest
+    {
+        public string TextId { get; set; } = string.Empty;
+        public string TextTitle { get; set; } = string.Empty;
+        public int SpeedBeforeWpm { get; set; }
+        public int SpeedAfterWpm { get; set; }
+        public int SpeedDelta { get; set; }
+        public string CompletionType { get; set; } = string.Empty;
+        public int CorrectAnswers { get; set; }
+        public int TotalQuestions { get; set; }
+        public bool QuestionsSkipped { get; set; }
+        public double AccuracyPercent { get; set; }
+        public int ErasedWords { get; set; }
+        public int TotalWords { get; set; }
     }
 }

@@ -163,6 +163,67 @@ namespace FastReading.Server.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("FastReading.Server.Models.WordErasingResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("AccuracyPercent")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CompletionType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("CorrectAnswers")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ErasedWords")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("QuestionsSkipped")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SpeedAfterWpm")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SpeedBeforeWpm")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SpeedDelta")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TextId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TextTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("TotalQuestions")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalWords")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WordErasingResults");
+                });
+
             modelBuilder.Entity("FastReading.Server.Models.FieldOfViewResult", b =>
                 {
                     b.HasOne("FastReading.Server.Models.User", null)
@@ -173,6 +234,15 @@ namespace FastReading.Server.Migrations
                 });
 
             modelBuilder.Entity("FastReading.Server.Models.RunningWordsResult", b =>
+                {
+                    b.HasOne("FastReading.Server.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FastReading.Server.Models.WordErasingResult", b =>
                 {
                     b.HasOne("FastReading.Server.Models.User", null)
                         .WithMany()

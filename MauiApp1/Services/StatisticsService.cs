@@ -91,6 +91,31 @@ namespace MauiApp1.Services
 
             return results ?? new List<FieldOfViewResultDto>();
         }
+
+        public async Task<bool> SaveWordErasingResultAsync(WordErasingResultRequest result)
+        {
+            await _auth.ApplyTokenIfExistsAsync();
+
+            var response = await _api.Http.PostAsJsonAsync("api/statistics/word-erasing", result);
+
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<List<WordErasingResultDto>> GetWordErasingResultsAsync()
+        {
+            await _auth.ApplyTokenIfExistsAsync();
+
+            var response = await _api.Http.GetAsync("api/statistics/word-erasing");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<WordErasingResultDto>();
+            }
+
+            var results = await response.Content.ReadFromJsonAsync<List<WordErasingResultDto>>();
+
+            return results ?? new List<WordErasingResultDto>();
+        }
     }
 
     public class SaveResultRequest
@@ -152,6 +177,40 @@ namespace MauiApp1.Services
         public double AccuracyPercent { get; set; }
         public int FinalLevel { get; set; }
         public int FinalIntervalMilliseconds { get; set; }
+        public DateTime CompletedAt { get; set; }
+    }
+
+    public class WordErasingResultRequest
+    {
+        public string TextId { get; set; } = string.Empty;
+        public string TextTitle { get; set; } = string.Empty;
+        public int SpeedBeforeWpm { get; set; }
+        public int SpeedAfterWpm { get; set; }
+        public int SpeedDelta { get; set; }
+        public string CompletionType { get; set; } = string.Empty;
+        public int CorrectAnswers { get; set; }
+        public int TotalQuestions { get; set; }
+        public bool QuestionsSkipped { get; set; }
+        public double AccuracyPercent { get; set; }
+        public int ErasedWords { get; set; }
+        public int TotalWords { get; set; }
+    }
+
+    public class WordErasingResultDto
+    {
+        public Guid Id { get; set; }
+        public string TextId { get; set; } = string.Empty;
+        public string TextTitle { get; set; } = string.Empty;
+        public int SpeedBeforeWpm { get; set; }
+        public int SpeedAfterWpm { get; set; }
+        public int SpeedDelta { get; set; }
+        public string CompletionType { get; set; } = string.Empty;
+        public int CorrectAnswers { get; set; }
+        public int TotalQuestions { get; set; }
+        public bool QuestionsSkipped { get; set; }
+        public double AccuracyPercent { get; set; }
+        public int ErasedWords { get; set; }
+        public int TotalWords { get; set; }
         public DateTime CompletedAt { get; set; }
     }
 }
