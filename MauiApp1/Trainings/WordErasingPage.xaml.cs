@@ -19,12 +19,11 @@ public partial class WordErasingPage : ContentPage
         RegexOptions.Compiled);
 
     private readonly StatisticsService _statisticsService;
+    private readonly IReadOnlyList<WordErasingTextDefinition> _texts = WordErasingContent.Texts;
+    private readonly List<WordToken> _tokens = [];
 
-    private IReadOnlyList<WordErasingTextDefinition> _texts = WordErasingContent.Texts;
-    private readonly List<WordToken> _tokens = new();
     private CancellationTokenSource? _readingCancellation;
     private Stopwatch? _readingStopwatch;
-
     private WordErasingTextDefinition? _currentText;
     private WordErasingCompletionType _completionType;
 
@@ -35,7 +34,6 @@ public partial class WordErasingPage : ContentPage
     private int _correctAnswers;
     private int _fullWordsErased;
     private int _lastRenderedPartialLetters = -1;
-
     private bool _isReading;
 
     public WordErasingPage(StatisticsService statisticsService)
@@ -59,7 +57,7 @@ public partial class WordErasingPage : ContentPage
         }
         catch
         {
-            results = new List<WordErasingResultDto>();
+            results = [];
         }
 
         _currentWpm = results.Count > 0
@@ -72,8 +70,7 @@ public partial class WordErasingPage : ContentPage
         _tokens.AddRange(Tokenize(_currentText.Content));
 
         PreparationTitleLabel.Text = _currentText.Title;
-        PreparationInfoLabel.Text = $"Текст {_currentTextIndex + 1} из {_texts.Count}. " +
-                                    $"Вопросов после чтения: {QuestionCount}.";
+        PreparationInfoLabel.Text = $"Текст {_currentTextIndex + 1} из {_texts.Count}. Вопросов после чтения: {QuestionCount}.";
         SpeedLabel.Text = $"Текущая скорость: {_currentWpm} WPM";
 
         ShowPreparationState();
@@ -128,14 +125,14 @@ public partial class WordErasingPage : ContentPage
         _lastRenderedPartialLetters = -1;
         _isReading = true;
 
-        ReadyButton.IsEnabled = false;
+        ReadyButton.IsEnabled = true;
         ReadingHeaderLabel.Text = _currentText.Title;
-        ReadingStatusLabel.Text = "Прокрутите текст до конца, чтобы активировать кнопку «Готово».";
+        ReadingStatusLabel.Text = "Читайте текст. Кнопка «Готово» доступна в любой момент.";
         ReadingTextLabel.Text = _currentText.Content;
         TimerLabel.Text = $"Время: {SessionDurationSeconds:00}";
-        await TextScrollView.ScrollToAsync(0, 0, false);
 
         ShowReadingState();
+        await TextScrollView.ScrollToAsync(0, 0, false);
 
         _readingCancellation?.Cancel();
         _readingCancellation = new CancellationTokenSource();
@@ -156,8 +153,8 @@ public partial class WordErasingPage : ContentPage
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var elapsedMs = _readingStopwatch?.Elapsed.TotalMilliseconds ?? 0;
-            var remainingSeconds = Math.Max(0, SessionDurationSeconds - (int)Math.Floor(elapsedMs / 1000d));
+            double elapsedMs = _readingStopwatch?.Elapsed.TotalMilliseconds ?? 0;
+            int remainingSeconds = Math.Max(0, SessionDurationSeconds - (int)Math.Floor(elapsedMs / 1000d));
             TimerLabel.Text = $"Время: {remainingSeconds:00}";
 
             double wordProgress = elapsedMs / msPerWord;
@@ -205,7 +202,7 @@ public partial class WordErasingPage : ContentPage
 
     private async void OnReadyClicked(object sender, EventArgs e)
     {
-        if (!_isReading || !ReadyButton.IsEnabled)
+        if (!_isReading)
         {
             return;
         }
@@ -216,17 +213,17 @@ public partial class WordErasingPage : ContentPage
         await BeginQuestionsAsync();
     }
 
-    private async Task BeginQuestionsAsync()
+    private Task BeginQuestionsAsync()
     {
         if (_currentText == null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         _currentQuestionIndex = 0;
         ShowQuestionState();
         BindCurrentQuestion();
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
     private void BindCurrentQuestion()
@@ -252,7 +249,7 @@ public partial class WordErasingPage : ContentPage
             return;
         }
 
-        if (!int.TryParse(button.CommandParameter?.ToString(), out var selectedIndex))
+        if (!int.TryParse(button.CommandParameter?.ToString(), out int selectedIndex))
         {
             return;
         }
@@ -393,7 +390,6 @@ public partial class WordErasingPage : ContentPage
         {
             string tokenText = match.Value;
             bool isWord = char.IsLetterOrDigit(tokenText[0]);
-
             tokens.Add(new WordToken(tokenText, isWord, isWord ? wordIndex : -1));
 
             if (isWord)
@@ -407,15 +403,10 @@ public partial class WordErasingPage : ContentPage
 
     private void OnTextScrolled(object? sender, ScrolledEventArgs e)
     {
-        if (!_isReading)
+        if (_isReading)
         {
-            ReadyButton.IsEnabled = false;
-            return;
+            ReadyButton.IsEnabled = true;
         }
-
-        double viewportBottom = e.ScrollY + TextScrollView.Height;
-        double contentHeight = TextScrollView.ContentSize.Height;
-        ReadyButton.IsEnabled = viewportBottom >= contentHeight - 8;
     }
 
     protected override void OnDisappearing()

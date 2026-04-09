@@ -6,7 +6,7 @@
     <Grid Padding="20">
 
         <VerticalStackLayout x:Name="PreparationLayout"
-                              Spacing="16">
+                             Spacing="16">
             <Label Text="Затирание слов"
                    FontSize="28"
                    FontAttributes="Bold"
@@ -37,8 +37,8 @@
               RowDefinitions="Auto,Auto,*,Auto"
               RowSpacing="12">
             <Label x:Name="ReadingHeaderLabel"
-                    FontSize="18"
-                    FontAttributes="Bold" />
+                   FontSize="18"
+                   FontAttributes="Bold" />
 
             <Grid Grid.Row="1"
                   ColumnDefinitions="*,Auto,Auto"
@@ -72,8 +72,8 @@
         </Grid>
 
         <VerticalStackLayout x:Name="QuestionLayout"
-                              IsVisible="False"
-                              Spacing="14">
+                             IsVisible="False"
+                             Spacing="14">
             <Label x:Name="QuestionProgressLabel"
                    FontSize="16"
                    FontAttributes="Bold" />

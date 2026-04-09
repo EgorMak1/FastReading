@@ -27,7 +27,7 @@ public partial class WordErasingStatisticsPage : ContentPage
         if (orderedResults.Count == 0)
         {
             CurrentSpeedLabel.Text = "Текущая скорость: 180 WPM";
-            LastAttemptLabel.Text = "Нет данных";
+            LastAttemptLabel.Text = "Попыток пока нет";
             SpeedChangeLabel.Text = string.Empty;
             NextSpeedLabel.Text = string.Empty;
             TotalAttemptsLabel.Text = string.Empty;
@@ -41,12 +41,11 @@ public partial class WordErasingStatisticsPage : ContentPage
 
         if (last.QuestionsSkipped)
         {
-            LastAttemptLabel.Text = $"Последняя попытка: вопросы не показывались, тип завершения: {GetCompletionText(last.CompletionType)}";
+            LastAttemptLabel.Text = $"Последняя попытка: вопросы пропущены, тип завершения: {GetCompletionText(last.CompletionType)}";
         }
         else
         {
-            LastAttemptLabel.Text = $"Последняя попытка: {last.CorrectAnswers}/{last.TotalQuestions} ({last.AccuracyPercent:F0}%), " +
-                                    $"тип завершения: {GetCompletionText(last.CompletionType)}";
+            LastAttemptLabel.Text = $"Последняя попытка: {last.CorrectAnswers}/{last.TotalQuestions} ({last.AccuracyPercent:F0}%), тип завершения: {GetCompletionText(last.CompletionType)}";
         }
 
         string speedDeltaText = last.SpeedDelta > 0

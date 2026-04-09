@@ -5,11 +5,11 @@
              Title="Статистика: Затирание слов">
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
-            <Label Text="Моя статистика"
+            <Label Text="Затирание слов"
                    FontSize="24"
                    HorizontalOptions="Center" />
 
-            <Label Text="Скорость упражнения Затирание слов"
+            <Label Text="График прогресса скорости по попыткам"
                    FontSize="14"
                    HorizontalOptions="Center"
                    TextColor="Gray" />
