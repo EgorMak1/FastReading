@@ -63,6 +63,7 @@
                         x:Name="TextScrollView"
                         Scrolled="OnTextScrolled">
                 <Label x:Name="ReadingTextLabel"
+                       FontFamily="Courier New"
                        FontSize="17"
                        LineBreakMode="WordWrap" />
             </ScrollView>

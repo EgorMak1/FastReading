@@ -19,7 +19,7 @@ public partial class WordErasingPage : ContentPage
         RegexOptions.Compiled);
 
     private readonly StatisticsService _statisticsService;
-    private readonly IReadOnlyList<WordErasingTextDefinition> _texts = WordErasingContent.Texts;
+    private IReadOnlyList<WordErasingTextDefinition> _texts = [];
     private readonly List<WordToken> _tokens = [];
 
     private CancellationTokenSource? _readingCancellation;
@@ -50,6 +50,8 @@ public partial class WordErasingPage : ContentPage
 
     private async Task InitializeSessionAsync()
     {
+        _texts = await WordErasingContent.GetTextsAsync();
+
         List<WordErasingResultDto> results;
         try
         {
