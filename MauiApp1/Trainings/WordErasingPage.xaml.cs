@@ -130,11 +130,11 @@ public partial class WordErasingPage : ContentPage
         TimerProgressBar.Progress = 1;
 
         ShowReadingState();
-        await TextScrollView.ScrollToAsync(0, 0, false);
 
         _readingCancellation?.Cancel();
         _readingCancellation = new CancellationTokenSource();
         _readingStopwatch = Stopwatch.StartNew();
+        Dispatcher.Dispatch(() => _ = TextScrollView.ScrollToAsync(0, 0, false));
 
         try
         {
