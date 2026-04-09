@@ -33,7 +33,7 @@
 
         <Grid x:Name="ReadingLayout"
               IsVisible="False"
-              RowDefinitions="Auto,Auto,*,Auto"
+              RowDefinitions="Auto,Auto,Auto,*,Auto"
               RowSpacing="12">
             <Label x:Name="ReadingHeaderLabel"
                    FontSize="18"
@@ -55,7 +55,11 @@
                         Clicked="OnReadyClicked" />
             </Grid>
 
-            <ScrollView Grid.Row="2"
+            <ProgressBar Grid.Row="2"
+                         x:Name="TimerProgressBar"
+                         Progress="1" />
+
+            <ScrollView Grid.Row="3"
                         x:Name="TextScrollView"
                         Scrolled="OnTextScrolled">
                 <Label x:Name="ReadingTextLabel"
@@ -63,7 +67,7 @@
                        LineBreakMode="WordWrap" />
             </ScrollView>
 
-            <Label Grid.Row="3"
+            <Label Grid.Row="4"
                    x:Name="ReadingStatusLabel"
                    FontSize="13"
                    TextColor="Gray" />

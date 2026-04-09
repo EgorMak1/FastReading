@@ -126,7 +126,8 @@ public partial class WordErasingPage : ContentPage
         ReadingHeaderLabel.Text = _currentText.Title;
         ReadingStatusLabel.Text = "Читайте текст. Кнопка «Готово» доступна в любой момент.";
         ReadingTextLabel.Text = _currentText.Content;
-        TimerLabel.Text = $"Время: {SessionDurationSeconds:00}";
+        TimerLabel.Text = FormatRemainingTime(SessionDurationSeconds);
+        TimerProgressBar.Progress = 1;
 
         ShowReadingState();
         await TextScrollView.ScrollToAsync(0, 0, false);
@@ -152,7 +153,8 @@ public partial class WordErasingPage : ContentPage
         {
             double elapsedMs = _readingStopwatch?.Elapsed.TotalMilliseconds ?? 0;
             int remainingSeconds = Math.Max(0, SessionDurationSeconds - (int)Math.Floor(elapsedMs / 1000d));
-            TimerLabel.Text = $"Время: {remainingSeconds:00}";
+            TimerLabel.Text = FormatRemainingTime(remainingSeconds);
+            TimerProgressBar.Progress = Math.Clamp(1d - elapsedMs / (SessionDurationSeconds * 1000d), 0d, 1d);
 
             double wordProgress = elapsedMs / msPerWord;
             int fullWordsErased = Math.Min((int)Math.Floor(wordProgress), GetTotalWordCount());
@@ -169,6 +171,8 @@ public partial class WordErasingPage : ContentPage
             {
                 _completionType = WordErasingCompletionType.Timer;
                 _isReading = false;
+                TimerLabel.Text = "00:00";
+                TimerProgressBar.Progress = 0;
                 await BeginQuestionsAsync();
                 return;
             }
@@ -398,6 +402,12 @@ public partial class WordErasingPage : ContentPage
         {
             ReadyButton.IsEnabled = true;
         }
+    }
+
+    private static string FormatRemainingTime(int remainingSeconds)
+    {
+        var time = TimeSpan.FromSeconds(Math.Max(0, remainingSeconds));
+        return $"{time.Minutes:00}:{time.Seconds:00}";
     }
 
     protected override void OnDisappearing()
