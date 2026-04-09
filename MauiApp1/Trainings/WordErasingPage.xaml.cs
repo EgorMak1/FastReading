@@ -52,7 +52,15 @@ public partial class WordErasingPage : ContentPage
 
     private async Task InitializeSessionAsync()
     {
-        var results = await _statisticsService.GetWordErasingResultsAsync();
+        List<WordErasingResultDto> results;
+        try
+        {
+            results = await _statisticsService.GetWordErasingResultsAsync();
+        }
+        catch
+        {
+            results = new List<WordErasingResultDto>();
+        }
 
         _currentWpm = results.Count > 0
             ? results.Last().SpeedAfterWpm
@@ -94,9 +102,22 @@ public partial class WordErasingPage : ContentPage
 
     private async void OnStartClicked(object sender, EventArgs e)
     {
-        if (_currentText == null || _isReading)
+        if (_isReading)
         {
             return;
+        }
+
+        if (_currentText == null)
+        {
+            _currentTextIndex = 0;
+            _currentText = _texts.FirstOrDefault();
+            if (_currentText == null)
+            {
+                return;
+            }
+
+            _tokens.Clear();
+            _tokens.AddRange(Tokenize(_currentText.Content));
         }
 
         _speedBeforeAttempt = _currentWpm;
