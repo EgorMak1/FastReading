@@ -20,6 +20,26 @@
                    HorizontalTextAlignment="Center"
                    TextColor="Gray" />
 
+            <VerticalStackLayout x:Name="DebugActionsLayout"
+                                 Spacing="8">
+                <Label Text="Инструменты разработки"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="#5C6BC0" />
+                <HorizontalStackLayout Spacing="8">
+                    <Button Text="Смоделировать повышение"
+                            BackgroundColor="#43A047"
+                            TextColor="White"
+                            HorizontalOptions="Fill"
+                            Clicked="OnSimulateLevelUpClicked" />
+                    <Button Text="Смоделировать понижение"
+                            BackgroundColor="#E53935"
+                            TextColor="White"
+                            HorizontalOptions="Fill"
+                            Clicked="OnSimulateLevelDownClicked" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
             <Label x:Name="NextNumberLabel"
                    Text="Найди: 1"
                    FontSize="24"

@@ -1,22 +1,33 @@
-﻿using MauiApp1.Services;
+using MauiApp1.Services;
 
 namespace MauiApp1.Trainings;
 
 public partial class RunningWordsPage : ContentPage
 {
-    private readonly List<string> _words = new();
-    private readonly List<string> _distractorWords = new();
-    private readonly List<int> _speedLevels = new() { 700, 600, 500, 400, 300 };
-    private readonly StatisticsService _statisticsService;
+    private static readonly IReadOnlyList<RunningWordsDifficultyConfig> DifficultyLevels =
+    [
+        new(1, 700, 3, false),
+        new(2, 600, 4, false),
+        new(3, 500, 5, false),
+        new(4, 400, 6, true),
+        new(5, 300, 7, true)
+    ];
 
-    private List<string> _answerOptions = new();
+    private readonly List<string> _wordPool = [];
+    private readonly StatisticsService _statisticsService;
+    private readonly Random _random = new();
+
+    private List<string> _currentSequence = [];
+    private List<string> _answerOptions = [];
     private CancellationTokenSource? _displayCancellation;
 
     private string _correctAnswer = string.Empty;
     private string _selectedAnswer = string.Empty;
 
     private int _currentSpeedLevel = 1;
+    private int _recommendedLevel = 1;
     private int _wordDisplayMilliseconds = 700;
+    private int _wordsPerRound = 3;
     private int _correctAnswersCount;
     private int _totalAttempts;
     private int _wrongAnswersCount;
@@ -24,58 +35,114 @@ public partial class RunningWordsPage : ContentPage
     private bool _isShowingWords;
     private bool _isAnswerSelection;
     private bool _statisticsSaved;
+    private bool _isInitialized;
 
     public RunningWordsPage(StatisticsService statisticsService)
     {
         InitializeComponent();
         _statisticsService = statisticsService;
         InitializeExerciseData();
-        UpdateSpeedByLevel();
         SetInitialState();
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (_isInitialized)
+        {
+            return;
+        }
+
+        _isInitialized = true;
+        await InitializeDifficultyAsync();
+        ApplyLevel(_recommendedLevel);
+        UpdateDifficultyLabel();
+        SetInitialState();
+    }
+
+    private async Task InitializeDifficultyAsync()
+    {
+        try
+        {
+            var results = await _statisticsService.GetRunningWordsResultsAsync();
+            var lastResult = results.LastOrDefault();
+
+            if (lastResult != null)
+            {
+                _recommendedLevel = ClampLevel(lastResult.FinalLevel);
+            }
+        }
+        catch
+        {
+            _recommendedLevel = 1;
+        }
     }
 
     private void InitializeExerciseData()
     {
-        _words.AddRange(new[] { "дом", "лес", "река", "мост" });
-        _distractorWords.AddRange(new[] { "стол", "окно", "мяч", "снег", "книга", "лампа", "кошка", "дерево" });
+        _wordPool.AddRange(
+        [
+            "дом", "лес", "река", "мост", "стол", "окно", "мяч", "снег",
+            "книга", "лампа", "кошка", "дерево", "поле", "ветер", "дождь",
+            "ручей", "берег", "трава", "пламя", "школа", "маска", "карта",
+            "город", "капля", "ветка", "птица", "звезда", "облако"
+        ]);
     }
 
-    private void UpdateSpeedByLevel()
+    private void ApplyLevel(int level)
     {
-        _wordDisplayMilliseconds = _speedLevels[_currentSpeedLevel - 1];
+        _currentSpeedLevel = ClampLevel(level);
+        var config = DifficultyLevels[_currentSpeedLevel - 1];
+        _wordDisplayMilliseconds = config.WordDisplayMilliseconds;
+        _wordsPerRound = config.WordsPerRound;
     }
 
     private void IncreaseSpeedLevel()
     {
-        if (_currentSpeedLevel < _speedLevels.Count)
-        {
-            _currentSpeedLevel++;
-            UpdateSpeedByLevel();
-        }
+        ApplyLevel(_currentSpeedLevel + 1);
     }
 
     private void DecreaseSpeedLevel()
     {
-        if (_currentSpeedLevel > 1)
-        {
-            _currentSpeedLevel--;
-            UpdateSpeedByLevel();
-        }
+        ApplyLevel(_currentSpeedLevel - 1);
+    }
+
+    private void GenerateWordsSequence()
+    {
+        _currentSequence = _wordPool
+            .OrderBy(_ => _random.Next())
+            .Take(_wordsPerRound)
+            .ToList();
+
+        _correctAnswer = _currentSequence.Last();
     }
 
     private void GenerateAnswerOptions()
     {
-        _correctAnswer = _words.Last();
+        var config = DifficultyLevels[_currentSpeedLevel - 1];
 
-        var random = new Random();
-        var distractors = _distractorWords
-            .Where(word => word != _correctAnswer)
-            .OrderBy(_ => random.Next())
+        IEnumerable<string> distractorPool = _wordPool.Where(word => word != _correctAnswer && !_currentSequence.Contains(word));
+
+        if (config.UseSimilarDistractors)
+        {
+            var similar = distractorPool
+                .Where(word => word.Length == _correctAnswer.Length || word[0] == _correctAnswer[0])
+                .ToList();
+
+            if (similar.Count >= 3)
+            {
+                distractorPool = similar;
+            }
+        }
+
+        var distractors = distractorPool
+            .OrderBy(_ => _random.Next())
             .Take(3)
             .ToList();
 
         _answerOptions = new List<string>(distractors) { _correctAnswer }
-            .OrderBy(_ => random.Next())
+            .OrderBy(_ => _random.Next())
             .ToList();
     }
 
@@ -83,12 +150,18 @@ public partial class RunningWordsPage : ContentPage
     {
         CurrentWordLabel.Text = "Нажмите кнопку, чтобы начать";
         SetAnswerButtonsEnabled(false);
+        UpdateDifficultyLabel();
         UpdateStatusText("После показа слов нужно выбрать последнее слово.");
+    }
+
+    private void UpdateDifficultyLabel()
+    {
+        DifficultyLabel.Text = $"Уровень {_currentSpeedLevel}: {_wordsPerRound} слов, скорость {_wordDisplayMilliseconds} мс. Рекомендованный стартовый уровень: {_recommendedLevel}.";
     }
 
     private void UpdateStatusText(string message)
     {
-        StatusLabel.Text = $"{message} Уровень: {_currentSpeedLevel}, скорость: {_wordDisplayMilliseconds} мс. " +
+        StatusLabel.Text = $"{message} Уровень: {_currentSpeedLevel}, скорость: {_wordDisplayMilliseconds} мс, слов в серии: {_wordsPerRound}. " +
                            $"Правильных ответов: {_correctAnswersCount} из {_totalAttempts}";
     }
 
@@ -115,7 +188,7 @@ public partial class RunningWordsPage : ContentPage
 
     private async Task ShowWordsSequentiallyAsync(CancellationToken cancellationToken)
     {
-        foreach (var word in _words)
+        foreach (var word in _currentSequence)
         {
             cancellationToken.ThrowIfCancellationRequested();
             CurrentWordLabel.Text = word;
@@ -138,6 +211,7 @@ public partial class RunningWordsPage : ContentPage
             return;
         }
 
+        GenerateWordsSequence();
         GenerateAnswerOptions();
         UpdateAnswerButtons();
 
@@ -185,11 +259,13 @@ public partial class RunningWordsPage : ContentPage
             DecreaseSpeedLevel();
         }
 
+        _recommendedLevel = _currentSpeedLevel;
         _isAnswerSelection = false;
 
         SetAnswerButtonsEnabled(false);
         StartButton.IsEnabled = true;
         CurrentWordLabel.Text = _correctAnswer;
+        UpdateDifficultyLabel();
 
         if (isCorrect)
         {
@@ -231,4 +307,15 @@ public partial class RunningWordsPage : ContentPage
         await SaveStatisticsAsync();
         base.OnDisappearing();
     }
+
+    private static int ClampLevel(int level)
+    {
+        return Math.Clamp(level, 1, DifficultyLevels.Count);
+    }
+
+    private sealed record RunningWordsDifficultyConfig(
+        int Level,
+        int WordDisplayMilliseconds,
+        int WordsPerRound,
+        bool UseSimilarDistractors);
 }

@@ -6,30 +6,65 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
 
-            <Label Text="Моя статистика"
+            <Label Text="Статистика упражнения «Бегущие слова»"
                    FontSize="24"
                    HorizontalOptions="Center" />
 
-            <Label Text="Результаты упражнения Бегущие слова"
+            <Label x:Name="SummaryLabel"
                    FontSize="14"
                    HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
                    TextColor="Gray" />
+
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                <Border Grid.Row="0" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Лучшая точность" FontAttributes="Bold" />
+                        <Label x:Name="BestResultLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Средняя точность" FontAttributes="Bold" />
+                        <Label x:Name="AverageResultLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Текущий уровень" FontAttributes="Bold" />
+                        <Label x:Name="CurrentLevelLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Лучшая скорость" FontAttributes="Bold" />
+                        <Label x:Name="BestSpeedLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="2" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Всего прохождений" FontAttributes="Bold" />
+                        <Label x:Name="TotalTrainingsLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="2" Grid.Column="1" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Средний уровень" FontAttributes="Bold" />
+                        <Label x:Name="AverageLevelLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <Label Text="Динамика точности по попыткам"
+                   FontSize="18"
+                   FontAttributes="Bold" />
 
             <GraphicsView x:Name="ChartView"
                           HeightRequest="300"
                           HorizontalOptions="Fill" />
 
-            <Label x:Name="BestResultLabel"
-                   FontSize="16"
-                   HorizontalOptions="Center" />
-
-            <Label x:Name="AverageResultLabel"
-                   FontSize="16"
-                   HorizontalOptions="Center" />
-
-            <Label x:Name="TotalTrainingsLabel"
-                   FontSize="16"
-                   HorizontalOptions="Center" />
+            <Label x:Name="LastSessionLabel"
+                   FontSize="15" />
 
         </VerticalStackLayout>
     </ScrollView>

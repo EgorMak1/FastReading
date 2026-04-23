@@ -16,6 +16,13 @@
                 HorizontalOptions="Center"
                 Text="Бегущие слова" />
 
+            <Label
+                x:Name="DifficultyLabel"
+                FontSize="16"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                TextColor="#5C6BC0" />
+
             <Frame
                 Padding="20"
                 BorderColor="LightGray"
@@ -35,7 +42,7 @@
                         FontSize="14"
                         HorizontalOptions="Center"
                         HorizontalTextAlignment="Center"
-                        Text="После показа слов нужно выбрать последнее слово" />
+                        Text="После показа слов нужно выбрать последнее слово." />
                 </VerticalStackLayout>
             </Frame>
 
