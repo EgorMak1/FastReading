@@ -24,5 +24,7 @@
                 Clicked="OnRunningWordsClicked" />
         <Button Text="Поле зрения"
                 Clicked="OnFieldOfViewClicked" />
+        <Button Text="Затирание слов"
+                Clicked="OnWordErasingClicked" />
     </VerticalStackLayout>
 </ContentPage>

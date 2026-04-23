@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiApp1.Trainings.WordErasingPage"
+             Title="Затирание слов">
+    <Grid Padding="20">
+        <VerticalStackLayout x:Name="PreparationLayout"
+                             Spacing="16">
+            <Label Text="Затирание слов"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label x:Name="PreparationTitleLabel"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center" />
+
+            <Label x:Name="PreparationInfoLabel"
+                   FontSize="14"
+                   HorizontalTextAlignment="Center"
+                   TextColor="Gray" />
+
+            <Label x:Name="SpeedLabel"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center" />
+
+            <Button x:Name="StartButton"
+                    Text="Начать"
+                    Clicked="OnStartClicked" />
+        </VerticalStackLayout>
+
+        <Grid x:Name="ReadingLayout"
+              IsVisible="False"
+              RowDefinitions="Auto,Auto,Auto,*,Auto"
+              RowSpacing="12">
+            <Label x:Name="ReadingHeaderLabel"
+                   FontSize="18"
+                   FontAttributes="Bold" />
+
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*,Auto,Auto"
+                  ColumnSpacing="10">
+                <Label x:Name="TimerLabel"
+                       FontSize="16"
+                       FontAttributes="Bold" />
+                <Button Grid.Column="1"
+                        x:Name="StopButton"
+                        Text="Стоп"
+                        Clicked="OnStopClicked" />
+                <Button Grid.Column="2"
+                        x:Name="ReadyButton"
+                        Text="Готово"
+                        Clicked="OnReadyClicked" />
+            </Grid>
+
+            <ProgressBar Grid.Row="2"
+                         x:Name="TimerProgressBar"
+                         Progress="1" />
+
+            <ScrollView Grid.Row="3"
+                        x:Name="TextScrollView"
+                        Scrolled="OnTextScrolled">
+                <Label x:Name="ReadingTextLabel"
+                       FontFamily="Courier New"
+                       FontSize="17"
+                       LineBreakMode="WordWrap" />
+            </ScrollView>
+
+            <Label Grid.Row="4"
+                   x:Name="ReadingStatusLabel"
+                   FontSize="13"
+                   TextColor="Gray" />
+        </Grid>
+
+        <VerticalStackLayout x:Name="QuestionLayout"
+                             IsVisible="False"
+                             Spacing="14">
+            <Label x:Name="QuestionProgressLabel"
+                   FontSize="16"
+                   FontAttributes="Bold" />
+
+            <Label x:Name="QuestionPromptLabel"
+                   FontSize="20" />
+
+            <Button x:Name="AnswerButton1"
+                    Clicked="OnAnswerClicked"
+                    CommandParameter="0" />
+            <Button x:Name="AnswerButton2"
+                    Clicked="OnAnswerClicked"
+                    CommandParameter="1" />
+            <Button x:Name="AnswerButton3"
+                    Clicked="OnAnswerClicked"
+                    CommandParameter="2" />
+            <Button x:Name="AnswerButton4"
+                    Clicked="OnAnswerClicked"
+                    CommandParameter="3" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

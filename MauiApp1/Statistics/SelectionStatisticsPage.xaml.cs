@@ -29,4 +29,10 @@ public partial class SelectionStatisticsPage : ContentPage
         var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<FieldOfViewStatisticsPage>();
         await Navigation.PushAsync(page);
     }
+
+    private async void OnWordErasingStatisticsClicked(object sender, EventArgs e)
+    {
+        var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<WordErasingStatisticsPage>();
+        await Navigation.PushAsync(page);
+    }
 }

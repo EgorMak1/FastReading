@@ -25,5 +25,10 @@
                 HorizontalOptions="Fill"
                 Clicked="OnFieldOfViewStatisticsClicked" />
 
+        <Button Text="Затирание слов"
+                FontSize="18"
+                HorizontalOptions="Fill"
+                Clicked="OnWordErasingStatisticsClicked" />
+
     </VerticalStackLayout>
 </ContentPage>

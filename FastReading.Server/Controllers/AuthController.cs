@@ -119,24 +119,35 @@ namespace FastReading.Server.Controllers
             if (string.IsNullOrWhiteSpace(request.Email) ||
                 string.IsNullOrWhiteSpace(request.Password))
             {
-                return BadRequest("Email и пароль обязательны.");
+                return BadRequest("Email/логин и пароль обязательны.");
             }
 
-            var email = request.Email.Trim().ToLowerInvariant();
+            var login = request.Email.Trim().ToLowerInvariant();
 
-            var user = await _db.Users
-                .FirstOrDefaultAsync(x => x.Email.ToLower() == email);
+            User? user;
+
+            try
+            {
+                user = await _db.Users
+                    .FirstOrDefaultAsync(x =>
+                        x.Email.ToLower() == login ||
+                        x.Username.ToLower() == login);
+            }
+            catch (InvalidOperationException)
+            {
+                return StatusCode(503, "Сервер временно недоступен. Повторите попытку позже.");
+            }
 
             if (user == null)
             {
-                return Unauthorized("Неверный email или пароль.");
+                return Unauthorized("Неверный email/логин или пароль.");
             }
 
             var isValid = PasswordHashing.VerifyPassword(request.Password, user.PasswordHash);
 
             if (!isValid)
             {
-                return Unauthorized("Неверный email или пароль.");
+                return Unauthorized("Неверный email/логин или пароль.");
             }
 
             var jwt = _config.GetSection("Jwt");
@@ -198,24 +209,35 @@ namespace FastReading.Server.Controllers
 
             public static bool VerifyPassword(string password, string storedHash)
             {
-                var parts = storedHash.Split(':');
-                if (parts.Length != 2)
+                try
+                {
+                    var parts = storedHash.Split(':');
+                    if (parts.Length != 2)
+                    {
+                        return false;
+                    }
+
+                    var salt = Convert.FromBase64String(parts[0]);
+                    var expectedHash = Convert.FromBase64String(parts[1]);
+
+                    using var pbkdf2 = new Rfc2898DeriveBytes(
+                        password: password,
+                        salt: salt,
+                        iterations: 100_000,
+                        hashAlgorithm: HashAlgorithmName.SHA256);
+
+                    var actualHash = pbkdf2.GetBytes(32);
+
+                    return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
+                }
+                catch (FormatException)
                 {
                     return false;
                 }
-
-                var salt = Convert.FromBase64String(parts[0]);
-                var expectedHash = Convert.FromBase64String(parts[1]);
-
-                using var pbkdf2 = new Rfc2898DeriveBytes(
-                    password: password,
-                    salt: salt,
-                    iterations: 100_000,
-                    hashAlgorithm: HashAlgorithmName.SHA256);
-
-                var actualHash = pbkdf2.GetBytes(32);
-
-                return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
+                catch (ArgumentException)
+                {
+                    return false;
+                }
             }
 
         }

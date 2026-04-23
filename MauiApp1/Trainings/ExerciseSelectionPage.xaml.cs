@@ -29,4 +29,10 @@ public partial class ExerciseSelectionPage : ContentPage
         var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<FieldOfViewPage>();
         await Navigation.PushAsync(page);
     }
+
+    private async void OnWordErasingClicked(object sender, EventArgs e)
+    {
+        var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<WordErasingPage>();
+        await Navigation.PushAsync(page);
+    }
 }

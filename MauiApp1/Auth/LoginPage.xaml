@@ -7,7 +7,7 @@
     <VerticalStackLayout Padding="30" Spacing="15">
 
         <Entry x:Name="EmailEntry"
-               Placeholder="Email" />
+               Placeholder="Email or username" />
 
         <Entry x:Name="PasswordEntry"
                Placeholder="Password"

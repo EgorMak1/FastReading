@@ -25,10 +25,12 @@ namespace MauiApp1
             builder.Services.AddTransient<ShulteStatisticsPage>();
             builder.Services.AddTransient<RunningWordsStatisticsPage>();
             builder.Services.AddTransient<FieldOfViewStatisticsPage>();
+            builder.Services.AddTransient<WordErasingStatisticsPage>();
             builder.Services.AddTransient<RegisterPage>();
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RunningWordsPage>();
             builder.Services.AddTransient<FieldOfViewPage>();
+            builder.Services.AddTransient<WordErasingPage>();
 
             builder.Services.AddHttpClient();
             builder.Services.AddSingleton<ApiClient>();
