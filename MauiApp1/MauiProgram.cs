@@ -1,4 +1,5 @@
-﻿using MauiApp1.Auth;
+using MauiApp1.Auth;
+using MauiApp1.Profile;
 using MauiApp1.Services;
 using MauiApp1.Statistics;
 using MauiApp1.Trainings;
@@ -26,6 +27,7 @@ namespace MauiApp1
             builder.Services.AddTransient<RunningWordsStatisticsPage>();
             builder.Services.AddTransient<FieldOfViewStatisticsPage>();
             builder.Services.AddTransient<WordErasingStatisticsPage>();
+            builder.Services.AddTransient<ProfilePage>();
             builder.Services.AddTransient<RegisterPage>();
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<RunningWordsPage>();
@@ -35,6 +37,7 @@ namespace MauiApp1
             builder.Services.AddHttpClient();
             builder.Services.AddSingleton<ApiClient>();
             builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddSingleton<ProfileService>();
             builder.Services.AddSingleton<StatisticsService>();
 
             return builder.Build();

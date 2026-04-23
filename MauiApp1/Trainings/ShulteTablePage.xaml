@@ -2,36 +2,43 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiApp1.Trainings.ShulteTablePage"
-             Title="ShulteTablePage">
-    <VerticalStackLayout>
-        <!-- Заголовок -->
-        <Label Text="Таблица Шульте"
+             Title="Таблица Шульте">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+            <Label Text="Таблица Шульте"
                    FontSize="32"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center" />
+                   HorizontalOptions="Center" />
 
-        <!-- Надпись для следующего числа -->
-        <Label x:Name="NextNumberLabel"
+            <Label x:Name="DifficultyLabel"
+                   FontSize="18"
+                   HorizontalOptions="Center"
+                   TextColor="#B39DDB" />
+
+            <Label x:Name="SessionStatsLabel"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   TextColor="Gray" />
+
+            <Label x:Name="NextNumberLabel"
                    Text="Найди: 1"
                    FontSize="24"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center" />
+                   HorizontalOptions="Center" />
 
-        <!-- Таймер -->
-        <Label x:Name="TimerLabel"
+            <Label x:Name="TimerLabel"
                    FontSize="24"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center" />
+                   HorizontalOptions="Center" />
 
-        <!-- Таблица Шульте -->
-        <Grid x:Name="ShulteTableGrid"
-                  RowSpacing="10"
-                  ColumnSpacing="10"/>
+            <Grid x:Name="ShulteTableGrid"
+                  RowSpacing="8"
+                  ColumnSpacing="8"
+                  HorizontalOptions="Fill"
+                  VerticalOptions="Fill" />
 
-        <!-- Кнопка для завершения тренировки -->
-        <Button Text="Завершить тренировку"
+            <Button Text="Завершить тренировку"
                     BackgroundColor="Red"
                     TextColor="White"
-                    Clicked="OnFinishTrainingClicked"/>
-    </VerticalStackLayout>
+                    Clicked="OnFinishTrainingClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

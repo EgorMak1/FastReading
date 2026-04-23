@@ -1,4 +1,5 @@
-﻿using MauiApp1.Auth;
+using MauiApp1.Auth;
+using MauiApp1.Profile;
 using MauiApp1.Statistics;
 using MauiApp1.Trainings;
 
@@ -20,6 +21,12 @@ namespace MauiApp1
         private async void OnViewStatisticsClicked(object sender, EventArgs e)
         {
             var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<SelectionStatisticsPage>();
+            await Navigation.PushAsync(page);
+        }
+
+        private async void OnViewProfileClicked(object sender, EventArgs e)
+        {
+            var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<ProfilePage>();
             await Navigation.PushAsync(page);
         }
 

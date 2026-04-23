@@ -3,6 +3,7 @@ using System;
 using FastReading.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FastReading.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260423162645_AddShulteResults")]
+    partial class AddShulteResults
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,52 +206,6 @@ namespace FastReading.Server.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("FastReading.Server.Models.UserExerciseProgress", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<double>("AverageScore")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("BestScore")
-                        .HasColumnType("double precision");
-
-                    b.Property<int>("CurrentLevel")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ExerciseType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<int>("FailStreak")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("LastPlayedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<double>("LastScore")
-                        .HasColumnType("double precision");
-
-                    b.Property<int>("SessionsCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("SuccessStreak")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "ExerciseType")
-                        .IsUnique();
-
-                    b.ToTable("UserExerciseProgresses");
-                });
-
             modelBuilder.Entity("FastReading.Server.Models.WordErasingResult", b =>
                 {
                     b.Property<Guid>("Id")
@@ -346,15 +303,6 @@ namespace FastReading.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FastReading.Server.Models.UserExerciseProgress", b =>
-                {
-                    b.HasOne("FastReading.Server.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("FastReading.Server.Models.WordErasingResult", b =>

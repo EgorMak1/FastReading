@@ -1,77 +1,166 @@
-using MauiApp1.Services;
-using System.Diagnostics;
+ï»¿using MauiApp1.Services;
 
 namespace MauiApp1.Trainings
 {
     public partial class ShulteTablePage : ContentPage
     {
-        private int _currentNumber = 1;
-        private DateTime _startTime;
-        private readonly List<Button> _buttons = new();
-        private int _errors = 0;
-        private bool _timerRunning;
+        private static readonly IReadOnlyList<ShulteDifficultyConfig> DifficultyLevels =
+        [
+            new(1, 4, 16, 24, 45, false),
+            new(2, 5, 25, 20, 60, false),
+            new(3, 5, 25, 18, 50, false),
+            new(4, 5, 25, 18, 45, true),
+            new(5, 6, 36, 16, 80, true)
+        ];
+
         private readonly StatisticsService _statisticsService;
+        private readonly List<Button> _buttons = [];
+
+        private ShulteDifficultyConfig _currentConfig = DifficultyLevels[0];
+        private int _currentNumber = 1;
+        private int _errors;
+        private int _recommendedLevel = 1;
+        private int _sessionLevelBefore = 1;
+        private bool _timerRunning;
+        private bool _isInitialized;
+        private bool _isFinishing;
+        private DateTime _startTime;
 
         public ShulteTablePage(StatisticsService statisticsService)
         {
             InitializeComponent();
             _statisticsService = statisticsService;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            if (_isInitialized)
+            {
+                return;
+            }
+
+            _isInitialized = true;
+            await InitializeDifficultyAsync();
+            StartNewSession();
+        }
+
+        private async Task InitializeDifficultyAsync()
+        {
+            try
+            {
+                var results = await _statisticsService.GetShulteResultsAsync();
+                var lastResult = results.LastOrDefault();
+
+                if (lastResult != null)
+                {
+                    _recommendedLevel = ClampLevel(lastResult.LevelAfter);
+                }
+            }
+            catch
+            {
+                _recommendedLevel = 1;
+            }
+        }
+
+        private void StartNewSession()
+        {
+            _sessionLevelBefore = _recommendedLevel;
+            _currentConfig = DifficultyLevels[_sessionLevelBefore - 1];
+            _currentNumber = 1;
+            _errors = 0;
+            _isFinishing = false;
+
             InitializeTable();
+            UpdateDifficultyLabels();
         }
 
         private void InitializeTable()
         {
-            const int gridSize = 5;
-            _currentNumber = 1;
-            _errors = 0;
+            _timerRunning = false;
             ShulteTableGrid.RowDefinitions.Clear();
             ShulteTableGrid.ColumnDefinitions.Clear();
             ShulteTableGrid.Children.Clear();
             _buttons.Clear();
 
-            for (int i = 0; i < gridSize; i++)
+            for (int i = 0; i < _currentConfig.GridSize; i++)
             {
                 ShulteTableGrid.RowDefinitions.Add(new RowDefinition(GridLength.Star));
                 ShulteTableGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
             }
 
             var numbers = Enumerable
-                .Range(1, gridSize * gridSize)
+                .Range(1, _currentConfig.NumbersCount)
                 .OrderBy(_ => Guid.NewGuid())
                 .ToList();
 
-            for (int row = 0; row < gridSize; row++)
+            for (int row = 0; row < _currentConfig.GridSize; row++)
             {
-                for (int col = 0; col < gridSize; col++)
+                for (int col = 0; col < _currentConfig.GridSize; col++)
                 {
+                    int number = numbers[row * _currentConfig.GridSize + col];
                     var button = new Button
                     {
-                        Text = numbers[row * gridSize + col].ToString(),
-                        FontSize = 20,
-                        BackgroundColor = Color.FromArgb("#D3D3D3")
+                        Text = number.ToString(),
+                        FontSize = _currentConfig.FontSize,
+                        BackgroundColor = GetButtonBackgroundColor(number),
+                        TextColor = Colors.Black
                     };
+
                     button.Clicked += OnButtonClicked;
                     _buttons.Add(button);
                     ShulteTableGrid.Add(button, col, row);
                 }
             }
 
-            NextNumberLabel.Text = $"Íàéäè: {_currentNumber}";
+            NextNumberLabel.Text = $"ÐÐ°Ð¹Ð´Ð¸: {_currentNumber}";
+            TimerLabel.Text = "Ð’Ñ€ÐµÐ¼Ñ: 00:00";
             _startTime = DateTime.Now;
             _timerRunning = true;
 
             Dispatcher.StartTimer(TimeSpan.FromSeconds(1), () =>
             {
-                if (!_timerRunning) return false;
-                TimerLabel.Text = $"Âðåìÿ: {DateTime.Now - _startTime:hh\\:mm\\:ss}";
+                if (!_timerRunning)
+                {
+                    return false;
+                }
+
+                TimerLabel.Text = $"Ð’Ñ€ÐµÐ¼Ñ: {DateTime.Now - _startTime:mm\\:ss}";
                 return true;
             });
         }
 
+        private Color GetButtonBackgroundColor(int number)
+        {
+            if (!_currentConfig.UseDistractorColors)
+            {
+                return Color.FromArgb("#D3D3D3");
+            }
+
+            var palette = new[]
+            {
+                Color.FromArgb("#D8E2FF"),
+                Color.FromArgb("#E8DEF8"),
+                Color.FromArgb("#D7F0E7"),
+                Color.FromArgb("#FFE6CC")
+            };
+
+            return palette[number % palette.Length];
+        }
+
+        private void UpdateDifficultyLabels()
+        {
+            DifficultyLabel.Text = $"Ð£Ñ€Ð¾Ð²ÐµÐ½ÑŒ {_currentConfig.Level}: ÑÐµÑ‚ÐºÐ° {_currentConfig.GridSize}x{_currentConfig.GridSize}, Ñ†ÐµÐ»ÑŒ Ð´Ð¾ {_currentConfig.TargetDurationSeconds} ÑÐµÐº.";
+            SessionStatsLabel.Text = $"Ð ÐµÐºÐ¾Ð¼ÐµÐ½Ð´Ð¾Ð²Ð°Ð½Ð½Ñ‹Ð¹ ÑÑ‚Ð°Ñ€Ñ‚Ð¾Ð²Ñ‹Ð¹ ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ: {_recommendedLevel}. ÐžÑˆÐ¸Ð±Ð¾Ðº Ð² Ñ‚ÐµÐºÑƒÑ‰ÐµÐ¹ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÐµ: {_errors}.";
+        }
+
         private async void OnButtonClicked(object? sender, EventArgs e)
         {
-            if (sender is not Button button)
+            if (sender is not Button button || _isFinishing)
+            {
                 return;
+            }
 
             int clickedNumber = int.Parse(button.Text);
 
@@ -79,45 +168,107 @@ namespace MauiApp1.Trainings
             {
                 button.BackgroundColor = Colors.Green;
                 _currentNumber++;
-                NextNumberLabel.Text = $"Íàéäè: {_currentNumber}";
-                Debug.WriteLine($"Òåêóùåå ÷èñëî: {_currentNumber}");
 
-                if (_currentNumber > 25)
+                if (_currentNumber > _currentConfig.NumbersCount)
                 {
                     await FinishTrainingAsync();
                     return;
                 }
+
+                NextNumberLabel.Text = $"ÐÐ°Ð¹Ð´Ð¸: {_currentNumber}";
             }
             else
             {
                 button.BackgroundColor = Colors.Red;
                 _errors++;
+                UpdateDifficultyLabels();
             }
 
-            await Task.Delay(400);
-            button.BackgroundColor = Color.FromArgb("#D3D3D3");
+            await Task.Delay(300);
+
+            if (!_isFinishing)
+            {
+                button.BackgroundColor = GetButtonBackgroundColor(clickedNumber);
+            }
         }
 
         private async Task FinishTrainingAsync()
         {
-            _timerRunning = false;
-            var timeSpent = DateTime.Now - _startTime;
-            var durationSeconds = (int)timeSpent.TotalSeconds;
+            if (_isFinishing)
+            {
+                return;
+            }
 
-            // Ñîõðàíÿåì ðåçóëüòàò íà ñåðâåð
+            _isFinishing = true;
+            _timerRunning = false;
+
+            var timeSpent = DateTime.Now - _startTime;
+            int durationSeconds = Math.Max(1, (int)Math.Round(timeSpent.TotalSeconds));
+            double score = CalculateScore(durationSeconds, _errors, _currentConfig);
+            int levelAfter = CalculateNextLevel(score, _errors, _sessionLevelBefore);
+            _recommendedLevel = levelAfter;
+
             await _statisticsService.SaveResultAsync("ShulteTable", durationSeconds);
+            await _statisticsService.SaveShulteResultAsync(new ShulteResultRequest
+            {
+                GridSize = _currentConfig.GridSize,
+                NumbersCount = _currentConfig.NumbersCount,
+                LevelBefore = _sessionLevelBefore,
+                LevelAfter = levelAfter,
+                DurationSeconds = durationSeconds,
+                ErrorsCount = _errors,
+                Score = score
+            });
 
             await DisplayAlert(
-                "Òðåíèðîâêà çàâåðøåíà",
-                $"Âðåìÿ: {timeSpent:hh\\:mm\\:ss}\nÎøèáêè: {_errors}",
+                "Ð¢Ñ€ÐµÐ½Ð¸Ñ€Ð¾Ð²ÐºÐ° Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð°",
+                $"Ð’Ñ€ÐµÐ¼Ñ: {timeSpent:mm\\:ss}\nÐžÑˆÐ¸Ð±ÐºÐ¸: {_errors}\nScore: {score:F0}\nÐ¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ: {levelAfter}",
                 "OK");
 
             await Navigation.PopAsync();
+        }
+
+        private static double CalculateScore(int durationSeconds, int errorsCount, ShulteDifficultyConfig config)
+        {
+            double timeDelta = durationSeconds - config.TargetDurationSeconds;
+            double timePenalty = Math.Max(0, timeDelta * 1.8);
+            double speedBonus = Math.Max(0, Math.Min(15, (config.TargetDurationSeconds - durationSeconds) * 0.8));
+            double errorPenalty = errorsCount * 8;
+
+            return Math.Clamp(100 - timePenalty - errorPenalty + speedBonus, 0, 100);
+        }
+
+        private static int CalculateNextLevel(double score, int errorsCount, int currentLevel)
+        {
+            if (score >= 85 && errorsCount <= 1)
+            {
+                return ClampLevel(currentLevel + 1);
+            }
+
+            if (score < 55 || errorsCount >= 5)
+            {
+                return ClampLevel(currentLevel - 1);
+            }
+
+            return ClampLevel(currentLevel);
+        }
+
+        private static int ClampLevel(int level)
+        {
+            return Math.Clamp(level, 1, DifficultyLevels.Count);
         }
 
         private async void OnFinishTrainingClicked(object sender, EventArgs e)
         {
             await FinishTrainingAsync();
         }
+
+        private sealed record ShulteDifficultyConfig(
+            int Level,
+            int GridSize,
+            int NumbersCount,
+            int FontSize,
+            int TargetDurationSeconds,
+            bool UseDistractorColors);
     }
 }
