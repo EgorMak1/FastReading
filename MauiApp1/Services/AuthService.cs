@@ -23,30 +23,45 @@ namespace MauiApp1.Services
 
         public async Task<string?> LoginAsync(string email, string password)
         {
-            var response = await _api.Http.PostAsJsonAsync("api/auth/login", new
+            try
             {
-                email,
-                password
-            });
+                var response = await _api.Http.PostAsJsonAsync("api/auth/login", new
+                {
+                    email,
+                    password
+                });
 
-            if (!response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+
+                var data = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                if (data == null || string.IsNullOrWhiteSpace(data.AccessToken))
+                {
+                    return null;
+                }
+
+                await SecureStorage.Default.SetAsync(TokenKey, data.AccessToken);
+
+                // сразу выставляем токен в HttpClient
+                _api.Http.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", data.AccessToken);
+
+                return data.AccessToken;
+            }
+            catch (HttpRequestException)
             {
                 return null;
             }
-
-            var data = await response.Content.ReadFromJsonAsync<LoginResponse>();
-            if (data == null || string.IsNullOrWhiteSpace(data.AccessToken))
+            catch (TaskCanceledException)
             {
                 return null;
             }
-
-            await SecureStorage.Default.SetAsync(TokenKey, data.AccessToken);
-
-            // сразу выставляем токен в HttpClient
-            _api.Http.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", data.AccessToken);
-
-            return data.AccessToken;
+            catch (System.Text.Json.JsonException)
+            {
+                return null;
+            }
         }
 
         public async Task<string?> GetAccessTokenAsync()
