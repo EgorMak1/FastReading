@@ -5,28 +5,29 @@ namespace MauiApp1.Trainings;
 
 public partial class FieldOfViewPage : ContentPage
 {
-    private const int GridSize = 5;
-
     private static readonly IReadOnlyList<FieldOfViewDifficultyConfig> DifficultyLevels =
     [
-        new(1, 1800, 0.20, 1, 4, false),
-        new(2, 1500, 0.28, 1, 4, false),
-        new(3, 1200, 0.35, 2, 3, false),
-        new(4, 900, 0.42, 2, 3, true),
-        new(5, 700, 0.50, 2, 2, true)
+        new(1, 5, 1800, 0.20, 1, 4, false),
+        new(2, 5, 1450, 0.28, 1, 4, false),
+        new(3, 7, 1100, 0.35, 2, 3, false),
+        new(4, 7, 850, 0.42, 2, 3, true),
+        new(5, 7, 650, 0.50, 3, 2, true)
     ];
 
     private static readonly char[] EasyLetters = "АБВГДЕЖЗИКЛМНОПРСТУФХ".ToCharArray();
     private static readonly char[] HardLetters = "НОСЕРХУКМ".ToCharArray();
 
     private readonly Label[] _edgeLabels = new Label[4];
+    private readonly List<Label> _fillerLabels = [];
     private readonly Random _random = new();
     private readonly StatisticsService _statisticsService;
     private readonly HashSet<int> _currentMismatchIndexes = [];
 
     private CancellationTokenSource? _exerciseCancellation;
+    private TaskCompletionSource<bool>? _gridConfirmationSource;
     private FieldOfViewDifficultyConfig _currentConfig = DifficultyLevels[0];
 
+    private int _gridSize = DifficultyLevels[0].GridSize;
     private int _currentLevel = 1;
     private int _recommendedLevel = 1;
     private int _currentIntervalMilliseconds = 1800;
@@ -40,6 +41,7 @@ public partial class FieldOfViewPage : ContentPage
     private char _currentBaseLetter;
 
     private bool _isRunning;
+    private bool _awaitingGridConfirmation;
     private bool _currentRoundScored;
     private bool _statisticsSaved;
     private bool _isInitialized;
@@ -49,7 +51,7 @@ public partial class FieldOfViewPage : ContentPage
         InitializeComponent();
         _statisticsService = statisticsService;
         BuildFieldGrid();
-        ResetBoard();
+        PrepareBoardForExercise();
         ApplyLevel(_currentLevel);
         UpdateStatsText();
     }
@@ -93,16 +95,22 @@ public partial class FieldOfViewPage : ContentPage
         FieldGrid.RowDefinitions.Clear();
         FieldGrid.ColumnDefinitions.Clear();
         FieldGrid.Children.Clear();
+        Array.Clear(_edgeLabels);
+        _fillerLabels.Clear();
 
-        for (int i = 0; i < GridSize; i++)
+        for (int i = 0; i < _gridSize; i++)
         {
             FieldGrid.RowDefinitions.Add(new RowDefinition(GridLength.Star));
             FieldGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
         }
 
-        for (int row = 0; row < GridSize; row++)
+        int middle = _gridSize / 2;
+        double fillerFontSize = _gridSize >= 7 ? 18 : 24;
+        double edgeFontSize = _gridSize >= 7 ? 24 : 30;
+
+        for (int row = 0; row < _gridSize; row++)
         {
-            for (int col = 0; col < GridSize; col++)
+            for (int col = 0; col < _gridSize; col++)
             {
                 var border = new Border
                 {
@@ -115,13 +123,13 @@ public partial class FieldOfViewPage : ContentPage
                     }
                 };
 
-                if (row == GridSize / 2 && col == GridSize / 2)
+                if (row == middle && col == middle)
                 {
                     border.BackgroundColor = Color.FromArgb("#F3F6FA");
                     border.Content = new Label
                     {
                         FontAttributes = FontAttributes.Bold,
-                        FontSize = 14,
+                        FontSize = _gridSize >= 7 ? 12 : 14,
                         HorizontalOptions = LayoutOptions.Center,
                         HorizontalTextAlignment = TextAlignment.Center,
                         Text = "Смотри\nв центр",
@@ -130,12 +138,12 @@ public partial class FieldOfViewPage : ContentPage
                         VerticalTextAlignment = TextAlignment.Center
                     };
                 }
-                else if (IsEdgeCenter(row, col))
+                else if (IsEdgeCenter(row, col, _gridSize))
                 {
                     var label = new Label
                     {
                         FontAttributes = FontAttributes.Bold,
-                        FontSize = 30,
+                        FontSize = edgeFontSize,
                         HorizontalOptions = LayoutOptions.Center,
                         HorizontalTextAlignment = TextAlignment.Center,
                         Text = "•",
@@ -144,21 +152,24 @@ public partial class FieldOfViewPage : ContentPage
                     };
 
                     border.Content = label;
-                    _edgeLabels[GetEdgeIndex(row, col)] = label;
+                    _edgeLabels[GetEdgeIndex(row, col, _gridSize)] = label;
                 }
                 else
                 {
-                    border.Content = new Label
+                    var label = new Label
                     {
                         FontAttributes = FontAttributes.Bold,
-                        FontSize = 24,
+                        FontSize = fillerFontSize,
                         HorizontalOptions = LayoutOptions.Center,
                         HorizontalTextAlignment = TextAlignment.Center,
-                        Text = GetRandomLetter().ToString(),
+                        Text = string.Empty,
                         TextColor = Colors.Black,
                         VerticalOptions = LayoutOptions.Center,
                         VerticalTextAlignment = TextAlignment.Center
                     };
+
+                    border.Content = label;
+                    _fillerLabels.Add(label);
                 }
 
                 FieldGrid.Add(border, col, row);
@@ -166,30 +177,30 @@ public partial class FieldOfViewPage : ContentPage
         }
     }
 
-    private static bool IsEdgeCenter(int row, int col)
+    private static bool IsEdgeCenter(int row, int col, int gridSize)
     {
-        int middle = GridSize / 2;
+        int middle = gridSize / 2;
         return (row == 0 && col == middle)
             || (row == middle && col == 0)
-            || (row == middle && col == GridSize - 1)
-            || (row == GridSize - 1 && col == middle);
+            || (row == middle && col == gridSize - 1)
+            || (row == gridSize - 1 && col == middle);
     }
 
-    private static int GetEdgeIndex(int row, int col)
+    private static int GetEdgeIndex(int row, int col, int gridSize)
     {
-        int middle = GridSize / 2;
+        int middle = gridSize / 2;
 
         if (row == 0 && col == middle)
         {
             return 0;
         }
 
-        if (row == middle && col == GridSize - 1)
+        if (row == middle && col == gridSize - 1)
         {
             return 1;
         }
 
-        if (row == GridSize - 1 && col == middle)
+        if (row == gridSize - 1 && col == middle)
         {
             return 2;
         }
@@ -201,7 +212,28 @@ public partial class FieldOfViewPage : ContentPage
     {
         _currentLevel = ClampLevel(level);
         _currentConfig = DifficultyLevels[_currentLevel - 1];
+        bool gridChanged = _gridSize != _currentConfig.GridSize;
+        _gridSize = _currentConfig.GridSize;
         _currentIntervalMilliseconds = _currentConfig.IntervalMilliseconds;
+
+        if (gridChanged)
+        {
+            BuildFieldGrid();
+
+            if (_isRunning && _roundsCount > 0)
+            {
+                EnterGridPreviewMode();
+            }
+            else
+            {
+                PrepareBoardForExercise();
+            }
+        }
+        else if (!_awaitingGridConfirmation)
+        {
+            ResetBoard();
+        }
+
         UpdateDifficultyLabel();
     }
 
@@ -210,10 +242,34 @@ public partial class FieldOfViewPage : ContentPage
         string lettersMode = _currentConfig.UseHardLetters ? "похожие буквы" : "обычные буквы";
 
         DifficultyLabel.Text =
-            $"Уровень {_currentLevel}: интервал {_currentIntervalMilliseconds} мс, " +
+            $"Уровень {_currentLevel}: поле {_gridSize}x{_gridSize}, интервал {_currentIntervalMilliseconds} мс, " +
             $"шанс несовпадения {_currentConfig.MismatchChance:P0}, до {_currentConfig.MaxMismatchCount} отличий, {lettersMode}. " +
             $"Повышение после {_currentConfig.CorrectRoundsToIncreaseLevel} правильных раундов подряд. " +
             $"Рекомендуемый стартовый уровень: {_recommendedLevel}.";
+    }
+
+    private void PrepareBoardForExercise()
+    {
+        PopulateFillerLetters();
+        ResetBoard();
+    }
+
+    private void PopulateFillerLetters()
+    {
+        foreach (var label in _fillerLabels)
+        {
+            label.Text = GetRandomLetter().ToString();
+            label.TextColor = Colors.Black;
+        }
+    }
+
+    private void ClearFillerLetters()
+    {
+        foreach (var label in _fillerLabels)
+        {
+            label.Text = string.Empty;
+            label.TextColor = Colors.Black;
+        }
     }
 
     private void ResetBoard()
@@ -222,12 +278,51 @@ public partial class FieldOfViewPage : ContentPage
 
         foreach (var label in _edgeLabels)
         {
-            if (label != null)
+            if (label == null)
             {
-                label.Text = "•";
-                label.TextColor = Colors.Black;
+                continue;
             }
+
+            label.Text = "•";
+            label.TextColor = Colors.Black;
         }
+    }
+
+    private void EnterGridPreviewMode()
+    {
+        _awaitingGridConfirmation = true;
+        _gridConfirmationSource = new TaskCompletionSource<bool>();
+        _currentRoundScored = true;
+
+        ClearFillerLetters();
+
+        foreach (var label in _edgeLabels)
+        {
+            if (label == null)
+            {
+                continue;
+            }
+
+            label.Text = "•";
+            label.TextColor = Color.FromArgb("#5C6BC0");
+        }
+
+        ReadyButton.IsVisible = true;
+        ReadyButton.IsEnabled = true;
+        ErrorButton.IsEnabled = false;
+        StatusLabel.Text =
+            $"Размер сетки изменён на {_gridSize}x{_gridSize}. Посмотрите на пустую сетку и ориентиры по краям, затем нажмите «Готов».";
+    }
+
+    private async Task WaitForGridConfirmationAsync(CancellationToken cancellationToken)
+    {
+        if (!_awaitingGridConfirmation || _gridConfirmationSource == null)
+        {
+            return;
+        }
+
+        using var registration = cancellationToken.Register(() => _gridConfirmationSource.TrySetCanceled(cancellationToken));
+        await _gridConfirmationSource.Task;
     }
 
     private void ResetSession()
@@ -242,8 +337,12 @@ public partial class FieldOfViewPage : ContentPage
         _currentRoundScored = false;
         _statisticsSaved = false;
         _currentBaseLetter = default;
+        _awaitingGridConfirmation = false;
+        _gridConfirmationSource = null;
 
-        ResetBoard();
+        ReadyButton.IsVisible = false;
+        ReadyButton.IsEnabled = false;
+        PrepareBoardForExercise();
         UpdateStatsText();
     }
 
@@ -251,6 +350,7 @@ public partial class FieldOfViewPage : ContentPage
     {
         while (!cancellationToken.IsCancellationRequested)
         {
+            await WaitForGridConfirmationAsync(cancellationToken);
             ShowNextRound();
 
             try
@@ -371,7 +471,7 @@ public partial class FieldOfViewPage : ContentPage
     private void UpdateStatsText()
     {
         StatsLabel.Text =
-            $"Уровень: {_currentLevel}, интервал: {_currentIntervalMilliseconds} мс. " +
+            $"Уровень: {_currentLevel}, поле: {_gridSize}x{_gridSize}, интервал: {_currentIntervalMilliseconds} мс. " +
             $"Раундов: {_roundsCount}, правильных: {_correctRoundsCount}, " +
             $"найдено ошибок: {_detectedMismatchCount}, пропущено: {_missedMismatchCount}, ложных: {_falseAlarmCount}.";
     }
@@ -397,12 +497,16 @@ public partial class FieldOfViewPage : ContentPage
         {
             await RunExerciseLoopAsync(_exerciseCancellation.Token);
         }
+        catch (OperationCanceledException)
+        {
+        }
         finally
         {
             _isRunning = false;
             StartButton.IsEnabled = true;
             StopButton.IsEnabled = false;
             ErrorButton.IsEnabled = false;
+            ReadyButton.IsEnabled = false;
         }
     }
 
@@ -411,9 +515,26 @@ public partial class FieldOfViewPage : ContentPage
         await StopAndSaveAsync("Тренировка остановлена.");
     }
 
+    private void OnReadyClicked(object sender, EventArgs e)
+    {
+        if (!_awaitingGridConfirmation || _gridConfirmationSource == null)
+        {
+            return;
+        }
+
+        _awaitingGridConfirmation = false;
+        ReadyButton.IsVisible = false;
+        ReadyButton.IsEnabled = false;
+        ErrorButton.IsEnabled = _isRunning;
+        PrepareBoardForExercise();
+        StatusLabel.Text = $"Новая сетка {_gridSize}x{_gridSize} подтверждена. Продолжаем упражнение.";
+        _gridConfirmationSource.TrySetResult(true);
+        _gridConfirmationSource = null;
+    }
+
     private void OnErrorClicked(object sender, EventArgs e)
     {
-        if (!_isRunning || _currentRoundScored)
+        if (!_isRunning || _currentRoundScored || _awaitingGridConfirmation)
         {
             return;
         }
@@ -447,6 +568,7 @@ public partial class FieldOfViewPage : ContentPage
 
         var request = new FieldOfViewResultRequest
         {
+            GridSize = _gridSize,
             TotalRounds = _roundsCount,
             CorrectRounds = _correctRoundsCount,
             DetectedMismatchCount = _detectedMismatchCount,
@@ -463,7 +585,11 @@ public partial class FieldOfViewPage : ContentPage
     private async Task StopAndSaveAsync(string message)
     {
         _exerciseCancellation?.Cancel();
+        _gridConfirmationSource?.TrySetCanceled();
+        _awaitingGridConfirmation = false;
         _isRunning = false;
+        ReadyButton.IsVisible = false;
+        ReadyButton.IsEnabled = false;
         StatusLabel.Text = message;
         ResetBoard();
         await SaveStatisticsAsync();
@@ -482,6 +608,7 @@ public partial class FieldOfViewPage : ContentPage
 
     private sealed record FieldOfViewDifficultyConfig(
         int Level,
+        int GridSize,
         int IntervalMilliseconds,
         double MismatchChance,
         int MaxMismatchCount,

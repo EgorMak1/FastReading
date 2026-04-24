@@ -173,6 +173,9 @@ namespace FastReading.Server.Data
             {
                 entity.HasKey(x => x.Id);
 
+                entity.Property(x => x.GridSize)
+                      .IsRequired();
+
                 entity.Property(x => x.TotalRounds)
                       .IsRequired();
 

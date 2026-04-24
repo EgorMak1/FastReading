@@ -205,6 +205,7 @@ namespace MauiApp1.Services
 
     public class FieldOfViewResultRequest
     {
+        public int GridSize { get; set; }
         public int TotalRounds { get; set; }
         public int CorrectRounds { get; set; }
         public int DetectedMismatchCount { get; set; }
@@ -218,6 +219,7 @@ namespace MauiApp1.Services
     public class FieldOfViewResultDto
     {
         public Guid Id { get; set; }
+        public int GridSize { get; set; }
         public int TotalRounds { get; set; }
         public int CorrectRounds { get; set; }
         public int DetectedMismatchCount { get; set; }

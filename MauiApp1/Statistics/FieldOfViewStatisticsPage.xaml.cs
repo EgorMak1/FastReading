@@ -44,7 +44,7 @@ public partial class FieldOfViewStatisticsPage : ContentPage
         var bestInterval = fieldOfViewResults.Min(r => r.FinalIntervalMilliseconds);
         var averageLevel = fieldOfViewResults.Average(r => r.FinalLevel);
 
-        SummaryLabel.Text = "Статистика показывает, насколько точно пользователь замечает отличия и удерживает сложность на высоких скоростях.";
+        SummaryLabel.Text = "Статистика показывает, насколько точно пользователь замечает отличия и удерживает сложность при росте скорости и размера поля.";
         BestResultLabel.Text = $"{best:F1}%";
         AverageResultLabel.Text = $"{average:F1}%";
         CurrentLevelLabel.Text = last.FinalLevel.ToString();
@@ -55,6 +55,7 @@ public partial class FieldOfViewStatisticsPage : ContentPage
             $"Последняя сессия: {last.CompletedAt.ToLocalTime():dd.MM.yyyy HH:mm}\n" +
             $"Точность: {last.AccuracyPercent:F1}%\n" +
             $"Уровень: {last.FinalLevel}\n" +
+            $"Поле: {last.GridSize}x{last.GridSize}\n" +
             $"Интервал: {last.FinalIntervalMilliseconds} мс\n" +
             $"Найдено отличий: {last.DetectedMismatchCount}, пропущено: {last.MissedMismatchCount}, ложных тревог: {last.FalseAlarmCount}";
 

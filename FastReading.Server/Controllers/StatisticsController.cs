@@ -205,15 +205,16 @@ namespace FastReading.Server.Controllers
                 return Unauthorized();
             }
 
-            if (request.TotalRounds <= 0)
+            if (request.GridSize <= 0 || request.TotalRounds <= 0)
             {
-                return BadRequest("TotalRounds must be greater than 0.");
+                return BadRequest("GridSize and TotalRounds must be greater than 0.");
             }
 
             var result = new FieldOfViewResult
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
+                GridSize = request.GridSize,
                 TotalRounds = request.TotalRounds,
                 CorrectRounds = request.CorrectRounds,
                 DetectedMismatchCount = request.DetectedMismatchCount,
@@ -251,6 +252,7 @@ namespace FastReading.Server.Controllers
                 .Select(x => new
                 {
                     x.Id,
+                    x.GridSize,
                     x.TotalRounds,
                     x.CorrectRounds,
                     x.DetectedMismatchCount,
@@ -422,7 +424,14 @@ namespace FastReading.Server.Controllers
         {
             var penalty = request.FalseAlarmCount * 4 + request.MissedMismatchCount * 5;
             var levelBonus = Math.Min(20, request.FinalLevel * 4);
-            return Math.Clamp(request.AccuracyPercent * 0.75 + levelBonus - penalty, 0, 100);
+            var gridBonus = request.GridSize switch
+            {
+                >= 7 => 8,
+                >= 5 => 4,
+                _ => 0
+            };
+
+            return Math.Clamp(request.AccuracyPercent * 0.7 + levelBonus + gridBonus - penalty, 0, 100);
         }
 
         private static double CalculateWordErasingScore(WordErasingResultRequest request)
@@ -474,6 +483,7 @@ namespace FastReading.Server.Controllers
 
     public class FieldOfViewResultRequest
     {
+        public int GridSize { get; set; }
         public int TotalRounds { get; set; }
         public int CorrectRounds { get; set; }
         public int DetectedMismatchCount { get; set; }

@@ -54,7 +54,7 @@
                 x:Name="StatsLabel"
                 FontSize="14"
                 HorizontalTextAlignment="Center"
-                Text="Уровень: 1, интервал: 1800 мс. Раундов: 0, правильных: 0." />
+                Text="Уровень: 1, поле: 5x5, интервал: 1800 мс. Раундов: 0, правильных: 0." />
 
             <HorizontalStackLayout
                 HorizontalOptions="Center"
@@ -71,6 +71,12 @@
                     IsEnabled="False"
                     Text="Стоп" />
             </HorizontalStackLayout>
+
+            <Button
+                x:Name="ReadyButton"
+                Clicked="OnReadyClicked"
+                IsVisible="False"
+                Text="Готов" />
 
             <Button
                 x:Name="ErrorButton"

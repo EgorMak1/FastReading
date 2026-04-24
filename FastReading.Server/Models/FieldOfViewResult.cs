@@ -4,6 +4,7 @@ namespace FastReading.Server.Models
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
+        public int GridSize { get; set; }
         public int TotalRounds { get; set; }
         public int CorrectRounds { get; set; }
         public int DetectedMismatchCount { get; set; }
