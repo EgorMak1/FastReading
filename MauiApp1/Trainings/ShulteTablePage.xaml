@@ -6,21 +6,17 @@
     Title="Таблица Шульте">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="12">
-            <Label
-                FontSize="32"
-                HorizontalOptions="Center"
-                Text="Таблица Шульте" />
-
+        <VerticalStackLayout Padding="16" Spacing="10">
             <Label
                 x:Name="DifficultyLabel"
-                FontSize="18"
+                FontSize="15"
                 HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
                 TextColor="#B39DDB" />
 
             <Label
                 x:Name="SessionStatsLabel"
-                FontSize="14"
+                FontSize="13"
                 HorizontalOptions="Center"
                 HorizontalTextAlignment="Center"
                 TextColor="Gray" />
@@ -30,7 +26,7 @@
                 Spacing="8">
                 <Label
                     FontAttributes="Bold"
-                    FontSize="16"
+                    FontSize="15"
                     Text="Инструменты разработки"
                     TextColor="#5C6BC0" />
                 <HorizontalStackLayout Spacing="8">
@@ -38,27 +34,35 @@
                         BackgroundColor="#43A047"
                         Clicked="OnSimulateLevelUpClicked"
                         HorizontalOptions="Fill"
-                        Text="Смоделировать повышение"
+                        Text="Повышение"
                         TextColor="White" />
                     <Button
                         BackgroundColor="#E53935"
                         Clicked="OnSimulateLevelDownClicked"
                         HorizontalOptions="Fill"
-                        Text="Смоделировать понижение"
+                        Text="Понижение"
                         TextColor="White" />
                 </HorizontalStackLayout>
             </VerticalStackLayout>
 
-            <Label
-                x:Name="NextNumberLabel"
-                FontSize="24"
-                HorizontalOptions="Center"
-                Text="Найди: 1" />
+            <Grid
+                ColumnDefinitions="*,*"
+                ColumnSpacing="10">
+                <Label
+                    x:Name="NextNumberLabel"
+                    Grid.Column="0"
+                    FontAttributes="Bold"
+                    FontSize="20"
+                    HorizontalTextAlignment="Center"
+                    Text="Найди: 1" />
 
-            <Label
-                x:Name="TimerLabel"
-                FontSize="24"
-                HorizontalOptions="Center" />
+                <Label
+                    x:Name="TimerLabel"
+                    Grid.Column="1"
+                    FontAttributes="Bold"
+                    FontSize="20"
+                    HorizontalTextAlignment="Center" />
+            </Grid>
 
             <Grid
                 x:Name="ShulteTableGrid"
@@ -70,7 +74,7 @@
             <Button
                 BackgroundColor="Red"
                 Clicked="OnFinishTrainingClicked"
-                Text="Завершить тренировку"
+                Text="Завершить"
                 TextColor="White" />
         </VerticalStackLayout>
     </ScrollView>

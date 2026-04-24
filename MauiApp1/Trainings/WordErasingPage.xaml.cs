@@ -139,7 +139,6 @@ public partial class WordErasingPage : ContentPage
         _isReading = true;
 
         ReadyButton.IsEnabled = true;
-        ReadingHeaderLabel.Text = _currentText.Title;
         ReadingStatusLabel.Text = "Читайте текст. Кнопка «Готово» доступна в любой момент.";
         ReadingTextLabel.Text = _currentText.Content;
         TimerLabel.Text = FormatRemainingTime(SessionDurationSeconds);

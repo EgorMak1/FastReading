@@ -5,20 +5,20 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Затирание слов">
 
-    <Grid Padding="20">
+    <Grid Padding="16">
         <VerticalStackLayout
             x:Name="PreparationLayout"
-            Spacing="16">
+            Spacing="14">
             <Label
                 FontAttributes="Bold"
-                FontSize="28"
+                FontSize="24"
                 HorizontalOptions="Center"
                 Text="Затирание слов" />
 
             <Label
                 x:Name="PreparationTitleLabel"
                 FontAttributes="Bold"
-                FontSize="20"
+                FontSize="18"
                 HorizontalTextAlignment="Center" />
 
             <Label
@@ -30,12 +30,12 @@
             <Label
                 x:Name="SpeedLabel"
                 FontAttributes="Bold"
-                FontSize="18"
+                FontSize="17"
                 HorizontalTextAlignment="Center" />
 
             <Label
                 x:Name="DifficultyLabel"
-                FontSize="16"
+                FontSize="15"
                 HorizontalTextAlignment="Center"
                 TextColor="#5C6BC0" />
 
@@ -48,21 +48,16 @@
         <Grid
             x:Name="ReadingLayout"
             IsVisible="False"
-            RowDefinitions="Auto,Auto,Auto,*,Auto"
-            RowSpacing="12">
-            <Label
-                x:Name="ReadingHeaderLabel"
-                FontAttributes="Bold"
-                FontSize="18" />
-
+            RowDefinitions="Auto,Auto,*,Auto"
+            RowSpacing="10">
             <Grid
-                Grid.Row="1"
                 ColumnDefinitions="*,Auto,Auto"
-                ColumnSpacing="10">
+                ColumnSpacing="8">
                 <Label
                     x:Name="TimerLabel"
                     FontAttributes="Bold"
-                    FontSize="16" />
+                    FontSize="16"
+                    VerticalTextAlignment="Center" />
                 <Button
                     x:Name="StopButton"
                     Grid.Column="1"
@@ -77,12 +72,12 @@
 
             <ProgressBar
                 x:Name="TimerProgressBar"
-                Grid.Row="2"
+                Grid.Row="1"
                 Progress="1" />
 
             <ScrollView
                 x:Name="TextScrollView"
-                Grid.Row="3"
+                Grid.Row="2"
                 Scrolled="OnTextScrolled">
                 <Label
                     x:Name="ReadingTextLabel"
@@ -93,23 +88,23 @@
 
             <Label
                 x:Name="ReadingStatusLabel"
-                Grid.Row="4"
-                FontSize="13"
+                Grid.Row="3"
+                FontSize="12"
                 TextColor="Gray" />
         </Grid>
 
         <VerticalStackLayout
             x:Name="QuestionLayout"
             IsVisible="False"
-            Spacing="14">
+            Spacing="12">
             <Label
                 x:Name="QuestionProgressLabel"
                 FontAttributes="Bold"
-                FontSize="16" />
+                FontSize="15" />
 
             <Label
                 x:Name="QuestionPromptLabel"
-                FontSize="20" />
+                FontSize="19" />
 
             <Button
                 x:Name="AnswerButton1"

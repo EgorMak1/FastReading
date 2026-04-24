@@ -5,6 +5,12 @@ namespace MauiApp1.Trainings;
 
 public partial class FieldOfViewPage : ContentPage
 {
+    private const int SafeRoundsWithoutMismatch = 2;
+    private const int AllowedMistakesOnSevenBySeven = 3;
+    private const int SevenBySevenSlowdownStepMilliseconds = 150;
+    private const int MaximumSevenBySevenRecoveryIntervalMilliseconds = 1400;
+    private const int FiveByFiveRecoveryLevel = 2;
+
     private static readonly IReadOnlyList<FieldOfViewDifficultyConfig> DifficultyLevels =
     [
         new(1, 5, 1800, 0.20, 1, 4, false),
@@ -30,13 +36,15 @@ public partial class FieldOfViewPage : ContentPage
     private int _gridSize = DifficultyLevels[0].GridSize;
     private int _currentLevel = 1;
     private int _recommendedLevel = 1;
-    private int _currentIntervalMilliseconds = 1800;
+    private int _currentIntervalMilliseconds = DifficultyLevels[0].IntervalMilliseconds;
     private int _roundsCount;
     private int _correctRoundsCount;
     private int _detectedMismatchCount;
     private int _missedMismatchCount;
     private int _falseAlarmCount;
     private int _consecutiveCorrectRounds;
+    private int _roundsSinceGridSetup;
+    private int _mistakesOnSevenBySeven;
 
     private char _currentBaseLetter;
 
@@ -210,14 +218,29 @@ public partial class FieldOfViewPage : ContentPage
 
     private void ApplyLevel(int level)
     {
+        int previousGridSize = _gridSize;
+
         _currentLevel = ClampLevel(level);
         _currentConfig = DifficultyLevels[_currentLevel - 1];
-        bool gridChanged = _gridSize != _currentConfig.GridSize;
         _gridSize = _currentConfig.GridSize;
         _currentIntervalMilliseconds = _currentConfig.IntervalMilliseconds;
 
+        bool gridChanged = previousGridSize != _gridSize;
+
         if (gridChanged)
         {
+            _roundsSinceGridSetup = 0;
+
+            if (_gridSize >= 7)
+            {
+                _mistakesOnSevenBySeven = 0;
+            }
+
+            if (_gridSize == 5)
+            {
+                _mistakesOnSevenBySeven = 0;
+            }
+
             BuildFieldGrid();
 
             if (_isRunning && _roundsCount > 0)
@@ -239,8 +262,12 @@ public partial class FieldOfViewPage : ContentPage
 
     private void UpdateDifficultyLabel()
     {
+        string extra = _gridSize >= 7
+            ? $" Ошибок на 7x7: {_mistakesOnSevenBySeven}/{AllowedMistakesOnSevenBySeven}."
+            : string.Empty;
+
         DifficultyLabel.Text =
-            $"Уровень {_currentLevel}: поле {_gridSize}x{_gridSize}, интервал {_currentIntervalMilliseconds} мс, до {_currentConfig.MaxMismatchCount} отличий.";
+            $"Уровень {_currentLevel}: поле {_gridSize}x{_gridSize}, интервал {_currentIntervalMilliseconds} мс, до {_currentConfig.MaxMismatchCount} отличий.{extra}";
     }
 
     private void PrepareBoardForExercise()
@@ -288,6 +315,7 @@ public partial class FieldOfViewPage : ContentPage
         _awaitingGridConfirmation = true;
         _gridConfirmationSource = new TaskCompletionSource<bool>();
         _currentRoundScored = true;
+        _roundsSinceGridSetup = 0;
 
         ClearFillerLetters();
 
@@ -321,7 +349,6 @@ public partial class FieldOfViewPage : ContentPage
 
     private void ResetSession()
     {
-        ApplyLevel(_recommendedLevel);
         _roundsCount = 0;
         _correctRoundsCount = 0;
         _detectedMismatchCount = 0;
@@ -333,7 +360,10 @@ public partial class FieldOfViewPage : ContentPage
         _currentBaseLetter = default;
         _awaitingGridConfirmation = false;
         _gridConfirmationSource = null;
+        _roundsSinceGridSetup = 0;
+        _mistakesOnSevenBySeven = 0;
 
+        ApplyLevel(_recommendedLevel);
         ReadyButton.IsVisible = false;
         ReadyButton.IsEnabled = false;
         PrepareBoardForExercise();
@@ -365,10 +395,11 @@ public partial class FieldOfViewPage : ContentPage
         _roundsCount++;
         _currentRoundScored = false;
         _currentMismatchIndexes.Clear();
-
         _currentBaseLetter = GetRandomLetter();
 
-        if (_random.NextDouble() < _currentConfig.MismatchChance)
+        bool allowMismatch = _roundsSinceGridSetup >= SafeRoundsWithoutMismatch;
+
+        if (allowMismatch && _random.NextDouble() < _currentConfig.MismatchChance)
         {
             int mismatchCount = _random.Next(1, _currentConfig.MaxMismatchCount + 1);
 
@@ -377,6 +408,8 @@ public partial class FieldOfViewPage : ContentPage
                 _currentMismatchIndexes.Add(_random.Next(_edgeLabels.Length));
             }
         }
+
+        _roundsSinceGridSetup++;
 
         for (int i = 0; i < _edgeLabels.Length; i++)
         {
@@ -390,7 +423,7 @@ public partial class FieldOfViewPage : ContentPage
 
         StatusLabel.Text = _currentMismatchIndexes.Count == 0
             ? "Следите за буквами."
-            : $"Есть отличие. Нажмите «Ошибка».";
+            : "Есть отличие. Нажмите «Ошибка».";
 
         UpdateStatsText();
     }
@@ -423,20 +456,31 @@ public partial class FieldOfViewPage : ContentPage
         if (_currentMismatchIndexes.Count > 0)
         {
             _missedMismatchCount++;
-            ApplyRoundResult(false, $"Пропуск. Отличий: {_currentMismatchIndexes.Count}.");
+            ApplyRoundResult(false, $"Пропуск. Отличий: {_currentMismatchIndexes.Count}.", hadMismatch: true);
             return;
         }
 
-        ApplyRoundResult(true, "Верно.");
+        ApplyRoundResult(true, "Совпадение. Ждите следующий раунд.", hadMismatch: false);
     }
 
-    private void ApplyRoundResult(bool isCorrect, string message)
+    private void ApplyRoundResult(bool isCorrect, string message, bool hadMismatch)
     {
         _currentRoundScored = true;
 
         if (isCorrect)
         {
             _correctRoundsCount++;
+
+            if (!hadMismatch)
+            {
+                _consecutiveCorrectRounds = 0;
+                _recommendedLevel = _currentLevel;
+                StatusLabel.Text = message;
+                UpdateDifficultyLabel();
+                UpdateStatsText();
+                return;
+            }
+
             _consecutiveCorrectRounds++;
 
             if (_consecutiveCorrectRounds >= _currentConfig.CorrectRoundsToIncreaseLevel && _currentLevel < DifficultyLevels.Count)
@@ -450,6 +494,33 @@ public partial class FieldOfViewPage : ContentPage
         {
             _consecutiveCorrectRounds = 0;
 
+            if (_gridSize >= 7)
+            {
+                _mistakesOnSevenBySeven++;
+
+                if (_mistakesOnSevenBySeven > AllowedMistakesOnSevenBySeven)
+                {
+                    ApplyLevel(FiveByFiveRecoveryLevel);
+                    _recommendedLevel = _currentLevel;
+                    message += $" Возврат на 5x5, интервал {_currentIntervalMilliseconds} мс.";
+                    StatusLabel.Text = message;
+                    UpdateDifficultyLabel();
+                    UpdateStatsText();
+                    return;
+                }
+
+                _currentIntervalMilliseconds = Math.Min(
+                    _currentIntervalMilliseconds + SevenBySevenSlowdownStepMilliseconds,
+                    MaximumSevenBySevenRecoveryIntervalMilliseconds);
+
+                _recommendedLevel = _currentLevel;
+                message += $" Замедление до {_currentIntervalMilliseconds} мс. Ошибок на 7x7: {_mistakesOnSevenBySeven}/{AllowedMistakesOnSevenBySeven}.";
+                StatusLabel.Text = message;
+                UpdateDifficultyLabel();
+                UpdateStatsText();
+                return;
+            }
+
             if (_currentLevel > 1)
             {
                 ApplyLevel(_currentLevel - 1);
@@ -459,6 +530,7 @@ public partial class FieldOfViewPage : ContentPage
 
         _recommendedLevel = _currentLevel;
         StatusLabel.Text = message;
+        UpdateDifficultyLabel();
         UpdateStatsText();
     }
 
@@ -536,12 +608,12 @@ public partial class FieldOfViewPage : ContentPage
         {
             _detectedMismatchCount++;
             HighlightMismatch();
-            ApplyRoundResult(true, $"Верно. Отличий: {_currentMismatchIndexes.Count}.");
+            ApplyRoundResult(true, $"Верно. Отличий: {_currentMismatchIndexes.Count}.", hadMismatch: true);
             return;
         }
 
         _falseAlarmCount++;
-        ApplyRoundResult(false, "Ложная тревога.");
+        ApplyRoundResult(false, "Ложная тревога.", hadMismatch: false);
     }
 
     private void HighlightMismatch()
