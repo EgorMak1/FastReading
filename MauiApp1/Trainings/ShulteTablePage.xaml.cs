@@ -50,6 +50,12 @@ namespace MauiApp1.Trainings
             StartNewSession();
         }
 
+        protected override void OnDisappearing()
+        {
+            _timerRunning = false;
+            base.OnDisappearing();
+        }
+
         private async Task InitializeDifficultyAsync()
         {
             try

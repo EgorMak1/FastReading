@@ -35,6 +35,7 @@ public partial class WordErasingPage : ContentPage
     private int _correctAnswers;
     private int _fullWordsErased;
     private int _lastRenderedPartialLetters = -1;
+    private bool _isInitialized;
     private bool _isReading;
 
     public WordErasingPage(StatisticsService statisticsService, bool startImmediately = false)
@@ -47,6 +48,13 @@ public partial class WordErasingPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        if (_isInitialized)
+        {
+            return;
+        }
+
+        _isInitialized = true;
         await InitializeSessionAsync();
     }
 
