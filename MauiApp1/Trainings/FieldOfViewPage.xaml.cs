@@ -9,17 +9,20 @@ public partial class FieldOfViewPage : ContentPage
 
     private static readonly IReadOnlyList<FieldOfViewDifficultyConfig> DifficultyLevels =
     [
-        new(1, 1800, 0.25, 4),
-        new(2, 1500, 0.30, 4),
-        new(3, 1200, 0.35, 3),
-        new(4, 900, 0.40, 3),
-        new(5, 700, 0.45, 2)
+        new(1, 1800, 0.20, 1, 4, false),
+        new(2, 1500, 0.28, 1, 4, false),
+        new(3, 1200, 0.35, 2, 3, false),
+        new(4, 900, 0.42, 2, 3, true),
+        new(5, 700, 0.50, 2, 2, true)
     ];
+
+    private static readonly char[] EasyLetters = "АБВГДЕЖЗИКЛМНОПРСТУФХ".ToCharArray();
+    private static readonly char[] HardLetters = "НОСЕРХУКМ".ToCharArray();
 
     private readonly Label[] _edgeLabels = new Label[4];
     private readonly Random _random = new();
-    private readonly char[] _letters = "АБВГДЕЖЗИКЛМНОПРСТУФХ".ToCharArray();
     private readonly StatisticsService _statisticsService;
+    private readonly HashSet<int> _currentMismatchIndexes = [];
 
     private CancellationTokenSource? _exerciseCancellation;
     private FieldOfViewDifficultyConfig _currentConfig = DifficultyLevels[0];
@@ -34,8 +37,9 @@ public partial class FieldOfViewPage : ContentPage
     private int _falseAlarmCount;
     private int _consecutiveCorrectRounds;
 
+    private char _currentBaseLetter;
+
     private bool _isRunning;
-    private bool _currentRoundHasMismatch;
     private bool _currentRoundScored;
     private bool _statisticsSaved;
     private bool _isInitialized;
@@ -203,12 +207,19 @@ public partial class FieldOfViewPage : ContentPage
 
     private void UpdateDifficultyLabel()
     {
-        DifficultyLabel.Text = $"Уровень {_currentLevel}: интервал {_currentIntervalMilliseconds} мс, вероятность несовпадения {_currentConfig.MismatchChance:P0}, " +
-                               $"повышение после {_currentConfig.CorrectRoundsToIncreaseLevel} правильных раундов подряд. Рекомендованный стартовый уровень: {_recommendedLevel}.";
+        string lettersMode = _currentConfig.UseHardLetters ? "похожие буквы" : "обычные буквы";
+
+        DifficultyLabel.Text =
+            $"Уровень {_currentLevel}: интервал {_currentIntervalMilliseconds} мс, " +
+            $"шанс несовпадения {_currentConfig.MismatchChance:P0}, до {_currentConfig.MaxMismatchCount} отличий, {lettersMode}. " +
+            $"Повышение после {_currentConfig.CorrectRoundsToIncreaseLevel} правильных раундов подряд. " +
+            $"Рекомендуемый стартовый уровень: {_recommendedLevel}.";
     }
 
     private void ResetBoard()
     {
+        _currentMismatchIndexes.Clear();
+
         foreach (var label in _edgeLabels)
         {
             if (label != null)
@@ -228,9 +239,9 @@ public partial class FieldOfViewPage : ContentPage
         _missedMismatchCount = 0;
         _falseAlarmCount = 0;
         _consecutiveCorrectRounds = 0;
-        _currentRoundHasMismatch = false;
         _currentRoundScored = false;
         _statisticsSaved = false;
+        _currentBaseLetter = default;
 
         ResetBoard();
         UpdateStatsText();
@@ -259,21 +270,34 @@ public partial class FieldOfViewPage : ContentPage
     {
         _roundsCount++;
         _currentRoundScored = false;
+        _currentMismatchIndexes.Clear();
 
-        char baseLetter = GetRandomLetter();
-        bool hasMismatch = _random.NextDouble() < _currentConfig.MismatchChance;
-        int mismatchIndex = hasMismatch ? _random.Next(_edgeLabels.Length) : -1;
+        _currentBaseLetter = GetRandomLetter();
 
-        _currentRoundHasMismatch = hasMismatch;
+        if (_random.NextDouble() < _currentConfig.MismatchChance)
+        {
+            int mismatchCount = _random.Next(1, _currentConfig.MaxMismatchCount + 1);
+
+            while (_currentMismatchIndexes.Count < mismatchCount)
+            {
+                _currentMismatchIndexes.Add(_random.Next(_edgeLabels.Length));
+            }
+        }
 
         for (int i = 0; i < _edgeLabels.Length; i++)
         {
-            char currentLetter = i == mismatchIndex ? GetDifferentLetter(baseLetter) : baseLetter;
+            char currentLetter = _currentMismatchIndexes.Contains(i)
+                ? GetDifferentLetter(_currentBaseLetter)
+                : _currentBaseLetter;
+
             _edgeLabels[i].Text = currentLetter.ToString();
             _edgeLabels[i].TextColor = Colors.Black;
         }
 
-        StatusLabel.Text = "Следите за буквами и нажимайте «Ошибка» только при несовпадении.";
+        StatusLabel.Text = _currentMismatchIndexes.Count == 0
+            ? "Следите за буквами и нажимайте «Ошибка» только если увидели отличие."
+            : $"Следите за буквами: в этом раунде может быть до {_currentConfig.MaxMismatchCount} отличий.";
+
         UpdateStatsText();
     }
 
@@ -291,7 +315,8 @@ public partial class FieldOfViewPage : ContentPage
 
     private char GetRandomLetter()
     {
-        return _letters[_random.Next(_letters.Length)];
+        var letters = _currentConfig.UseHardLetters ? HardLetters : EasyLetters;
+        return letters[_random.Next(letters.Length)];
     }
 
     private void FinalizeCurrentRound()
@@ -301,10 +326,10 @@ public partial class FieldOfViewPage : ContentPage
             return;
         }
 
-        if (_currentRoundHasMismatch)
+        if (_currentMismatchIndexes.Count > 0)
         {
             _missedMismatchCount++;
-            ApplyRoundResult(false, "Ошибка пропущена: одна буква отличалась.");
+            ApplyRoundResult(false, $"Ошибка пропущена: отличий было {_currentMismatchIndexes.Count}.");
             return;
         }
 
@@ -345,9 +370,10 @@ public partial class FieldOfViewPage : ContentPage
 
     private void UpdateStatsText()
     {
-        StatsLabel.Text = $"Уровень: {_currentLevel}, интервал: {_currentIntervalMilliseconds} мс. " +
-                          $"Раундов: {_roundsCount}, правильных: {_correctRoundsCount}, " +
-                          $"найдено ошибок: {_detectedMismatchCount}, пропущено: {_missedMismatchCount}, ложных: {_falseAlarmCount}.";
+        StatsLabel.Text =
+            $"Уровень: {_currentLevel}, интервал: {_currentIntervalMilliseconds} мс. " +
+            $"Раундов: {_roundsCount}, правильных: {_correctRoundsCount}, " +
+            $"найдено ошибок: {_detectedMismatchCount}, пропущено: {_missedMismatchCount}, ложных: {_falseAlarmCount}.";
     }
 
     private async void OnStartClicked(object sender, EventArgs e)
@@ -392,11 +418,11 @@ public partial class FieldOfViewPage : ContentPage
             return;
         }
 
-        if (_currentRoundHasMismatch)
+        if (_currentMismatchIndexes.Count > 0)
         {
             _detectedMismatchCount++;
             HighlightMismatch();
-            ApplyRoundResult(true, "Верно: отличие замечено.");
+            ApplyRoundResult(true, $"Верно: найдено отличий {_currentMismatchIndexes.Count}.");
             return;
         }
 
@@ -406,11 +432,9 @@ public partial class FieldOfViewPage : ContentPage
 
     private void HighlightMismatch()
     {
-        string firstLetter = _edgeLabels[0].Text;
-
-        foreach (var label in _edgeLabels)
+        for (int i = 0; i < _edgeLabels.Length; i++)
         {
-            label.TextColor = label.Text == firstLetter ? Colors.Black : Colors.Red;
+            _edgeLabels[i].TextColor = _currentMismatchIndexes.Contains(i) ? Colors.Red : Colors.Black;
         }
     }
 
@@ -460,5 +484,7 @@ public partial class FieldOfViewPage : ContentPage
         int Level,
         int IntervalMilliseconds,
         double MismatchChance,
-        int CorrectRoundsToIncreaseLevel);
+        int MaxMismatchCount,
+        int CorrectRoundsToIncreaseLevel,
+        bool UseHardLetters);
 }

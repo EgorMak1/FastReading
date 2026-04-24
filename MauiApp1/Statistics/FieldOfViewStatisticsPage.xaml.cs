@@ -1,4 +1,4 @@
-﻿using MauiApp1.Services;
+using MauiApp1.Services;
 using Microsoft.Maui.Graphics;
 
 namespace MauiApp1.Statistics;
@@ -44,7 +44,7 @@ public partial class FieldOfViewStatisticsPage : ContentPage
         var bestInterval = fieldOfViewResults.Min(r => r.FinalIntervalMilliseconds);
         var averageLevel = fieldOfViewResults.Average(r => r.FinalLevel);
 
-        SummaryLabel.Text = "Система учитывает точность реакции на несовпадения и достигнутый уровень сложности.";
+        SummaryLabel.Text = "Статистика показывает, насколько точно пользователь замечает отличия и удерживает сложность на высоких скоростях.";
         BestResultLabel.Text = $"{best:F1}%";
         AverageResultLabel.Text = $"{average:F1}%";
         CurrentLevelLabel.Text = last.FinalLevel.ToString();
@@ -55,7 +55,8 @@ public partial class FieldOfViewStatisticsPage : ContentPage
             $"Последняя сессия: {last.CompletedAt.ToLocalTime():dd.MM.yyyy HH:mm}\n" +
             $"Точность: {last.AccuracyPercent:F1}%\n" +
             $"Уровень: {last.FinalLevel}\n" +
-            $"Интервал: {last.FinalIntervalMilliseconds} мс";
+            $"Интервал: {last.FinalIntervalMilliseconds} мс\n" +
+            $"Найдено отличий: {last.DetectedMismatchCount}, пропущено: {last.MissedMismatchCount}, ложных тревог: {last.FalseAlarmCount}";
 
         ChartView.Drawable = new PercentageChartDrawable(fieldOfViewResults.Select(r => r.AccuracyPercent).ToList());
         ChartView.Invalidate();
