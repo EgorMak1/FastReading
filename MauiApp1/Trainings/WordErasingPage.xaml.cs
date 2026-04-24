@@ -19,6 +19,7 @@ public partial class WordErasingPage : ContentPage
         RegexOptions.Compiled);
 
     private readonly StatisticsService _statisticsService;
+    private readonly bool _startImmediately;
     private IReadOnlyList<WordErasingTextDefinition> _texts = [];
     private readonly List<WordToken> _tokens = [];
 
@@ -36,10 +37,11 @@ public partial class WordErasingPage : ContentPage
     private int _lastRenderedPartialLetters = -1;
     private bool _isReading;
 
-    public WordErasingPage(StatisticsService statisticsService)
+    public WordErasingPage(StatisticsService statisticsService, bool startImmediately = false)
     {
         InitializeComponent();
         _statisticsService = statisticsService;
+        _startImmediately = startImmediately;
     }
 
     protected override async void OnAppearing()
@@ -78,6 +80,12 @@ public partial class WordErasingPage : ContentPage
         SpeedLabel.Text = $"Текущая скорость: {_currentWpm} WPM";
         DifficultyLabel.Text = $"Диапазон сложности: {GetSpeedBandText(_currentWpm)}. В следующей попытке скорость изменится по результату ответов.";
 
+        if (_startImmediately)
+        {
+            await StartReadingAttemptAsync();
+            return;
+        }
+
         ShowPreparationState();
     }
 
@@ -102,7 +110,7 @@ public partial class WordErasingPage : ContentPage
         QuestionLayout.IsVisible = true;
     }
 
-    private async void OnStartClicked(object sender, EventArgs e)
+    private async Task StartReadingAttemptAsync()
     {
         if (_isReading)
         {
@@ -151,6 +159,11 @@ public partial class WordErasingPage : ContentPage
         catch (OperationCanceledException)
         {
         }
+    }
+
+    private async void OnStartClicked(object sender, EventArgs e)
+    {
+        await StartReadingAttemptAsync();
     }
 
     private async Task RunReadingLoopAsync(CancellationToken cancellationToken)

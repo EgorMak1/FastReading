@@ -1,30 +1,38 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp1.Trainings.ExerciseSelectionPage"
-             Title="ExerciseSelectionPage">
+<ContentPage
+    x:Class="MauiApp1.Trainings.ExerciseSelectionPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Упражнения">
+
     <VerticalStackLayout
         HorizontalOptions="Center"
-        VerticalOptions="Center"
-        Spacing="20">
-        
-        <Label Text="Выберите упражнение"
-               FontSize="32"
-               HorizontalOptions="Center"
-               VerticalOptions="Center" />
+        Padding="20"
+        Spacing="20"
+        VerticalOptions="Center">
 
-        <!-- Кнопка для Таблицы Шульте -->
-        <Button Text="Таблица Шульте"
-                BackgroundColor="DodgerBlue"
-                TextColor="White"
-                Clicked="OnShulteTableClicked" />
+        <Label
+            FontSize="32"
+            HorizontalOptions="Center"
+            Text="Выберите упражнение"
+            VerticalOptions="Center" />
 
-        <!-- Добавили кнопку для нового упражнения -->
-        <Button Text="Бегущие слова" 
-                Clicked="OnRunningWordsClicked" />
-        <Button Text="Поле зрения"
-                Clicked="OnFieldOfViewClicked" />
-        <Button Text="Затирание слов"
-                Clicked="OnWordErasingClicked" />
+        <Button
+            BackgroundColor="DodgerBlue"
+            Clicked="OnShulteTableClicked"
+            Text="Таблица Шульте"
+            TextColor="White" />
+
+        <Button
+            Clicked="OnRunningWordsClicked"
+            Text="Бегущие слова" />
+
+        <Button
+            Clicked="OnFieldOfViewClicked"
+            Text="Поле зрения" />
+
+        <Button
+            Clicked="OnWordErasingClicked"
+            Text="Затирание слов" />
     </VerticalStackLayout>
 </ContentPage>

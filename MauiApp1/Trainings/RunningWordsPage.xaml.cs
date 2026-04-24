@@ -110,23 +110,20 @@ public partial class RunningWordsPage : ContentPage
 
     private void SetInitialState()
     {
-        CurrentWordLabel.Text = "Нажмите кнопку, чтобы начать";
+        CurrentWordLabel.Text = "Нажмите старт";
         SetAnswerButtonsEnabled(false);
         UpdateDifficultyLabel();
-        UpdateStatusText("После показа слов нужно выбрать последнее слово.");
+        UpdateStatusText("Подготовка к раунду.");
     }
 
     private void UpdateDifficultyLabel()
     {
-        DifficultyLabel.Text = $"Текущая скорость: {_wordDisplayMilliseconds} мс на слово. " +
-                               $"Стартовая скорость по истории: {_recommendedSpeedMilliseconds} мс. " +
-                               $"После правильного ответа интервал уменьшается на 50 мс, после ошибки увеличивается на 50 мс.";
+        DifficultyLabel.Text = $"Скорость: {_wordDisplayMilliseconds} мс. Старт по истории: {_recommendedSpeedMilliseconds} мс.";
     }
 
     private void UpdateStatusText(string message)
     {
-        StatusLabel.Text = $"{message} Скорость: {_wordDisplayMilliseconds} мс на слово. " +
-                           $"Правильных ответов: {_correctAnswersCount} из {_totalAttempts}.";
+        StatusLabel.Text = $"{message} Верных ответов: {_correctAnswersCount} из {_totalAttempts}.";
     }
 
     private void UpdateAnswerButtons()
@@ -163,7 +160,7 @@ public partial class RunningWordsPage : ContentPage
         _isAnswerSelection = true;
 
         CurrentWordLabel.Text = "?";
-        UpdateStatusText("Выберите последнее показанное слово.");
+        UpdateStatusText("Выберите последнее слово.");
         SetAnswerButtonsEnabled(true);
         StartButton.IsEnabled = false;
     }
@@ -188,7 +185,7 @@ public partial class RunningWordsPage : ContentPage
 
         StartButton.IsEnabled = false;
         SetAnswerButtonsEnabled(false);
-        UpdateStatusText("Смотрите на слова и запоминайте последнее.");
+        UpdateStatusText("Смотрите на слова.");
 
         try
         {
@@ -233,7 +230,7 @@ public partial class RunningWordsPage : ContentPage
 
         if (isCorrect)
         {
-            UpdateStatusText("Верно! Вы правильно выбрали последнее слово.");
+            UpdateStatusText("Верно.");
         }
         else
         {

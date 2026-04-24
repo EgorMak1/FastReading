@@ -11,8 +11,8 @@
             Spacing="20">
 
             <Label
-                FontSize="28"
                 FontAttributes="Bold"
+                FontSize="28"
                 HorizontalOptions="Center"
                 Text="Бегущие слова" />
 
@@ -32,35 +32,35 @@
 
                     <Label
                         x:Name="CurrentWordLabel"
-                        FontSize="24"
                         FontAttributes="Bold"
+                        FontSize="24"
                         HorizontalOptions="Center"
-                        Text="Нажмите кнопку, чтобы начать" />
+                        Text="Нажмите старт" />
 
                     <Label
                         x:Name="StatusLabel"
                         FontSize="14"
                         HorizontalOptions="Center"
                         HorizontalTextAlignment="Center"
-                        Text="После показа слов нужно выбрать последнее слово." />
+                        Text="Подготовка к раунду." />
                 </VerticalStackLayout>
             </Frame>
 
             <Label
-                FontSize="18"
                 FontAttributes="Bold"
+                FontSize="18"
                 Text="Варианты ответа:" />
 
-            <Button x:Name="AnswerButton1" Text="Вариант 1" Clicked="OnAnswerClicked" />
-            <Button x:Name="AnswerButton2" Text="Вариант 2" Clicked="OnAnswerClicked" />
-            <Button x:Name="AnswerButton3" Text="Вариант 3" Clicked="OnAnswerClicked" />
-            <Button x:Name="AnswerButton4" Text="Вариант 4" Clicked="OnAnswerClicked" />
+            <Button x:Name="AnswerButton1" Clicked="OnAnswerClicked" Text="Вариант 1" />
+            <Button x:Name="AnswerButton2" Clicked="OnAnswerClicked" Text="Вариант 2" />
+            <Button x:Name="AnswerButton3" Clicked="OnAnswerClicked" Text="Вариант 3" />
+            <Button x:Name="AnswerButton4" Clicked="OnAnswerClicked" Text="Вариант 4" />
 
             <Button
                 x:Name="StartButton"
                 Margin="0,20,0,0"
-                Text="Начать упражнение"
-                Clicked="OnStartClicked" />
+                Clicked="OnStartClicked"
+                Text="Начать упражнение" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

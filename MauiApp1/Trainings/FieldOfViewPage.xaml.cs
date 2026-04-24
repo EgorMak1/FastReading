@@ -239,13 +239,8 @@ public partial class FieldOfViewPage : ContentPage
 
     private void UpdateDifficultyLabel()
     {
-        string lettersMode = _currentConfig.UseHardLetters ? "похожие буквы" : "обычные буквы";
-
         DifficultyLabel.Text =
-            $"Уровень {_currentLevel}: поле {_gridSize}x{_gridSize}, интервал {_currentIntervalMilliseconds} мс, " +
-            $"шанс несовпадения {_currentConfig.MismatchChance:P0}, до {_currentConfig.MaxMismatchCount} отличий, {lettersMode}. " +
-            $"Повышение после {_currentConfig.CorrectRoundsToIncreaseLevel} правильных раундов подряд. " +
-            $"Рекомендуемый стартовый уровень: {_recommendedLevel}.";
+            $"Уровень {_currentLevel}: поле {_gridSize}x{_gridSize}, интервал {_currentIntervalMilliseconds} мс, до {_currentConfig.MaxMismatchCount} отличий.";
     }
 
     private void PrepareBoardForExercise()
@@ -310,8 +305,7 @@ public partial class FieldOfViewPage : ContentPage
         ReadyButton.IsVisible = true;
         ReadyButton.IsEnabled = true;
         ErrorButton.IsEnabled = false;
-        StatusLabel.Text =
-            $"Размер сетки изменён на {_gridSize}x{_gridSize}. Посмотрите на пустую сетку и ориентиры по краям, затем нажмите «Готов».";
+        StatusLabel.Text = $"Новая сетка {_gridSize}x{_gridSize}. Нажмите «Готов».";
     }
 
     private async Task WaitForGridConfirmationAsync(CancellationToken cancellationToken)
@@ -395,8 +389,8 @@ public partial class FieldOfViewPage : ContentPage
         }
 
         StatusLabel.Text = _currentMismatchIndexes.Count == 0
-            ? "Следите за буквами и нажимайте «Ошибка» только если увидели отличие."
-            : $"Следите за буквами: в этом раунде может быть до {_currentConfig.MaxMismatchCount} отличий.";
+            ? "Следите за буквами."
+            : $"Есть отличие. Нажмите «Ошибка».";
 
         UpdateStatsText();
     }
@@ -429,11 +423,11 @@ public partial class FieldOfViewPage : ContentPage
         if (_currentMismatchIndexes.Count > 0)
         {
             _missedMismatchCount++;
-            ApplyRoundResult(false, $"Ошибка пропущена: отличий было {_currentMismatchIndexes.Count}.");
+            ApplyRoundResult(false, $"Пропуск. Отличий: {_currentMismatchIndexes.Count}.");
             return;
         }
 
-        ApplyRoundResult(true, "Верно: все буквы совпадали.");
+        ApplyRoundResult(true, "Верно.");
     }
 
     private void ApplyRoundResult(bool isCorrect, string message)
@@ -449,7 +443,7 @@ public partial class FieldOfViewPage : ContentPage
             {
                 ApplyLevel(_currentLevel + 1);
                 _consecutiveCorrectRounds = 0;
-                message += $" Уровень повышен до {_currentLevel}.";
+                message += $" Уровень {_currentLevel}.";
             }
         }
         else
@@ -459,7 +453,7 @@ public partial class FieldOfViewPage : ContentPage
             if (_currentLevel > 1)
             {
                 ApplyLevel(_currentLevel - 1);
-                message += $" Уровень снижен до {_currentLevel}.";
+                message += $" Уровень {_currentLevel}.";
             }
         }
 
@@ -472,8 +466,7 @@ public partial class FieldOfViewPage : ContentPage
     {
         StatsLabel.Text =
             $"Уровень: {_currentLevel}, поле: {_gridSize}x{_gridSize}, интервал: {_currentIntervalMilliseconds} мс. " +
-            $"Раундов: {_roundsCount}, правильных: {_correctRoundsCount}, " +
-            $"найдено ошибок: {_detectedMismatchCount}, пропущено: {_missedMismatchCount}, ложных: {_falseAlarmCount}.";
+            $"Раундов: {_roundsCount}, верных: {_correctRoundsCount}, найдено: {_detectedMismatchCount}, пропущено: {_missedMismatchCount}, ложных: {_falseAlarmCount}.";
     }
 
     private async void OnStartClicked(object sender, EventArgs e)
@@ -527,7 +520,7 @@ public partial class FieldOfViewPage : ContentPage
         ReadyButton.IsEnabled = false;
         ErrorButton.IsEnabled = _isRunning;
         PrepareBoardForExercise();
-        StatusLabel.Text = $"Новая сетка {_gridSize}x{_gridSize} подтверждена. Продолжаем упражнение.";
+        StatusLabel.Text = $"Сетка {_gridSize}x{_gridSize} подтверждена.";
         _gridConfirmationSource.TrySetResult(true);
         _gridConfirmationSource = null;
     }
@@ -543,12 +536,12 @@ public partial class FieldOfViewPage : ContentPage
         {
             _detectedMismatchCount++;
             HighlightMismatch();
-            ApplyRoundResult(true, $"Верно: найдено отличий {_currentMismatchIndexes.Count}.");
+            ApplyRoundResult(true, $"Верно. Отличий: {_currentMismatchIndexes.Count}.");
             return;
         }
 
         _falseAlarmCount++;
-        ApplyRoundResult(false, "Ложная тревога: все буквы были одинаковыми.");
+        ApplyRoundResult(false, "Ложная тревога.");
     }
 
     private void HighlightMismatch()

@@ -1,106 +1,132 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp1.Trainings.WordErasingPage"
-             Title="Затирание слов">
+<ContentPage
+    x:Class="MauiApp1.Trainings.WordErasingPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Затирание слов">
+
     <Grid Padding="20">
-        <VerticalStackLayout x:Name="PreparationLayout"
-                             Spacing="16">
-            <Label Text="Затирание слов"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center" />
+        <VerticalStackLayout
+            x:Name="PreparationLayout"
+            Spacing="16">
+            <Label
+                FontAttributes="Bold"
+                FontSize="28"
+                HorizontalOptions="Center"
+                Text="Затирание слов" />
 
-            <Label x:Name="PreparationTitleLabel"
-                   FontSize="20"
-                   FontAttributes="Bold"
-                   HorizontalTextAlignment="Center" />
+            <Label
+                x:Name="PreparationTitleLabel"
+                FontAttributes="Bold"
+                FontSize="20"
+                HorizontalTextAlignment="Center" />
 
-            <Label x:Name="PreparationInfoLabel"
-                   FontSize="14"
-                   HorizontalTextAlignment="Center"
-                   TextColor="Gray" />
+            <Label
+                x:Name="PreparationInfoLabel"
+                FontSize="14"
+                HorizontalTextAlignment="Center"
+                TextColor="Gray" />
 
-            <Label x:Name="SpeedLabel"
-                   FontSize="18"
-                   FontAttributes="Bold"
-                   HorizontalTextAlignment="Center" />
+            <Label
+                x:Name="SpeedLabel"
+                FontAttributes="Bold"
+                FontSize="18"
+                HorizontalTextAlignment="Center" />
 
-            <Label x:Name="DifficultyLabel"
-                   FontSize="16"
-                   HorizontalTextAlignment="Center"
-                   TextColor="#5C6BC0" />
+            <Label
+                x:Name="DifficultyLabel"
+                FontSize="16"
+                HorizontalTextAlignment="Center"
+                TextColor="#5C6BC0" />
 
-            <Button x:Name="StartButton"
-                    Text="Начать"
-                    Clicked="OnStartClicked" />
+            <Button
+                x:Name="StartButton"
+                Clicked="OnStartClicked"
+                Text="Начать" />
         </VerticalStackLayout>
 
-        <Grid x:Name="ReadingLayout"
-              IsVisible="False"
-              RowDefinitions="Auto,Auto,Auto,*,Auto"
-              RowSpacing="12">
-            <Label x:Name="ReadingHeaderLabel"
-                   FontSize="18"
-                   FontAttributes="Bold" />
+        <Grid
+            x:Name="ReadingLayout"
+            IsVisible="False"
+            RowDefinitions="Auto,Auto,Auto,*,Auto"
+            RowSpacing="12">
+            <Label
+                x:Name="ReadingHeaderLabel"
+                FontAttributes="Bold"
+                FontSize="18" />
 
-            <Grid Grid.Row="1"
-                  ColumnDefinitions="*,Auto,Auto"
-                  ColumnSpacing="10">
-                <Label x:Name="TimerLabel"
-                       FontSize="16"
-                       FontAttributes="Bold" />
-                <Button Grid.Column="1"
-                        x:Name="StopButton"
-                        Text="Стоп"
-                        Clicked="OnStopClicked" />
-                <Button Grid.Column="2"
-                        x:Name="ReadyButton"
-                        Text="Готово"
-                        Clicked="OnReadyClicked" />
+            <Grid
+                Grid.Row="1"
+                ColumnDefinitions="*,Auto,Auto"
+                ColumnSpacing="10">
+                <Label
+                    x:Name="TimerLabel"
+                    FontAttributes="Bold"
+                    FontSize="16" />
+                <Button
+                    x:Name="StopButton"
+                    Grid.Column="1"
+                    Clicked="OnStopClicked"
+                    Text="Стоп" />
+                <Button
+                    x:Name="ReadyButton"
+                    Grid.Column="2"
+                    Clicked="OnReadyClicked"
+                    Text="Готово" />
             </Grid>
 
-            <ProgressBar Grid.Row="2"
-                         x:Name="TimerProgressBar"
-                         Progress="1" />
+            <ProgressBar
+                x:Name="TimerProgressBar"
+                Grid.Row="2"
+                Progress="1" />
 
-            <ScrollView Grid.Row="3"
-                        x:Name="TextScrollView"
-                        Scrolled="OnTextScrolled">
-                <Label x:Name="ReadingTextLabel"
-                       FontFamily="Courier New"
-                       FontSize="17"
-                       LineBreakMode="WordWrap" />
+            <ScrollView
+                x:Name="TextScrollView"
+                Grid.Row="3"
+                Scrolled="OnTextScrolled">
+                <Label
+                    x:Name="ReadingTextLabel"
+                    FontFamily="Courier New"
+                    FontSize="17"
+                    LineBreakMode="WordWrap" />
             </ScrollView>
 
-            <Label Grid.Row="4"
-                   x:Name="ReadingStatusLabel"
-                   FontSize="13"
-                   TextColor="Gray" />
+            <Label
+                x:Name="ReadingStatusLabel"
+                Grid.Row="4"
+                FontSize="13"
+                TextColor="Gray" />
         </Grid>
 
-        <VerticalStackLayout x:Name="QuestionLayout"
-                             IsVisible="False"
-                             Spacing="14">
-            <Label x:Name="QuestionProgressLabel"
-                   FontSize="16"
-                   FontAttributes="Bold" />
+        <VerticalStackLayout
+            x:Name="QuestionLayout"
+            IsVisible="False"
+            Spacing="14">
+            <Label
+                x:Name="QuestionProgressLabel"
+                FontAttributes="Bold"
+                FontSize="16" />
 
-            <Label x:Name="QuestionPromptLabel"
-                   FontSize="20" />
+            <Label
+                x:Name="QuestionPromptLabel"
+                FontSize="20" />
 
-            <Button x:Name="AnswerButton1"
-                    Clicked="OnAnswerClicked"
-                    CommandParameter="0" />
-            <Button x:Name="AnswerButton2"
-                    Clicked="OnAnswerClicked"
-                    CommandParameter="1" />
-            <Button x:Name="AnswerButton3"
-                    Clicked="OnAnswerClicked"
-                    CommandParameter="2" />
-            <Button x:Name="AnswerButton4"
-                    Clicked="OnAnswerClicked"
-                    CommandParameter="3" />
+            <Button
+                x:Name="AnswerButton1"
+                Clicked="OnAnswerClicked"
+                CommandParameter="0" />
+            <Button
+                x:Name="AnswerButton2"
+                Clicked="OnAnswerClicked"
+                CommandParameter="1" />
+            <Button
+                x:Name="AnswerButton3"
+                Clicked="OnAnswerClicked"
+                CommandParameter="2" />
+            <Button
+                x:Name="AnswerButton4"
+                Clicked="OnAnswerClicked"
+                CommandParameter="3" />
         </VerticalStackLayout>
     </Grid>
 </ContentPage>
