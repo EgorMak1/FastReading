@@ -13,17 +13,17 @@ namespace MauiApp1.Services
             _auth = auth;
         }
 
-        public async Task<UserProfileDto?> GetProfileAsync()
+        public async Task<UserProfileDto?> GetProfileAsync(CancellationToken cancellationToken = default)
         {
             await _auth.ApplyTokenIfExistsAsync();
 
-            var response = await _api.Http.GetAsync("api/profile");
+            var response = await _api.Http.GetAsync("api/profile", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 return null;
             }
 
-            return await response.Content.ReadFromJsonAsync<UserProfileDto>();
+            return await response.Content.ReadFromJsonAsync<UserProfileDto>(cancellationToken: cancellationToken);
         }
     }
 

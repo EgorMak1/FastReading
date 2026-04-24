@@ -5,6 +5,8 @@ namespace MauiApp1.Profile
     public partial class ProfilePage : ContentPage
     {
         private readonly ProfileService _profileService;
+        private CancellationTokenSource? _loadCancellation;
+        private bool _isActive;
 
         public ProfilePage(ProfileService profileService)
         {
@@ -15,32 +17,58 @@ namespace MauiApp1.Profile
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            await LoadProfileAsync();
+            _isActive = true;
+            _loadCancellation?.Cancel();
+            _loadCancellation = new CancellationTokenSource();
+            await LoadProfileAsync(_loadCancellation.Token);
         }
 
-        private async Task LoadProfileAsync()
+        protected override void OnDisappearing()
         {
-            var profile = await _profileService.GetProfileAsync();
-            if (profile == null)
+            _isActive = false;
+            _loadCancellation?.Cancel();
+            base.OnDisappearing();
+        }
+
+        private async Task LoadProfileAsync(CancellationToken cancellationToken)
+        {
+            try
             {
-                SummaryLabel.Text = "Не удалось загрузить профиль.";
-                return;
+                var profile = await _profileService.GetProfileAsync(cancellationToken);
+                if (!_isActive || cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                if (profile == null)
+                {
+                    SummaryLabel.Text = "Не удалось загрузить профиль.";
+                    return;
+                }
+
+                SummaryLabel.Text = "Система оценивает накопленный прогресс, устойчивость выполнения и подбирает следующее направление тренировки.";
+                OverallScoreLabel.Text = $"{profile.OverallScore:F1}";
+                TodayPointsLabel.Text = $"{profile.TodayPoints:F1}";
+                TotalSessionsLabel.Text = profile.TotalSessions.ToString();
+                ExercisesTrackedLabel.Text = profile.ExercisesTracked.ToString();
+                ReadinessLabel.Text = profile.Readiness;
+
+                InsightsLabel.Text = BuildInsights(profile);
+                RecommendationLabel.Text = profile.Recommendation;
+                ExerciseProgressContainer.Children.Clear();
+
+                foreach (var exercise in profile.ExerciseProgress.OrderByDescending(x => x.LastPlayedAt))
+                {
+                    if (!_isActive || cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    ExerciseProgressContainer.Children.Add(CreateExerciseCard(exercise));
+                }
             }
-
-            SummaryLabel.Text = "Система оценивает накопленный прогресс, устойчивость выполнения и подбирает следующее направление тренировки.";
-            OverallScoreLabel.Text = $"{profile.OverallScore:F1}";
-            TodayPointsLabel.Text = $"{profile.TodayPoints:F1}";
-            TotalSessionsLabel.Text = profile.TotalSessions.ToString();
-            ExercisesTrackedLabel.Text = profile.ExercisesTracked.ToString();
-            ReadinessLabel.Text = profile.Readiness;
-
-            InsightsLabel.Text = BuildInsights(profile);
-            RecommendationLabel.Text = profile.Recommendation;
-            ExerciseProgressContainer.Children.Clear();
-
-            foreach (var exercise in profile.ExerciseProgress.OrderByDescending(x => x.LastPlayedAt))
+            catch (OperationCanceledException)
             {
-                ExerciseProgressContainer.Children.Add(CreateExerciseCard(exercise));
             }
         }
 
