@@ -1,4 +1,4 @@
-using MauiApp1.Services;
+п»їusing MauiApp1.Services;
 
 namespace MauiApp1.Auth
 {
@@ -19,7 +19,7 @@ namespace MauiApp1.Auth
 
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
-                await DisplayAlert("Ошибка", "Введите Email и Password.", "OK");
+                await DisplayAlert("РћС€РёР±РєР°", "Р’РІРµРґРёС‚Рµ email РёР»Рё Р»РѕРіРёРЅ Рё РїР°СЂРѕР»СЊ.", "РћРљ");
                 return;
             }
 
@@ -29,24 +29,21 @@ namespace MauiApp1.Auth
 
                 if (string.IsNullOrWhiteSpace(token))
                 {
-                    await DisplayAlert("Ошибка", "Неверный email или пароль.", "OK");
+                    await DisplayAlert("РћС€РёР±РєР°", "РќРµРІРµСЂРЅС‹Р№ email, Р»РѕРіРёРЅ РёР»Рё РїР°СЂРѕР»СЊ.", "РћРљ");
                     return;
                 }
-
-                
 
                 var services = App.Current!.Handler!.MauiContext!.Services;
                 var mainPage = services.GetRequiredService<MainPage>();
 
-                var window = this.Window ?? Application.Current!.Windows[0];
+                var window = Window ?? Application.Current!.Windows[0];
                 window.Page = new NavigationPage(mainPage);
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Исключение", ex.Message, "OK");
+                await DisplayAlert("РћС€РёР±РєР°", ex.Message, "РћРљ");
             }
         }
-
 
         private async void OnGoToRegisterClicked(object sender, EventArgs e)
         {

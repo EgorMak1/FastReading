@@ -1,4 +1,4 @@
-using MauiApp1.Services;
+п»їusing MauiApp1.Services;
 
 namespace MauiApp1.Auth
 {
@@ -19,7 +19,7 @@ namespace MauiApp1.Auth
 
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
-                await DisplayAlert("Ошибка", "Введите Email и Password.", "OK");
+                await DisplayAlert("РћС€РёР±РєР°", "Р’РІРµРґРёС‚Рµ email Рё РїР°СЂРѕР»СЊ.", "РћРљ");
                 return;
             }
 
@@ -29,16 +29,16 @@ namespace MauiApp1.Auth
 
                 if (result == null)
                 {
-                    await DisplayAlert("Ошибка", "Пользователь уже существует или сервер недоступен.", "OK");
+                    await DisplayAlert("РћС€РёР±РєР°", "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РёР»Рё СЃРµСЂРІРµСЂ РЅРµРґРѕСЃС‚СѓРїРµРЅ.", "РћРљ");
                     return;
                 }
 
-                await DisplayAlert("Успех", $"Регистрация выполнена.\nUsername: {result.Username}", "OK");
+                await DisplayAlert("РЈСЃРїРµС…", $"Р РµРіРёСЃС‚СЂР°С†РёСЏ РІС‹РїРѕР»РЅРµРЅР°.\nР›РѕРіРёРЅ: {result.Username}", "РћРљ");
                 await Navigation.PopAsync();
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Исключение", ex.Message, "OK");
+                await DisplayAlert("РћС€РёР±РєР°", ex.Message, "РћРљ");
             }
         }
     }
