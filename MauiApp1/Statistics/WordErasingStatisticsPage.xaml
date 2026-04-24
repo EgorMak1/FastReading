@@ -9,7 +9,7 @@
                    FontSize="24"
                    HorizontalOptions="Center" />
 
-            <Label Text="График прогресса скорости по попыткам"
+            <Label Text="Динамика скорости чтения по попыткам"
                    FontSize="14"
                    HorizontalOptions="Center"
                    TextColor="Gray" />
@@ -22,6 +22,11 @@
                    FontSize="18"
                    FontAttributes="Bold"
                    HorizontalOptions="Center" />
+
+            <Label x:Name="CurrentBandLabel"
+                   FontSize="16"
+                   HorizontalOptions="Center"
+                   TextColor="#5C6BC0" />
 
             <Label x:Name="LastAttemptLabel"
                    FontSize="16"
