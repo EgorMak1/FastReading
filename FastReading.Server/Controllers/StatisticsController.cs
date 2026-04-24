@@ -406,8 +406,16 @@ namespace FastReading.Server.Controllers
 
         private static double CalculateRunningWordsScore(RunningWordsResultRequest request)
         {
-            var levelBonus = Math.Min(20, request.FinalLevel * 4);
-            return Math.Clamp(request.AccuracyPercent * 0.8 + levelBonus, 0, 100);
+            var speedBonus = request.FinalSpeedMilliseconds switch
+            {
+                <= 250 => 20,
+                <= 350 => 16,
+                <= 450 => 12,
+                <= 550 => 8,
+                _ => 4
+            };
+
+            return Math.Clamp(request.AccuracyPercent * 0.8 + speedBonus, 0, 100);
         }
 
         private static double CalculateFieldOfViewScore(FieldOfViewResultRequest request)

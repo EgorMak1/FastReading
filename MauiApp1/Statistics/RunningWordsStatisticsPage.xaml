@@ -31,13 +31,13 @@
                 </Border>
                 <Border Grid.Row="1" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
                     <VerticalStackLayout>
-                        <Label Text="Текущий уровень" FontAttributes="Bold" />
-                        <Label x:Name="CurrentLevelLabel" FontSize="20" />
+                        <Label Text="Текущая скорость" FontAttributes="Bold" />
+                        <Label x:Name="CurrentSpeedLabel" FontSize="20" />
                     </VerticalStackLayout>
                 </Border>
                 <Border Grid.Row="1" Grid.Column="1" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
                     <VerticalStackLayout>
-                        <Label Text="Лучшая скорость" FontAttributes="Bold" />
+                        <Label Text="Самая высокая скорость" FontAttributes="Bold" />
                         <Label x:Name="BestSpeedLabel" FontSize="20" />
                     </VerticalStackLayout>
                 </Border>
@@ -49,8 +49,8 @@
                 </Border>
                 <Border Grid.Row="2" Grid.Column="1" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
                     <VerticalStackLayout>
-                        <Label Text="Средний уровень" FontAttributes="Bold" />
-                        <Label x:Name="AverageLevelLabel" FontSize="20" />
+                        <Label Text="Средняя скорость" FontAttributes="Bold" />
+                        <Label x:Name="AverageSpeedLabel" FontSize="20" />
                     </VerticalStackLayout>
                 </Border>
             </Grid>

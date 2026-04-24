@@ -29,10 +29,10 @@ public partial class RunningWordsStatisticsPage : ContentPage
             SummaryLabel.Text = "Пока нет данных по упражнению.";
             BestResultLabel.Text = "-";
             AverageResultLabel.Text = "-";
-            CurrentLevelLabel.Text = "-";
+            CurrentSpeedLabel.Text = "-";
             BestSpeedLabel.Text = "-";
             TotalTrainingsLabel.Text = "0";
-            AverageLevelLabel.Text = "-";
+            AverageSpeedLabel.Text = "-";
             LastSessionLabel.Text = "Нет завершённых тренировок.";
             ChartView.Drawable = null;
             return;
@@ -42,19 +42,18 @@ public partial class RunningWordsStatisticsPage : ContentPage
         var best = runningWordsResults.Max(r => r.AccuracyPercent);
         var average = runningWordsResults.Average(r => r.AccuracyPercent);
         var bestSpeed = runningWordsResults.Min(r => r.FinalSpeedMilliseconds);
-        var averageLevel = runningWordsResults.Average(r => r.FinalLevel);
+        var averageSpeed = runningWordsResults.Average(r => r.FinalSpeedMilliseconds);
 
-        SummaryLabel.Text = "Система учитывает точность запоминания и достигнутый уровень сложности.";
+        SummaryLabel.Text = "Система учитывает точность запоминания и текущую скорость показа слов.";
         BestResultLabel.Text = $"{best:F1}%";
         AverageResultLabel.Text = $"{average:F1}%";
-        CurrentLevelLabel.Text = last.FinalLevel.ToString();
+        CurrentSpeedLabel.Text = $"{last.FinalSpeedMilliseconds} мс";
         BestSpeedLabel.Text = $"{bestSpeed} мс";
         TotalTrainingsLabel.Text = runningWordsResults.Count.ToString();
-        AverageLevelLabel.Text = $"{averageLevel:F1}";
+        AverageSpeedLabel.Text = $"{averageSpeed:F1} мс";
         LastSessionLabel.Text =
             $"Последняя сессия: {last.CompletedAt.ToLocalTime():dd.MM.yyyy HH:mm}\n" +
             $"Точность: {last.AccuracyPercent:F1}%\n" +
-            $"Уровень: {last.FinalLevel}\n" +
             $"Скорость: {last.FinalSpeedMilliseconds} мс";
 
         ChartView.Drawable = new RunningWordsChartDrawable(
