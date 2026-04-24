@@ -33,8 +33,12 @@ namespace MauiApp1.Services
         public double TodayPoints { get; set; }
         public int TotalSessions { get; set; }
         public int ExercisesTracked { get; set; }
+        public string Readiness { get; set; } = string.Empty;
         public string? StrongestExercise { get; set; }
         public string? WeakestExercise { get; set; }
+        public string? MostStableExercise { get; set; }
+        public string? NeedsAttentionExercise { get; set; }
+        public string Recommendation { get; set; } = string.Empty;
         public List<ExerciseProgressDto> ExerciseProgress { get; set; } = [];
     }
 
@@ -49,5 +53,7 @@ namespace MauiApp1.Services
         public int SuccessStreak { get; set; }
         public int FailStreak { get; set; }
         public DateTime LastPlayedAt { get; set; }
+        public string Trend { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
     }
 }

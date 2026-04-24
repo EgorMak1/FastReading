@@ -23,6 +23,12 @@
                 Text="Если одна буква отличается, нажмите «Ошибка». Если все буквы одинаковые, ничего не нажимайте."
                 TextColor="Gray" />
 
+            <Label
+                x:Name="DifficultyLabel"
+                FontSize="16"
+                HorizontalTextAlignment="Center"
+                TextColor="#5C6BC0" />
+
             <Frame
                 Padding="12"
                 BorderColor="LightGray"

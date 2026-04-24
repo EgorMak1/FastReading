@@ -14,7 +14,7 @@
                    HorizontalTextAlignment="Center"
                    TextColor="Gray" />
 
-            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
                 <Border Grid.Row="0" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
                     <VerticalStackLayout>
                         <Label Text="Общий score" FontAttributes="Bold" />
@@ -39,11 +39,25 @@
                         <Label x:Name="ExercisesTrackedLabel" FontSize="22" />
                     </VerticalStackLayout>
                 </Border>
+                <Border Grid.Row="2" Grid.ColumnSpan="2" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Состояние обучения" FontAttributes="Bold" />
+                        <Label x:Name="ReadinessLabel" FontSize="20" TextColor="#5C6BC0" />
+                    </VerticalStackLayout>
+                </Border>
             </Grid>
 
-            <Label x:Name="InsightsLabel"
-                   FontSize="15"
-                   TextColor="#5C6BC0" />
+            <Border Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Аналитика" FontSize="20" FontAttributes="Bold" />
+                    <Label x:Name="InsightsLabel"
+                           FontSize="15"
+                           TextColor="#5C6BC0" />
+                    <Label x:Name="RecommendationLabel"
+                           FontSize="15"
+                           TextColor="#455A64" />
+                </VerticalStackLayout>
+            </Border>
 
             <Label Text="Прогресс по упражнениям"
                    FontSize="20"

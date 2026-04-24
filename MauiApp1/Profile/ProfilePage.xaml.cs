@@ -1,4 +1,4 @@
-using MauiApp1.Services;
+﻿using MauiApp1.Services;
 
 namespace MauiApp1.Profile
 {
@@ -27,13 +27,15 @@ namespace MauiApp1.Profile
                 return;
             }
 
-            SummaryLabel.Text = "Система оценивает текущий прогресс по упражнениям и подстраивает сложность по накопленным результатам.";
+            SummaryLabel.Text = "Система оценивает накопленный прогресс, устойчивость выполнения и подбирает следующее направление тренировки.";
             OverallScoreLabel.Text = $"{profile.OverallScore:F1}";
             TodayPointsLabel.Text = $"{profile.TodayPoints:F1}";
             TotalSessionsLabel.Text = profile.TotalSessions.ToString();
             ExercisesTrackedLabel.Text = profile.ExercisesTracked.ToString();
+            ReadinessLabel.Text = profile.Readiness;
 
             InsightsLabel.Text = BuildInsights(profile);
+            RecommendationLabel.Text = profile.Recommendation;
             ExerciseProgressContainer.Children.Clear();
 
             foreach (var exercise in profile.ExerciseProgress.OrderByDescending(x => x.LastPlayedAt))
@@ -50,7 +52,9 @@ namespace MauiApp1.Profile
             }
 
             return $"Сильная сторона: {ToDisplayName(profile.StrongestExercise)}. " +
-                   $"Зона роста: {ToDisplayName(profile.WeakestExercise)}.";
+                   $"Наиболее стабильное упражнение: {ToDisplayName(profile.MostStableExercise)}. " +
+                   $"Зона роста: {ToDisplayName(profile.WeakestExercise)}. " +
+                   $"Требует внимания: {ToDisplayName(profile.NeedsAttentionExercise)}.";
         }
 
         private static View CreateExerciseCard(ExerciseProgressDto exercise)
@@ -82,6 +86,11 @@ namespace MauiApp1.Profile
                         new Label
                         {
                             Text = $"Серия успехов: {exercise.SuccessStreak} | Серия неудач: {exercise.FailStreak}"
+                        },
+                        new Label
+                        {
+                            Text = $"Тренд: {exercise.Trend} | Статус: {exercise.Status}",
+                            TextColor = Color.FromArgb("#5C6BC0")
                         },
                         new Label
                         {

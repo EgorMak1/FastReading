@@ -1,4 +1,4 @@
-﻿using MauiApp1.Services;
+using MauiApp1.Services;
 using Microsoft.Maui.Controls.Shapes;
 
 namespace MauiApp1.Trainings;
@@ -6,17 +6,26 @@ namespace MauiApp1.Trainings;
 public partial class FieldOfViewPage : ContentPage
 {
     private const int GridSize = 5;
-    private const int CorrectRoundsToIncreaseLevel = 4;
+
+    private static readonly IReadOnlyList<FieldOfViewDifficultyConfig> DifficultyLevels =
+    [
+        new(1, 1800, 0.25, 4),
+        new(2, 1500, 0.30, 4),
+        new(3, 1200, 0.35, 3),
+        new(4, 900, 0.40, 3),
+        new(5, 700, 0.45, 2)
+    ];
 
     private readonly Label[] _edgeLabels = new Label[4];
     private readonly Random _random = new();
-    private readonly int[] _speedLevels = { 1800, 1500, 1200, 900, 700 };
     private readonly char[] _letters = "АБВГДЕЖЗИКЛМНОПРСТУФХ".ToCharArray();
     private readonly StatisticsService _statisticsService;
 
     private CancellationTokenSource? _exerciseCancellation;
+    private FieldOfViewDifficultyConfig _currentConfig = DifficultyLevels[0];
 
     private int _currentLevel = 1;
+    private int _recommendedLevel = 1;
     private int _currentIntervalMilliseconds = 1800;
     private int _roundsCount;
     private int _correctRoundsCount;
@@ -29,6 +38,7 @@ public partial class FieldOfViewPage : ContentPage
     private bool _currentRoundHasMismatch;
     private bool _currentRoundScored;
     private bool _statisticsSaved;
+    private bool _isInitialized;
 
     public FieldOfViewPage(StatisticsService statisticsService)
     {
@@ -36,7 +46,42 @@ public partial class FieldOfViewPage : ContentPage
         _statisticsService = statisticsService;
         BuildFieldGrid();
         ResetBoard();
+        ApplyLevel(_currentLevel);
         UpdateStatsText();
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (_isInitialized)
+        {
+            return;
+        }
+
+        _isInitialized = true;
+        await InitializeDifficultyAsync();
+        ApplyLevel(_recommendedLevel);
+        UpdateDifficultyLabel();
+        UpdateStatsText();
+    }
+
+    private async Task InitializeDifficultyAsync()
+    {
+        try
+        {
+            var results = await _statisticsService.GetFieldOfViewResultsAsync();
+            var lastResult = results.LastOrDefault();
+
+            if (lastResult != null)
+            {
+                _recommendedLevel = ClampLevel(lastResult.FinalLevel);
+            }
+        }
+        catch
+        {
+            _recommendedLevel = 1;
+        }
     }
 
     private void BuildFieldGrid()
@@ -148,6 +193,20 @@ public partial class FieldOfViewPage : ContentPage
         return 3;
     }
 
+    private void ApplyLevel(int level)
+    {
+        _currentLevel = ClampLevel(level);
+        _currentConfig = DifficultyLevels[_currentLevel - 1];
+        _currentIntervalMilliseconds = _currentConfig.IntervalMilliseconds;
+        UpdateDifficultyLabel();
+    }
+
+    private void UpdateDifficultyLabel()
+    {
+        DifficultyLabel.Text = $"Уровень {_currentLevel}: интервал {_currentIntervalMilliseconds} мс, вероятность несовпадения {_currentConfig.MismatchChance:P0}, " +
+                               $"повышение после {_currentConfig.CorrectRoundsToIncreaseLevel} правильных раундов подряд. Рекомендованный стартовый уровень: {_recommendedLevel}.";
+    }
+
     private void ResetBoard()
     {
         foreach (var label in _edgeLabels)
@@ -162,7 +221,7 @@ public partial class FieldOfViewPage : ContentPage
 
     private void ResetSession()
     {
-        _currentLevel = 1;
+        ApplyLevel(_recommendedLevel);
         _roundsCount = 0;
         _correctRoundsCount = 0;
         _detectedMismatchCount = 0;
@@ -173,14 +232,8 @@ public partial class FieldOfViewPage : ContentPage
         _currentRoundScored = false;
         _statisticsSaved = false;
 
-        UpdateSpeedByLevel();
         ResetBoard();
         UpdateStatsText();
-    }
-
-    private void UpdateSpeedByLevel()
-    {
-        _currentIntervalMilliseconds = _speedLevels[_currentLevel - 1];
     }
 
     private async Task RunExerciseLoopAsync(CancellationToken cancellationToken)
@@ -208,7 +261,7 @@ public partial class FieldOfViewPage : ContentPage
         _currentRoundScored = false;
 
         char baseLetter = GetRandomLetter();
-        bool hasMismatch = _random.NextDouble() < 0.3;
+        bool hasMismatch = _random.NextDouble() < _currentConfig.MismatchChance;
         int mismatchIndex = hasMismatch ? _random.Next(_edgeLabels.Length) : -1;
 
         _currentRoundHasMismatch = hasMismatch;
@@ -267,11 +320,10 @@ public partial class FieldOfViewPage : ContentPage
             _correctRoundsCount++;
             _consecutiveCorrectRounds++;
 
-            if (_consecutiveCorrectRounds >= CorrectRoundsToIncreaseLevel && _currentLevel < _speedLevels.Length)
+            if (_consecutiveCorrectRounds >= _currentConfig.CorrectRoundsToIncreaseLevel && _currentLevel < DifficultyLevels.Count)
             {
-                _currentLevel++;
+                ApplyLevel(_currentLevel + 1);
                 _consecutiveCorrectRounds = 0;
-                UpdateSpeedByLevel();
                 message += $" Уровень повышен до {_currentLevel}.";
             }
         }
@@ -281,12 +333,12 @@ public partial class FieldOfViewPage : ContentPage
 
             if (_currentLevel > 1)
             {
-                _currentLevel--;
-                UpdateSpeedByLevel();
+                ApplyLevel(_currentLevel - 1);
                 message += $" Уровень снижен до {_currentLevel}.";
             }
         }
 
+        _recommendedLevel = _currentLevel;
         StatusLabel.Text = message;
         UpdateStatsText();
     }
@@ -398,4 +450,15 @@ public partial class FieldOfViewPage : ContentPage
         await StopAndSaveAsync("Тренировка остановлена.");
         base.OnDisappearing();
     }
+
+    private static int ClampLevel(int level)
+    {
+        return Math.Clamp(level, 1, DifficultyLevels.Count);
+    }
+
+    private sealed record FieldOfViewDifficultyConfig(
+        int Level,
+        int IntervalMilliseconds,
+        double MismatchChance,
+        int CorrectRoundsToIncreaseLevel);
 }
