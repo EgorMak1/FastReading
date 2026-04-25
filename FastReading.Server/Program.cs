@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 
-// Регистрируем AppDbContext и указываем, что используем PostgreSQL
+// Р РµРіРёСЃС‚СЂРёСЂСѓРµРј AppDbContext Рё СѓРєР°Р·С‹РІР°РµРј, С‡С‚Рѕ РёСЃРїРѕР»СЊР·СѓРµРј PostgreSQL
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<FastReading.Server.Data.AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
