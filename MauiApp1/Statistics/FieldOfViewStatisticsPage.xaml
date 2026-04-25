@@ -1,35 +1,77 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp1.Statistics.FieldOfViewStatisticsPage"
-             Title="Статистика: Поле зрения">
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Statistics.FieldOfViewStatisticsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Статистика: Поле зрения">
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
 
-            <Label Text="Моя статистика"
-                   FontSize="24"
-                   HorizontalOptions="Center" />
+            <Label
+                FontSize="24"
+                HorizontalOptions="Center"
+                Text="Статистика упражнения «Поле зрения»" />
 
-            <Label Text="Точность упражнения Поле зрения"
-                   FontSize="14"
-                   HorizontalOptions="Center"
-                   TextColor="Gray" />
+            <Label
+                x:Name="SummaryLabel"
+                FontSize="14"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                TextColor="Gray" />
 
-            <GraphicsView x:Name="ChartView"
-                          HeightRequest="300"
-                          HorizontalOptions="Fill" />
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                <Border Grid.Row="0" Grid.Column="0" Padding="12" Stroke="#D0D0D0" StrokeThickness="1">
+                    <VerticalStackLayout>
+                        <Label FontAttributes="Bold" Text="Лучшая точность" />
+                        <Label x:Name="BestResultLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" Padding="12" Stroke="#D0D0D0" StrokeThickness="1">
+                    <VerticalStackLayout>
+                        <Label FontAttributes="Bold" Text="Средняя точность" />
+                        <Label x:Name="AverageResultLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="0" Padding="12" Stroke="#D0D0D0" StrokeThickness="1">
+                    <VerticalStackLayout>
+                        <Label FontAttributes="Bold" Text="Текущий уровень" />
+                        <Label x:Name="CurrentLevelLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" Padding="12" Stroke="#D0D0D0" StrokeThickness="1">
+                    <VerticalStackLayout>
+                        <Label FontAttributes="Bold" Text="Лучший интервал" />
+                        <Label x:Name="BestIntervalLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="2" Grid.Column="0" Padding="12" Stroke="#D0D0D0" StrokeThickness="1">
+                    <VerticalStackLayout>
+                        <Label FontAttributes="Bold" Text="Всего прохождений" />
+                        <Label x:Name="TotalTrainingsLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="2" Grid.Column="1" Padding="12" Stroke="#D0D0D0" StrokeThickness="1">
+                    <VerticalStackLayout>
+                        <Label FontAttributes="Bold" Text="Средний уровень" />
+                        <Label x:Name="AverageLevelLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
 
-            <Label x:Name="BestResultLabel"
-                   FontSize="16"
-                   HorizontalOptions="Center" />
+            <Label
+                FontAttributes="Bold"
+                FontSize="18"
+                Text="Динамика точности по попыткам" />
 
-            <Label x:Name="AverageResultLabel"
-                   FontSize="16"
-                   HorizontalOptions="Center" />
+            <GraphicsView
+                x:Name="ChartView"
+                HeightRequest="300"
+                HorizontalOptions="Fill" />
 
-            <Label x:Name="TotalTrainingsLabel"
-                   FontSize="16"
-                   HorizontalOptions="Center" />
+            <Label
+                x:Name="LastSessionLabel"
+                FontSize="15" />
 
         </VerticalStackLayout>
     </ScrollView>

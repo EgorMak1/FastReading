@@ -1,4 +1,4 @@
-using MauiApp1.Services;
+﻿using MauiApp1.Services;
 using Microsoft.Maui.Graphics;
 
 namespace MauiApp1.Statistics;
@@ -22,33 +22,42 @@ public partial class RunningWordsStatisticsPage : ContentPage
     private async Task LoadStatisticsAsync()
     {
         var results = await _statisticsService.GetRunningWordsResultsAsync();
-
-        var runningWordsResults = results
-            .OrderBy(r => r.CompletedAt)
-            .ToList();
+        var runningWordsResults = results.OrderBy(r => r.CompletedAt).ToList();
 
         if (runningWordsResults.Count == 0)
         {
-            BestResultLabel.Text = "��� ������";
-            AverageResultLabel.Text = string.Empty;
-            TotalTrainingsLabel.Text = string.Empty;
+            SummaryLabel.Text = "Пока нет данных по упражнению.";
+            BestResultLabel.Text = "-";
+            AverageResultLabel.Text = "-";
+            CurrentSpeedLabel.Text = "-";
+            BestSpeedLabel.Text = "-";
+            TotalTrainingsLabel.Text = "0";
+            AverageSpeedLabel.Text = "-";
+            LastSessionLabel.Text = "Нет завершённых тренировок.";
             ChartView.Drawable = null;
             return;
         }
 
+        var last = runningWordsResults.Last();
         var best = runningWordsResults.Max(r => r.AccuracyPercent);
         var average = runningWordsResults.Average(r => r.AccuracyPercent);
-        var total = runningWordsResults.Count;
+        var bestSpeed = runningWordsResults.Min(r => r.FinalSpeedMilliseconds);
+        var averageSpeed = runningWordsResults.Average(r => r.FinalSpeedMilliseconds);
 
-        BestResultLabel.Text = $"������ ���������: {best:F1}%";
-        AverageResultLabel.Text = $"������� ���������: {average:F1}%";
-        TotalTrainingsLabel.Text = $"����� �����������: {total}";
+        SummaryLabel.Text = "Система учитывает точность запоминания и текущую скорость показа слов.";
+        BestResultLabel.Text = $"{best:F1}%";
+        AverageResultLabel.Text = $"{average:F1}%";
+        CurrentSpeedLabel.Text = $"{last.FinalSpeedMilliseconds} мс";
+        BestSpeedLabel.Text = $"{bestSpeed} мс";
+        TotalTrainingsLabel.Text = runningWordsResults.Count.ToString();
+        AverageSpeedLabel.Text = $"{averageSpeed:F1} мс";
+        LastSessionLabel.Text =
+            $"Последняя сессия: {last.CompletedAt.ToLocalTime():dd.MM.yyyy HH:mm}\n" +
+            $"Точность: {last.AccuracyPercent:F1}%\n" +
+            $"Скорость: {last.FinalSpeedMilliseconds} мс";
 
-        var drawable = new RunningWordsChartDrawable(
-            runningWordsResults.Select(r => r.AccuracyPercent).ToList()
-        );
-
-        ChartView.Drawable = drawable;
+        ChartView.Drawable = new RunningWordsChartDrawable(
+            runningWordsResults.Select(r => r.AccuracyPercent).ToList());
         ChartView.Invalidate();
     }
 }
@@ -65,14 +74,16 @@ public class RunningWordsChartDrawable : IDrawable
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
         if (_values.Count == 0)
+        {
             return;
+        }
 
         float padding = 40f;
         float width = dirtyRect.Width - padding * 2;
         float height = dirtyRect.Height - padding * 2;
 
-        double maxVal = 100;
-        double minVal = 0;
+        const double maxVal = 100;
+        const double minVal = 0;
 
         canvas.FillColor = Colors.White;
         canvas.FillRectangle(dirtyRect);
@@ -89,7 +100,7 @@ public class RunningWordsChartDrawable : IDrawable
 
         for (int i = 0; i < _values.Count; i++)
         {
-            float x = padding + (i / (float)(_values.Count - 1 == 0 ? 1 : _values.Count - 1)) * width;
+            float x = padding + (i / (float)Math.Max(1, _values.Count - 1)) * width;
             float y = padding + height - (float)((_values[i] - minVal) / (maxVal - minVal)) * height;
             points.Add(new PointF(x, y));
         }

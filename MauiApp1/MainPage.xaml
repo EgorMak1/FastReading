@@ -29,6 +29,11 @@
                 TextColor="White"
                 Clicked="OnViewStatisticsClicked"/>
 
+            <Button Text="Профиль"
+                BackgroundColor="#5C6BC0"
+                TextColor="White"
+                Clicked="OnViewProfileClicked"/>
+
             <!-- Кнопка для выхода -->
             <Button Text="Выйти"
                 BackgroundColor="Red"

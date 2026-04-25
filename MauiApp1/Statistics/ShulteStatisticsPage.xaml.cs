@@ -1,4 +1,4 @@
-using MauiApp1.Services;
+ï»¿using MauiApp1.Services;
 using Microsoft.Maui.Graphics;
 
 namespace MauiApp1.Statistics;
@@ -21,108 +21,143 @@ public partial class ShulteStatisticsPage : ContentPage
 
     private async Task LoadStatisticsAsync()
     {
-        var results = await _statisticsService.GetResultsAsync();
-
-        var shulteResults = results
-            .Where(r => r.ExerciseType == "ShulteTable")
-            .OrderBy(r => r.CompletedAt)
-            .ToList();
+        var results = await _statisticsService.GetShulteResultsAsync();
+        var shulteResults = results.OrderBy(r => r.CompletedAt).ToList();
 
         if (shulteResults.Count == 0)
         {
-            BestResultLabel.Text = "Íåò äàííûõ";
+            SummaryLabel.Text = "ÐŸÐ¾ÐºÐ° Ð½ÐµÑ‚ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð¿Ð¾ Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ðµ Ð¨ÑƒÐ»ÑŒÑ‚Ðµ.";
+            BestResultLabel.Text = "-";
+            AverageResultLabel.Text = "-";
+            BestScoreLabel.Text = "-";
+            CurrentLevelLabel.Text = "-";
+            TotalTrainingsLabel.Text = "0";
+            AverageErrorsLabel.Text = "-";
+            LastSessionLabel.Text = "ÐÐµÑ‚ Ð·Ð°Ð²ÐµÑ€ÑˆÑ‘Ð½Ð½Ñ‹Ñ… Ñ‚Ñ€ÐµÐ½Ð¸Ñ€Ð¾Ð²Ð¾Ðº.";
+            ChartView.Drawable = new EmptyChartDrawable("ÐŸÐ¾ÐºÐ° Ð½ÐµÑ‚ Ð´Ð°Ð½Ð½Ñ‹Ñ…");
+            ChartView.Invalidate();
             return;
         }
 
-        var best = shulteResults.Min(r => r.DurationSeconds);
-        var average = shulteResults.Average(r => r.DurationSeconds);
-        var total = shulteResults.Count;
+        var last = shulteResults.Last();
+        var bestTime = shulteResults.Min(r => r.DurationSeconds);
+        var averageTime = shulteResults.Average(r => r.DurationSeconds);
+        var bestScore = shulteResults.Max(r => r.Score);
+        var averageErrors = shulteResults.Average(r => r.ErrorsCount);
 
-        BestResultLabel.Text = $"Ëó÷øèé ðåçóëüòàò: {best} ñåê";
-        AverageResultLabel.Text = $"Ñðåäíåå âðåìÿ: {average:F1} ñåê";
-        TotalTrainingsLabel.Text = $"Âñåãî òðåíèðîâîê: {total}";
+        SummaryLabel.Text = "Ð¡Ñ‚Ð°Ñ‚Ð¸ÑÑ‚Ð¸ÐºÐ° ÑƒÑ‡Ð¸Ñ‚Ñ‹Ð²Ð°ÐµÑ‚ Ð²Ñ€ÐµÐ¼Ñ, Ð¾ÑˆÐ¸Ð±ÐºÐ¸, ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ ÑÐ»Ð¾Ð¶Ð½Ð¾ÑÑ‚Ð¸ Ð¸ Ð¸Ñ‚Ð¾Ð³Ð¾Ð²Ñ‹Ð¹ score.";
+        BestResultLabel.Text = $"{bestTime} ÑÐµÐº";
+        AverageResultLabel.Text = $"{averageTime:F1} ÑÐµÐº";
+        BestScoreLabel.Text = $"{bestScore:F1}";
+        CurrentLevelLabel.Text = last.LevelAfter.ToString();
+        TotalTrainingsLabel.Text = shulteResults.Count.ToString();
+        AverageErrorsLabel.Text = $"{averageErrors:F1}";
+        LastSessionLabel.Text =
+            $"Ð”Ð°Ñ‚Ð°: {last.CompletedAt.ToLocalTime():dd.MM.yyyy HH:mm}\n" +
+            $"Ð’Ñ€ÐµÐ¼Ñ: {last.DurationSeconds} ÑÐµÐº\n" +
+            $"ÐžÑˆÐ¸Ð±ÐºÐ¸: {last.ErrorsCount}\n" +
+            $"Score: {last.Score:F1}\n" +
+            $"Ð£Ñ€Ð¾Ð²ÐµÐ½ÑŒ: {last.LevelBefore} -> {last.LevelAfter}";
 
-        var drawable = new LineChartDrawable(
-            shulteResults.Select(r => r.DurationSeconds).ToList(),
-            shulteResults.Select(r => r.CompletedAt).ToList()
-        );
-
-        ChartView.Drawable = drawable;
+        ChartView.Drawable = new ShulteScoreChartDrawable(shulteResults);
         ChartView.Invalidate();
     }
 }
 
-public class LineChartDrawable : IDrawable
+public class ShulteScoreChartDrawable : IDrawable
 {
-    private readonly List<int> _values;
-    private readonly List<DateTime> _dates;
+    private readonly List<ShulteResultDto> _results;
 
-    public LineChartDrawable(List<int> values, List<DateTime> dates)
+    public ShulteScoreChartDrawable(List<ShulteResultDto> results)
     {
-        _values = values;
-        _dates = dates;
+        _results = results;
     }
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
-        if (_values.Count == 0) return;
+        if (_results.Count == 0)
+        {
+            return;
+        }
 
-        float padding = 40f;
-        float width = dirtyRect.Width - padding * 2;
-        float height = dirtyRect.Height - padding * 2;
+        float paddingLeft = 48f;
+        float paddingRight = 18f;
+        float paddingTop = 20f;
+        float paddingBottom = 36f;
+        float width = dirtyRect.Width - paddingLeft - paddingRight;
+        float height = dirtyRect.Height - paddingTop - paddingBottom;
 
-        int maxVal = _values.Max();
-        int minVal = _values.Min();
-        if (maxVal == minVal) maxVal = minVal + 1;
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
 
-        // Ôîí
         canvas.FillColor = Colors.White;
         canvas.FillRectangle(dirtyRect);
 
-        // Îñè
-        canvas.StrokeColor = Colors.Gray;
-        canvas.StrokeSize = 1;
-        canvas.DrawLine(padding, padding, padding, padding + height);
-        canvas.DrawLine(padding, padding + height, padding + width, padding + height);
+        const float minVal = 0f;
+        const float maxVal = 100f;
 
-        // Ëèíèÿ ãðàôèêà
-        canvas.StrokeColor = Color.FromArgb("#2196F3");
-        canvas.StrokeSize = 2;
+        canvas.StrokeColor = Color.FromArgb("#D6D6D6");
+        canvas.StrokeSize = 1;
+
+        for (int tick = 0; tick <= 4; tick++)
+        {
+            float y = paddingTop + (height / 4f) * tick;
+            canvas.DrawLine(paddingLeft, y, paddingLeft + width, y);
+        }
+
+        canvas.StrokeColor = Colors.Gray;
+        canvas.DrawLine(paddingLeft, paddingTop, paddingLeft, paddingTop + height);
+        canvas.DrawLine(paddingLeft, paddingTop + height, paddingLeft + width, paddingTop + height);
 
         var points = new List<PointF>();
-        for (int i = 0; i < _values.Count; i++)
+        for (int i = 0; i < _results.Count; i++)
         {
-            float x = padding + (i / (float)(_values.Count - 1 == 0 ? 1 : _values.Count - 1)) * width;
-            float y = padding + height - ((_values[i] - minVal) / (float)(maxVal - minVal)) * height;
+            float x = paddingLeft + (i / (float)Math.Max(1, _results.Count - 1)) * width;
+            float y = paddingTop + height - (float)((_results[i].Score - minVal) / (maxVal - minVal)) * height;
             points.Add(new PointF(x, y));
         }
 
+        canvas.StrokeColor = Color.FromArgb("#5C6BC0");
+        canvas.StrokeSize = 3;
         for (int i = 0; i < points.Count - 1; i++)
         {
             canvas.DrawLine(points[i].X, points[i].Y, points[i + 1].X, points[i + 1].Y);
         }
 
-        // Òî÷êè
-        canvas.FillColor = Color.FromArgb("#2196F3");
+        canvas.FillColor = Color.FromArgb("#5C6BC0");
         foreach (var point in points)
         {
-            canvas.FillCircle(point.X, point.Y, 5);
+            canvas.FillCircle(point.X, point.Y, 4);
         }
 
-        // Ïîäïèñè îñè Y
         canvas.FontColor = Colors.Gray;
-        canvas.FontSize = 10;
-        canvas.DrawString(maxVal.ToString(), 0, padding, padding - 2, 20, HorizontalAlignment.Right, VerticalAlignment.Center);
-        canvas.DrawString(minVal.ToString(), 0, padding + height - 10, padding - 2, 20, HorizontalAlignment.Right, VerticalAlignment.Center);
+        canvas.FontSize = 11;
+        canvas.DrawString("100", 0, paddingTop - 8, paddingLeft - 8, 20, HorizontalAlignment.Right, VerticalAlignment.Center);
+        canvas.DrawString("50", 0, paddingTop + height / 2f - 8, paddingLeft - 8, 20, HorizontalAlignment.Right, VerticalAlignment.Center);
+        canvas.DrawString("0", 0, paddingTop + height - 8, paddingLeft - 8, 20, HorizontalAlignment.Right, VerticalAlignment.Center);
 
-        // Ïîäïèñè îñè X
-        if (_dates.Count > 0)
-        {
-            canvas.DrawString(_dates.First().ToString("dd.MM"), padding - 10, padding + height + 5, 40, 20, HorizontalAlignment.Center, VerticalAlignment.Top);
-            if (_dates.Count > 1)
-            {
-                canvas.DrawString(_dates.Last().ToString("dd.MM"), padding + width - 10, padding + height + 5, 40, 20, HorizontalAlignment.Center, VerticalAlignment.Top);
-            }
-        }
+        canvas.DrawString("1", paddingLeft - 6, paddingTop + height + 4, 20, 20, HorizontalAlignment.Left, VerticalAlignment.Top);
+        canvas.DrawString(_results.Count.ToString(), paddingLeft + width - 16, paddingTop + height + 4, 24, 20, HorizontalAlignment.Right, VerticalAlignment.Top);
+    }
+}
+
+public class EmptyChartDrawable : IDrawable
+{
+    private readonly string _message;
+
+    public EmptyChartDrawable(string message)
+    {
+        _message = message;
+    }
+
+    public void Draw(ICanvas canvas, RectF dirtyRect)
+    {
+        canvas.FillColor = Colors.White;
+        canvas.FillRectangle(dirtyRect);
+        canvas.FontColor = Colors.Gray;
+        canvas.FontSize = 16;
+        canvas.DrawString(_message, dirtyRect, HorizontalAlignment.Center, VerticalAlignment.Center);
     }
 }

@@ -7,53 +7,73 @@
 
     <ScrollView>
         <VerticalStackLayout
-            Padding="20"
-            Spacing="20">
+            Padding="16"
+            Spacing="12">
 
             <Label
-                FontSize="28"
-                FontAttributes="Bold"
-                HorizontalOptions="Center"
-                Text="Бегущие слова" />
+                x:Name="DifficultyLabel"
+                FontSize="14"
+                HorizontalTextAlignment="Center"
+                TextColor="#5C6BC0" />
 
             <Frame
-                Padding="20"
+                Padding="16"
                 BorderColor="LightGray"
-                CornerRadius="12">
+                CornerRadius="10">
 
-                <VerticalStackLayout Spacing="12">
+                <VerticalStackLayout Spacing="10">
 
                     <Label
                         x:Name="CurrentWordLabel"
-                        FontSize="24"
                         FontAttributes="Bold"
+                        FontSize="24"
                         HorizontalOptions="Center"
-                        Text="Нажмите кнопку, чтобы начать" />
+                        Text="Нажмите старт" />
 
                     <Label
                         x:Name="StatusLabel"
-                        FontSize="14"
+                        FontSize="13"
                         HorizontalOptions="Center"
                         HorizontalTextAlignment="Center"
-                        Text="После показа слов нужно выбрать последнее слово" />
+                        Text="Подготовка к раунду." />
                 </VerticalStackLayout>
             </Frame>
 
-            <Label
-                FontSize="18"
-                FontAttributes="Bold"
-                Text="Варианты ответа:" />
-
-            <Button x:Name="AnswerButton1" Text="Вариант 1" Clicked="OnAnswerClicked" />
-            <Button x:Name="AnswerButton2" Text="Вариант 2" Clicked="OnAnswerClicked" />
-            <Button x:Name="AnswerButton3" Text="Вариант 3" Clicked="OnAnswerClicked" />
-            <Button x:Name="AnswerButton4" Text="Вариант 4" Clicked="OnAnswerClicked" />
+            <Grid
+                ColumnDefinitions="*,*"
+                ColumnSpacing="10"
+                RowDefinitions="Auto,Auto"
+                RowSpacing="10">
+                <Button
+                    x:Name="AnswerButton1"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Clicked="OnAnswerClicked"
+                    Text="Вариант 1" />
+                <Button
+                    x:Name="AnswerButton2"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Clicked="OnAnswerClicked"
+                    Text="Вариант 2" />
+                <Button
+                    x:Name="AnswerButton3"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Clicked="OnAnswerClicked"
+                    Text="Вариант 3" />
+                <Button
+                    x:Name="AnswerButton4"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Clicked="OnAnswerClicked"
+                    Text="Вариант 4" />
+            </Grid>
 
             <Button
                 x:Name="StartButton"
-                Margin="0,20,0,0"
-                Text="Начать упражнение"
-                Clicked="OnStartClicked" />
+                Clicked="OnStartClicked"
+                Text="Начать" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

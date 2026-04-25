@@ -93,6 +93,12 @@ namespace FastReading.Server.Controllers
 
             _db.RunningWordsResults.Add(result);
             await _db.SaveChangesAsync();
+            await UpdateExerciseProgressAsync(
+                userId,
+                "RunningWords",
+                request.FinalLevel,
+                CalculateRunningWordsScore(request),
+                result.CompletedAt);
 
             return Ok(new { result.Id, result.CompletedAt });
         }
@@ -124,6 +130,73 @@ namespace FastReading.Server.Controllers
             return Ok(results);
         }
 
+        [HttpPost("shulte")]
+        public async Task<IActionResult> SaveShulteResult([FromBody] ShulteResultRequest request)
+        {
+            if (!TryGetCurrentUserId(out var userId))
+            {
+                return Unauthorized();
+            }
+
+            if (request.GridSize <= 0 || request.NumbersCount <= 0 || request.DurationSeconds <= 0)
+            {
+                return BadRequest("GridSize, NumbersCount and DurationSeconds must be greater than 0.");
+            }
+
+            var result = new ShulteResult
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                GridSize = request.GridSize,
+                NumbersCount = request.NumbersCount,
+                LevelBefore = request.LevelBefore,
+                LevelAfter = request.LevelAfter,
+                DurationSeconds = request.DurationSeconds,
+                ErrorsCount = request.ErrorsCount,
+                Score = request.Score,
+                CompletedAt = DateTime.UtcNow
+            };
+
+            _db.ShulteResults.Add(result);
+            await _db.SaveChangesAsync();
+            await UpdateExerciseProgressAsync(
+                userId,
+                "ShulteTable",
+                request.LevelAfter,
+                request.Score,
+                result.CompletedAt);
+
+            return Ok(new { result.Id, result.CompletedAt });
+        }
+
+        [HttpGet("shulte")]
+        public async Task<IActionResult> GetShulteResults()
+        {
+            if (!TryGetCurrentUserId(out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var results = await _db.ShulteResults
+                .Where(x => x.UserId == userId)
+                .OrderBy(x => x.CompletedAt)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.GridSize,
+                    x.NumbersCount,
+                    x.LevelBefore,
+                    x.LevelAfter,
+                    x.DurationSeconds,
+                    x.ErrorsCount,
+                    x.Score,
+                    x.CompletedAt
+                })
+                .ToListAsync();
+
+            return Ok(results);
+        }
+
         [HttpPost("field-of-view")]
         public async Task<IActionResult> SaveFieldOfViewResult([FromBody] FieldOfViewResultRequest request)
         {
@@ -132,15 +205,16 @@ namespace FastReading.Server.Controllers
                 return Unauthorized();
             }
 
-            if (request.TotalRounds <= 0)
+            if (request.GridSize <= 0 || request.TotalRounds <= 0)
             {
-                return BadRequest("TotalRounds must be greater than 0.");
+                return BadRequest("GridSize and TotalRounds must be greater than 0.");
             }
 
             var result = new FieldOfViewResult
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
+                GridSize = request.GridSize,
                 TotalRounds = request.TotalRounds,
                 CorrectRounds = request.CorrectRounds,
                 DetectedMismatchCount = request.DetectedMismatchCount,
@@ -154,6 +228,12 @@ namespace FastReading.Server.Controllers
 
             _db.FieldOfViewResults.Add(result);
             await _db.SaveChangesAsync();
+            await UpdateExerciseProgressAsync(
+                userId,
+                "FieldOfView",
+                request.FinalLevel,
+                CalculateFieldOfViewScore(request),
+                result.CompletedAt);
 
             return Ok(new { result.Id, result.CompletedAt });
         }
@@ -172,6 +252,7 @@ namespace FastReading.Server.Controllers
                 .Select(x => new
                 {
                     x.Id,
+                    x.GridSize,
                     x.TotalRounds,
                     x.CorrectRounds,
                     x.DetectedMismatchCount,
@@ -221,6 +302,12 @@ namespace FastReading.Server.Controllers
 
             _db.WordErasingResults.Add(result);
             await _db.SaveChangesAsync();
+            await UpdateExerciseProgressAsync(
+                userId,
+                "WordErasing",
+                CalculateWordErasingLevel(request.SpeedAfterWpm),
+                CalculateWordErasingScore(request),
+                result.CompletedAt);
 
             return Ok(new { result.Id, result.CompletedAt });
         }
@@ -265,6 +352,106 @@ namespace FastReading.Server.Controllers
 
             return Guid.TryParse(userIdClaim?.Value, out userId);
         }
+
+        private async Task UpdateExerciseProgressAsync(Guid userId, string exerciseType, int currentLevel, double score, DateTime playedAt)
+        {
+            var progress = await _db.UserExerciseProgresses
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.ExerciseType == exerciseType);
+
+            if (progress == null)
+            {
+                progress = new UserExerciseProgress
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    ExerciseType = exerciseType,
+                    CurrentLevel = currentLevel,
+                    LastScore = score,
+                    AverageScore = score,
+                    BestScore = score,
+                    SessionsCount = 1,
+                    SuccessStreak = score >= 80 ? 1 : 0,
+                    FailStreak = score < 55 ? 1 : 0,
+                    LastPlayedAt = playedAt
+                };
+
+                _db.UserExerciseProgresses.Add(progress);
+            }
+            else
+            {
+                progress.CurrentLevel = currentLevel;
+                progress.LastScore = score;
+                progress.AverageScore = ((progress.AverageScore * progress.SessionsCount) + score) / (progress.SessionsCount + 1);
+                progress.BestScore = Math.Max(progress.BestScore, score);
+                progress.SessionsCount++;
+                progress.LastPlayedAt = playedAt;
+
+                if (score >= 80)
+                {
+                    progress.SuccessStreak++;
+                    progress.FailStreak = 0;
+                }
+                else if (score < 55)
+                {
+                    progress.FailStreak++;
+                    progress.SuccessStreak = 0;
+                }
+                else
+                {
+                    progress.SuccessStreak = 0;
+                    progress.FailStreak = 0;
+                }
+            }
+
+            await _db.SaveChangesAsync();
+        }
+
+        private static double CalculateRunningWordsScore(RunningWordsResultRequest request)
+        {
+            var speedBonus = request.FinalSpeedMilliseconds switch
+            {
+                <= 250 => 20,
+                <= 350 => 16,
+                <= 450 => 12,
+                <= 550 => 8,
+                _ => 4
+            };
+
+            return Math.Clamp(request.AccuracyPercent * 0.8 + speedBonus, 0, 100);
+        }
+
+        private static double CalculateFieldOfViewScore(FieldOfViewResultRequest request)
+        {
+            var penalty = request.FalseAlarmCount * 4 + request.MissedMismatchCount * 5;
+            var levelBonus = Math.Min(20, request.FinalLevel * 4);
+            var gridBonus = request.GridSize switch
+            {
+                >= 7 => 8,
+                >= 5 => 4,
+                _ => 0
+            };
+
+            return Math.Clamp(request.AccuracyPercent * 0.7 + levelBonus + gridBonus - penalty, 0, 100);
+        }
+
+        private static double CalculateWordErasingScore(WordErasingResultRequest request)
+        {
+            var speedBonus = Math.Clamp(request.SpeedDelta + 15, 0, 30);
+            var skippedPenalty = request.QuestionsSkipped ? 20 : 0;
+            return Math.Clamp(request.AccuracyPercent * 0.7 + speedBonus - skippedPenalty, 0, 100);
+        }
+
+        private static int CalculateWordErasingLevel(int speedAfterWpm)
+        {
+            return speedAfterWpm switch
+            {
+                <= 160 => 1,
+                <= 220 => 2,
+                <= 280 => 3,
+                <= 340 => 4,
+                _ => 5
+            };
+        }
     }
 
     public class SaveResultRequest
@@ -283,8 +470,20 @@ namespace FastReading.Server.Controllers
         public int FinalSpeedMilliseconds { get; set; }
     }
 
+    public class ShulteResultRequest
+    {
+        public int GridSize { get; set; }
+        public int NumbersCount { get; set; }
+        public int LevelBefore { get; set; }
+        public int LevelAfter { get; set; }
+        public int DurationSeconds { get; set; }
+        public int ErrorsCount { get; set; }
+        public double Score { get; set; }
+    }
+
     public class FieldOfViewResultRequest
     {
+        public int GridSize { get; set; }
         public int TotalRounds { get; set; }
         public int CorrectRounds { get; set; }
         public int DetectedMismatchCount { get; set; }

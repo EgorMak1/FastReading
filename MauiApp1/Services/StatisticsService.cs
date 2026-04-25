@@ -67,6 +67,31 @@ namespace MauiApp1.Services
             return results ?? new List<RunningWordsResultDto>();
         }
 
+        public async Task<bool> SaveShulteResultAsync(ShulteResultRequest result)
+        {
+            await _auth.ApplyTokenIfExistsAsync();
+
+            var response = await _api.Http.PostAsJsonAsync("api/statistics/shulte", result);
+
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<List<ShulteResultDto>> GetShulteResultsAsync()
+        {
+            await _auth.ApplyTokenIfExistsAsync();
+
+            var response = await _api.Http.GetAsync("api/statistics/shulte");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<ShulteResultDto>();
+            }
+
+            var results = await response.Content.ReadFromJsonAsync<List<ShulteResultDto>>();
+
+            return results ?? new List<ShulteResultDto>();
+        }
+
         public async Task<bool> SaveFieldOfViewResultAsync(FieldOfViewResultRequest result)
         {
             await _auth.ApplyTokenIfExistsAsync();
@@ -154,8 +179,33 @@ namespace MauiApp1.Services
         public DateTime CompletedAt { get; set; }
     }
 
+    public class ShulteResultRequest
+    {
+        public int GridSize { get; set; }
+        public int NumbersCount { get; set; }
+        public int LevelBefore { get; set; }
+        public int LevelAfter { get; set; }
+        public int DurationSeconds { get; set; }
+        public int ErrorsCount { get; set; }
+        public double Score { get; set; }
+    }
+
+    public class ShulteResultDto
+    {
+        public Guid Id { get; set; }
+        public int GridSize { get; set; }
+        public int NumbersCount { get; set; }
+        public int LevelBefore { get; set; }
+        public int LevelAfter { get; set; }
+        public int DurationSeconds { get; set; }
+        public int ErrorsCount { get; set; }
+        public double Score { get; set; }
+        public DateTime CompletedAt { get; set; }
+    }
+
     public class FieldOfViewResultRequest
     {
+        public int GridSize { get; set; }
         public int TotalRounds { get; set; }
         public int CorrectRounds { get; set; }
         public int DetectedMismatchCount { get; set; }
@@ -169,6 +219,7 @@ namespace MauiApp1.Services
     public class FieldOfViewResultDto
     {
         public Guid Id { get; set; }
+        public int GridSize { get; set; }
         public int TotalRounds { get; set; }
         public int CorrectRounds { get; set; }
         public int DetectedMismatchCount { get; set; }

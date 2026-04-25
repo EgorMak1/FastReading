@@ -1,4 +1,4 @@
-using MauiApp1.Services;
+﻿using MauiApp1.Services;
 using MauiApp1.Statistics;
 using System.Diagnostics;
 using System.Text;
@@ -19,6 +19,7 @@ public partial class WordErasingPage : ContentPage
         RegexOptions.Compiled);
 
     private readonly StatisticsService _statisticsService;
+    private readonly bool _startImmediately;
     private IReadOnlyList<WordErasingTextDefinition> _texts = [];
     private readonly List<WordToken> _tokens = [];
 
@@ -34,17 +35,26 @@ public partial class WordErasingPage : ContentPage
     private int _correctAnswers;
     private int _fullWordsErased;
     private int _lastRenderedPartialLetters = -1;
+    private bool _isInitialized;
     private bool _isReading;
 
-    public WordErasingPage(StatisticsService statisticsService)
+    public WordErasingPage(StatisticsService statisticsService, bool startImmediately = false)
     {
         InitializeComponent();
         _statisticsService = statisticsService;
+        _startImmediately = startImmediately;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        if (_isInitialized)
+        {
+            return;
+        }
+
+        _isInitialized = true;
         await InitializeSessionAsync();
     }
 
@@ -62,15 +72,27 @@ public partial class WordErasingPage : ContentPage
             results = [];
         }
 
-        _currentWpm = results.Count > 0 ? results.Last().SpeedAfterWpm : DefaultWpm;
-        _currentTextIndex = results.Count % _texts.Count;
-        _currentText = _texts[_currentTextIndex];
+        _currentWpm = NormalizeWpm(results.Count > 0 ? results.Last().SpeedAfterWpm : DefaultWpm);
+        _currentTextIndex = _texts.Count == 0 ? 0 : results.Count % _texts.Count;
+        _currentText = _texts.ElementAtOrDefault(_currentTextIndex);
+        if (_currentText == null)
+        {
+            return;
+        }
+
         _tokens.Clear();
         _tokens.AddRange(Tokenize(_currentText.Content));
 
         PreparationTitleLabel.Text = _currentText.Title;
-        PreparationInfoLabel.Text = $"Текст {_currentTextIndex + 1} из {_texts.Count}. Вопросов после чтения: {QuestionCount}.";
+        PreparationInfoLabel.Text = $"Текст {_currentTextIndex + 1} из {_texts.Count}. После чтения будет {QuestionCount} вопросов.";
         SpeedLabel.Text = $"Текущая скорость: {_currentWpm} WPM";
+        DifficultyLabel.Text = $"Диапазон сложности: {GetSpeedBandText(_currentWpm)}. В следующей попытке скорость изменится по результату ответов.";
+
+        if (_startImmediately)
+        {
+            await StartReadingAttemptAsync();
+            return;
+        }
 
         ShowPreparationState();
     }
@@ -96,7 +118,7 @@ public partial class WordErasingPage : ContentPage
         QuestionLayout.IsVisible = true;
     }
 
-    private async void OnStartClicked(object sender, EventArgs e)
+    private async Task StartReadingAttemptAsync()
     {
         if (_isReading)
         {
@@ -125,7 +147,6 @@ public partial class WordErasingPage : ContentPage
         _isReading = true;
 
         ReadyButton.IsEnabled = true;
-        ReadingHeaderLabel.Text = _currentText.Title;
         ReadingStatusLabel.Text = "Читайте текст. Кнопка «Готово» доступна в любой момент.";
         ReadingTextLabel.Text = _currentText.Content;
         TimerLabel.Text = FormatRemainingTime(SessionDurationSeconds);
@@ -145,6 +166,11 @@ public partial class WordErasingPage : ContentPage
         catch (OperationCanceledException)
         {
         }
+    }
+
+    private async void OnStartClicked(object sender, EventArgs e)
+    {
+        await StartReadingAttemptAsync();
     }
 
     private async Task RunReadingLoopAsync(CancellationToken cancellationToken)
@@ -280,7 +306,7 @@ public partial class WordErasingPage : ContentPage
         _isReading = false;
 
         int speedDelta = questionsSkipped ? -15 : CalculateSpeedDelta(correctAnswers);
-        int speedAfter = Math.Clamp(_speedBeforeAttempt + speedDelta, MinWpm, MaxWpm);
+        int speedAfter = NormalizeWpm(_speedBeforeAttempt + speedDelta);
         double accuracyPercent = questionsSkipped ? 0 : correctAnswers / (double)QuestionCount * 100d;
 
         var request = new WordErasingResultRequest
@@ -410,6 +436,23 @@ public partial class WordErasingPage : ContentPage
     {
         var time = TimeSpan.FromSeconds(Math.Max(0, remainingSeconds));
         return $"{time.Minutes:00}:{time.Seconds:00}";
+    }
+
+    private static int NormalizeWpm(int wpm)
+    {
+        return Math.Clamp(wpm, MinWpm, MaxWpm);
+    }
+
+    private static string GetSpeedBandText(int wpm)
+    {
+        return wpm switch
+        {
+            <= 160 => "уровень 1 (базовый темп)",
+            <= 220 => "уровень 2 (устойчивый темп)",
+            <= 280 => "уровень 3 (ускоренное чтение)",
+            <= 340 => "уровень 4 (высокий темп)",
+            _ => "уровень 5 (максимальный темп)"
+        };
     }
 
     protected override void OnDisappearing()

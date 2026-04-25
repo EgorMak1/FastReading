@@ -12,6 +12,8 @@ namespace FastReading.Server.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<TrainingResult> TrainingResults { get; set; }
+        public DbSet<ShulteResult> ShulteResults { get; set; }
+        public DbSet<UserExerciseProgress> UserExerciseProgresses { get; set; }
         public DbSet<RunningWordsResult> RunningWordsResults { get; set; }
         public DbSet<FieldOfViewResult> FieldOfViewResults { get; set; }
         public DbSet<WordErasingResult> WordErasingResults { get; set; }
@@ -92,9 +94,87 @@ namespace FastReading.Server.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
+            modelBuilder.Entity<ShulteResult>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.GridSize)
+                      .IsRequired();
+
+                entity.Property(x => x.NumbersCount)
+                      .IsRequired();
+
+                entity.Property(x => x.LevelBefore)
+                      .IsRequired();
+
+                entity.Property(x => x.LevelAfter)
+                      .IsRequired();
+
+                entity.Property(x => x.DurationSeconds)
+                      .IsRequired();
+
+                entity.Property(x => x.ErrorsCount)
+                      .IsRequired();
+
+                entity.Property(x => x.Score)
+                      .IsRequired();
+
+                entity.Property(x => x.CompletedAt)
+                      .IsRequired();
+
+                entity.HasOne<User>()
+                      .WithMany()
+                      .HasForeignKey(x => x.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<UserExerciseProgress>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.HasIndex(x => new { x.UserId, x.ExerciseType })
+                      .IsUnique();
+
+                entity.Property(x => x.ExerciseType)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(x => x.CurrentLevel)
+                      .IsRequired();
+
+                entity.Property(x => x.LastScore)
+                      .IsRequired();
+
+                entity.Property(x => x.AverageScore)
+                      .IsRequired();
+
+                entity.Property(x => x.BestScore)
+                      .IsRequired();
+
+                entity.Property(x => x.SessionsCount)
+                      .IsRequired();
+
+                entity.Property(x => x.SuccessStreak)
+                      .IsRequired();
+
+                entity.Property(x => x.FailStreak)
+                      .IsRequired();
+
+                entity.Property(x => x.LastPlayedAt)
+                      .IsRequired();
+
+                entity.HasOne<User>()
+                      .WithMany()
+                      .HasForeignKey(x => x.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
             modelBuilder.Entity<FieldOfViewResult>(entity =>
             {
                 entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.GridSize)
+                      .IsRequired();
 
                 entity.Property(x => x.TotalRounds)
                       .IsRequired();

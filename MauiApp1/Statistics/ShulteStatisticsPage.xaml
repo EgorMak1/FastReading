@@ -2,35 +2,72 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiApp1.Statistics.ShulteStatisticsPage"
-             Title="Статистика Таблицы Шульте">
+             Title="Статистика Шульте">
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="15">
-
-            <Label Text="Моя статистика"
-                   FontSize="24"
+        <VerticalStackLayout Padding="20" Spacing="14">
+            <Label Text="Статистика таблицы Шульте"
+                   FontSize="26"
                    HorizontalOptions="Center" />
 
-            <Label Text="Время прохождения (секунды)"
+            <Label x:Name="SummaryLabel"
                    FontSize="14"
                    HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
                    TextColor="Gray" />
 
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                <Border Grid.Row="0" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Лучшее время" FontAttributes="Bold" />
+                        <Label x:Name="BestResultLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Среднее время" FontAttributes="Bold" />
+                        <Label x:Name="AverageResultLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Лучший score" FontAttributes="Bold" />
+                        <Label x:Name="BestScoreLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Текущий уровень" FontAttributes="Bold" />
+                        <Label x:Name="CurrentLevelLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="2" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Всего тренировок" FontAttributes="Bold" />
+                        <Label x:Name="TotalTrainingsLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="2" Grid.Column="1" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="Среднее число ошибок" FontAttributes="Bold" />
+                        <Label x:Name="AverageErrorsLabel" FontSize="20" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <Label Text="Динамика score по попыткам"
+                   FontSize="18"
+                   FontAttributes="Bold" />
+
             <GraphicsView x:Name="ChartView"
-                          HeightRequest="300"
+                          HeightRequest="320"
                           HorizontalOptions="Fill" />
 
-            <Label x:Name="BestResultLabel"
-                   FontSize="16"
-                   HorizontalOptions="Center" />
-
-            <Label x:Name="AverageResultLabel"
-                   FontSize="16"
-                   HorizontalOptions="Center" />
-
-            <Label x:Name="TotalTrainingsLabel"
-                   FontSize="16"
-                   HorizontalOptions="Center" />
-
+            <Border Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Последняя тренировка" FontAttributes="Bold" FontSize="18" />
+                    <Label x:Name="LastSessionLabel" />
+                </VerticalStackLayout>
+            </Border>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

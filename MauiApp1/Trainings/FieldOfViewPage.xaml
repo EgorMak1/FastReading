@@ -7,26 +7,19 @@
 
     <ScrollView>
         <VerticalStackLayout
-            Padding="20"
-            Spacing="16">
+            Padding="16"
+            Spacing="12">
 
             <Label
-                FontAttributes="Bold"
-                FontSize="28"
-                HorizontalOptions="Center"
-                Text="Поле зрения" />
-
-            <Label
-                x:Name="InstructionLabel"
+                x:Name="DifficultyLabel"
                 FontSize="14"
                 HorizontalTextAlignment="Center"
-                Text="Если одна буква отличается, нажмите «Ошибка». Если все буквы одинаковые, ничего не нажимайте."
-                TextColor="Gray" />
+                TextColor="#5C6BC0" />
 
             <Frame
-                Padding="12"
+                Padding="10"
                 BorderColor="LightGray"
-                CornerRadius="12"
+                CornerRadius="10"
                 HorizontalOptions="Center">
 
                 <Grid
@@ -40,39 +33,49 @@
             <Label
                 x:Name="StatusLabel"
                 FontAttributes="Bold"
-                FontSize="16"
+                FontSize="15"
                 HorizontalTextAlignment="Center"
-                Text="Нажмите «Начать», чтобы запустить тренировку." />
+                Text="Нажмите «Начать»." />
 
             <Label
                 x:Name="StatsLabel"
-                FontSize="14"
+                FontSize="13"
                 HorizontalTextAlignment="Center"
-                Text="Уровень: 1, интервал: 1800 мс. Раундов: 0, правильных: 0." />
+                Text="Уровень: 1, поле: 5x5, интервал: 1800 мс. Раундов: 0, верных: 0." />
 
-            <HorizontalStackLayout
-                HorizontalOptions="Center"
-                Spacing="12">
-
+            <Grid
+                ColumnDefinitions="*,*"
+                ColumnSpacing="10">
                 <Button
                     x:Name="StartButton"
+                    Grid.Column="0"
                     Clicked="OnStartClicked"
                     Text="Начать" />
 
                 <Button
                     x:Name="StopButton"
+                    Grid.Column="1"
                     Clicked="OnStopClicked"
                     IsEnabled="False"
                     Text="Стоп" />
-            </HorizontalStackLayout>
+            </Grid>
 
             <Button
                 x:Name="ErrorButton"
                 BackgroundColor="#D9534F"
                 Clicked="OnErrorClicked"
+                FontAttributes="Bold"
+                FontSize="18"
+                HeightRequest="56"
                 IsEnabled="False"
                 Text="Ошибка"
                 TextColor="White" />
+
+            <Button
+                x:Name="ReadyButton"
+                Clicked="OnReadyClicked"
+                IsVisible="False"
+                Text="Готов" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

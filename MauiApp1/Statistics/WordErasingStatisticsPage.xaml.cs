@@ -1,4 +1,4 @@
-using MauiApp1.Services;
+﻿using MauiApp1.Services;
 using Microsoft.Maui.Graphics;
 
 namespace MauiApp1.Statistics;
@@ -27,6 +27,7 @@ public partial class WordErasingStatisticsPage : ContentPage
         if (orderedResults.Count == 0)
         {
             CurrentSpeedLabel.Text = "Текущая скорость: 180 WPM";
+            CurrentBandLabel.Text = "Диапазон сложности: уровень 2 (устойчивый темп)";
             LastAttemptLabel.Text = "Попыток пока нет";
             SpeedChangeLabel.Text = string.Empty;
             NextSpeedLabel.Text = string.Empty;
@@ -37,6 +38,7 @@ public partial class WordErasingStatisticsPage : ContentPage
 
         var last = orderedResults.Last();
         CurrentSpeedLabel.Text = $"Текущая скорость: {last.SpeedAfterWpm} WPM";
+        CurrentBandLabel.Text = $"Диапазон сложности: {GetSpeedBandText(last.SpeedAfterWpm)}";
         TotalAttemptsLabel.Text = $"Всего попыток: {orderedResults.Count}";
 
         if (last.QuestionsSkipped)
@@ -50,7 +52,7 @@ public partial class WordErasingStatisticsPage : ContentPage
 
         string speedDeltaText = last.SpeedDelta > 0 ? $"+{last.SpeedDelta}" : last.SpeedDelta.ToString();
         SpeedChangeLabel.Text = $"Изменение скорости: {last.SpeedBeforeWpm} -> {last.SpeedAfterWpm} ({speedDeltaText})";
-        NextSpeedLabel.Text = $"Следующее упражнение будет на скорости {last.SpeedAfterWpm} WPM";
+        NextSpeedLabel.Text = $"Следующее упражнение начнётся со скорости {last.SpeedAfterWpm} WPM";
 
         ChartView.Drawable = new WordErasingWpmChartDrawable(orderedResults.Select(r => r.SpeedAfterWpm).ToList());
         ChartView.Invalidate();
@@ -63,6 +65,18 @@ public partial class WordErasingStatisticsPage : ContentPage
             "Ready" => "Готово",
             "Stop" => "Стоп",
             _ => "Таймер"
+        };
+    }
+
+    private static string GetSpeedBandText(int wpm)
+    {
+        return wpm switch
+        {
+            <= 160 => "уровень 1 (базовый темп)",
+            <= 220 => "уровень 2 (устойчивый темп)",
+            <= 280 => "уровень 3 (ускоренное чтение)",
+            <= 340 => "уровень 4 (высокий темп)",
+            _ => "уровень 5 (максимальный темп)"
         };
     }
 }
