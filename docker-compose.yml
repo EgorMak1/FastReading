@@ -8,11 +8,33 @@ services:
     environment:
       POSTGRES_DB: fastreading_local
       POSTGRES_USER: fastreading_user
-      POSTGRES_PASSWORD: fastreading_password
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME_FASTREADING_DB_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fastreading_user -d fastreading_local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: FastReading.Server/Dockerfile
+    container_name: fastreading_server
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=fastreading_local;Username=fastreading_user;Password=${POSTGRES_PASSWORD:-CHANGE_ME_FASTREADING_DB_PASSWORD}"
+      Jwt__Key: ${JWT_KEY:-CHANGE_ME_FASTREADING_JWT_KEY_MIN_32_CHARS}
+      Jwt__Issuer: FastReading.Server
+      Jwt__Audience: FastReading.Client
+    ports:
+      - "8080:8080"
 
 volumes:
   pgdata:

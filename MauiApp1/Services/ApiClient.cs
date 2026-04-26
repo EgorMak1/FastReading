@@ -22,16 +22,16 @@ namespace MauiApp1.Services
 #if DEBUG
 
 #if ANDROID
-            // Android Emulator -> доступ к localhost хоста
-            return "http://10.0.2.2:5242/";
+            // Android Debug -> VPS API
+            return "http://159.194.232.38:8080/";
 #else
-            // Windows локальная разработка
-            return "http://localhost:5242/";
+            // Windows Debug -> VPS API
+            return "http://159.194.232.38:8080/";
 #endif
 
 #else
             // Production (VPS)
-            return "http://158.160.179.55:5242/";
+            return "http://159.194.232.38:8080/";
 #endif
         }
     }
