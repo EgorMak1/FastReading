@@ -18,7 +18,8 @@
 
             <Frame
                 Padding="16"
-                BorderColor="LightGray"
+                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#2B2B2B}"
+                BorderColor="{AppThemeBinding Light=LightGray, Dark=#5A5A5A}"
                 CornerRadius="10">
 
                 <VerticalStackLayout Spacing="10">
@@ -28,6 +29,7 @@
                         FontAttributes="Bold"
                         FontSize="24"
                         HorizontalOptions="Center"
+                        TextColor="{AppThemeBinding Light=#111111, Dark=#FFFFFF}"
                         Text="Нажмите старт" />
 
                     <Label
@@ -35,6 +37,7 @@
                         FontSize="13"
                         HorizontalOptions="Center"
                         HorizontalTextAlignment="Center"
+                        TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}"
                         Text="Подготовка к раунду." />
                 </VerticalStackLayout>
             </Frame>

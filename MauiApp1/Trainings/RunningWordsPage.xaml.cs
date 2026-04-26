@@ -258,8 +258,29 @@ public partial class RunningWordsPage : ContentPage
         _statisticsSaved = await _statisticsService.SaveRunningWordsResultAsync(request);
     }
 
+    private void RecordUnansweredAttemptAsWrong()
+    {
+        if (!_isShowingWords && !_isAnswerSelection)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(_selectedAnswer) || string.IsNullOrEmpty(_correctAnswer))
+        {
+            return;
+        }
+
+        _totalAttempts++;
+        _wrongAnswersCount++;
+        _wordDisplayMilliseconds = NormalizeSpeed(_wordDisplayMilliseconds + SpeedStepMilliseconds);
+        _recommendedSpeedMilliseconds = _wordDisplayMilliseconds;
+        _isAnswerSelection = false;
+    }
+
     protected override async void OnDisappearing()
     {
+        RecordUnansweredAttemptAsWrong();
+
         _displayCancellation?.Cancel();
         _isShowingWords = false;
         _isAnswerSelection = false;
