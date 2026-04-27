@@ -41,7 +41,15 @@ namespace MauiApp1.Services
         public string? MostStableExercise { get; set; }
         public string? NeedsAttentionExercise { get; set; }
         public string Recommendation { get; set; } = string.Empty;
+        public List<DailyActivityDto> DailyActivity { get; set; } = [];
         public List<ExerciseProgressDto> ExerciseProgress { get; set; } = [];
+    }
+
+    public class DailyActivityDto
+    {
+        public DateTime Date { get; set; }
+        public double Points { get; set; }
+        public int Sessions { get; set; }
     }
 
     public class ExerciseProgressDto

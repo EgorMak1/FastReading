@@ -52,6 +52,7 @@ namespace FastReading.Server.Controllers
                 .FirstOrDefault();
             var recommendation = BuildRecommendation(progresses);
             var readiness = BuildReadinessStatus(overallScore, progresses.Count);
+            var dailyActivity = await BuildDailyActivityAsync(userId, 14);
 
             return Ok(new
             {
@@ -67,6 +68,7 @@ namespace FastReading.Server.Controllers
                 mostStableExercise = mostStable?.ExerciseType,
                 needsAttentionExercise = needsAttention?.ExerciseType,
                 recommendation,
+                dailyActivity,
                 exerciseProgress = progresses.Select(x => new
                 {
                     x.ExerciseType,
@@ -90,6 +92,67 @@ namespace FastReading.Server.Controllers
                            ?? User.FindFirst("sub");
 
             return Guid.TryParse(userIdClaim?.Value, out userId);
+        }
+
+        private async Task<List<DailyActivityPoint>> BuildDailyActivityAsync(Guid userId, int days)
+        {
+            var today = DateTime.UtcNow.Date;
+            var startDate = today.AddDays(-(days - 1));
+            var endDate = today.AddDays(1);
+            var points = new List<ActivityPoint>();
+
+            points.AddRange(await _db.ShulteResults
+                .Where(x => x.UserId == userId && x.CompletedAt >= startDate && x.CompletedAt < endDate)
+                .Select(x => new ActivityPoint
+                {
+                    CompletedAt = x.CompletedAt,
+                    Points = x.Score
+                })
+                .ToListAsync());
+
+            points.AddRange(await _db.RunningWordsResults
+                .Where(x => x.UserId == userId && x.CompletedAt >= startDate && x.CompletedAt < endDate)
+                .Select(x => new ActivityPoint
+                {
+                    CompletedAt = x.CompletedAt,
+                    Points = x.AccuracyPercent
+                })
+                .ToListAsync());
+
+            points.AddRange(await _db.FieldOfViewResults
+                .Where(x => x.UserId == userId && x.CompletedAt >= startDate && x.CompletedAt < endDate)
+                .Select(x => new ActivityPoint
+                {
+                    CompletedAt = x.CompletedAt,
+                    Points = x.AccuracyPercent
+                })
+                .ToListAsync());
+
+            points.AddRange(await _db.WordErasingResults
+                .Where(x => x.UserId == userId && x.CompletedAt >= startDate && x.CompletedAt < endDate)
+                .Select(x => new ActivityPoint
+                {
+                    CompletedAt = x.CompletedAt,
+                    Points = x.AccuracyPercent
+                })
+                .ToListAsync());
+
+            var grouped = points
+                .GroupBy(x => x.CompletedAt.Date)
+                .ToDictionary(
+                    x => x.Key,
+                    x => new
+                    {
+                        Points = x.Sum(y => y.Points),
+                        Sessions = x.Count()
+                    });
+
+            return Enumerable.Range(0, days)
+                .Select(offset => startDate.AddDays(offset))
+                .Select(date => grouped.TryGetValue(date, out var day)
+                    ? new DailyActivityPoint(date, Math.Round(day.Points, 1), day.Sessions)
+                    : new DailyActivityPoint(date, 0, 0))
+                .ToList();
         }
 
         private static string BuildReadinessStatus(double overallScore, int exercisesTracked)
@@ -183,5 +246,12 @@ namespace FastReading.Server.Controllers
 
             return "В процессе освоения";
         }
+        private sealed class ActivityPoint
+        {
+            public DateTime CompletedAt { get; set; }
+            public double Points { get; set; }
+        }
+
+        private sealed record DailyActivityPoint(DateTime Date, double Points, int Sessions);
     }
 }

@@ -9,6 +9,8 @@ namespace MauiApp1
     {
         private readonly ProfileService _profileService;
         private CancellationTokenSource? _loadCancellation;
+        private int _activityPeriodDays = 7;
+        private IReadOnlyList<DailyActivityDto> _dailyActivity = [];
 
         public MainPage(ProfileService profileService)
         {
@@ -56,6 +58,8 @@ namespace MauiApp1
                     : LocalizeExerciseNames(profile.Recommendation);
 
                 AccuracyLabel.Text = "—";
+                _dailyActivity = profile.DailyActivity;
+                RenderActivityChart();
             }
             catch (OperationCanceledException)
             {
@@ -74,6 +78,8 @@ namespace MauiApp1
             TotalSessionsLabel.Text = "—";
             AccuracyLabel.Text = "—";
             RecommendationLabel.Text = "Нет данных";
+            _dailyActivity = [];
+            RenderActivityChart();
         }
 
         private async void OnStartTrainingClicked(object sender, EventArgs e)
@@ -92,6 +98,81 @@ namespace MauiApp1
         {
             var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<ProfilePage>();
             await Navigation.PushAsync(page);
+        }
+
+        private async void OnActivityPeriodTapped(object sender, TappedEventArgs e)
+        {
+            var selectedPeriod = await DisplayActionSheet("Период", "Отмена", null, "7 дней", "14 дней");
+
+            if (selectedPeriod == "7 дней")
+            {
+                _activityPeriodDays = 7;
+            }
+            else if (selectedPeriod == "14 дней")
+            {
+                _activityPeriodDays = 14;
+            }
+            else
+            {
+                return;
+            }
+
+            ActivityPeriodLabel.Text = $"{_activityPeriodDays} дней";
+            RenderActivityChart();
+        }
+
+        private void RenderActivityChart()
+        {
+            if (ActivityChartGrid == null || ActivityEmptyLabel == null)
+            {
+                return;
+            }
+
+            ActivityChartGrid.Children.Clear();
+            ActivityChartGrid.ColumnDefinitions.Clear();
+
+            var points = _dailyActivity
+                .TakeLast(_activityPeriodDays)
+                .ToList();
+            var maxPoints = points.Count == 0 ? 0 : points.Max(x => x.Points);
+
+            ActivityEmptyLabel.IsVisible = maxPoints <= 0;
+            if (maxPoints <= 0)
+            {
+                return;
+            }
+
+            var isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
+            var barColor = isDark ? Color.FromArgb("#93C5FD") : Color.FromArgb("#2563EB");
+            const double maxBarHeight = 72;
+
+            for (var i = 0; i < points.Count; i++)
+            {
+                ActivityChartGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+
+                var barHeight = Math.Max(6, maxBarHeight * points[i].Points / maxPoints);
+                var bar = new Border
+                {
+                    BackgroundColor = barColor,
+                    HeightRequest = barHeight,
+                    StrokeThickness = 0,
+                    StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
+                    {
+                        CornerRadius = new CornerRadius(4)
+                    },
+                    VerticalOptions = LayoutOptions.End
+                };
+
+                var column = new Grid
+                {
+                    HeightRequest = maxBarHeight,
+                    VerticalOptions = LayoutOptions.End
+                };
+                column.Children.Add(bar);
+
+                ActivityChartGrid.Children.Add(column);
+                Grid.SetColumn(column, i);
+            }
         }
 
         private void OnExitClicked(object sender, EventArgs e)

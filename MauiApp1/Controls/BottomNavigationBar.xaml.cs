@@ -44,22 +44,22 @@ public partial class BottomNavigationBar : ContentView
         }
     }
 
-    private void OnHomeClicked(object sender, EventArgs e)
+    private void OnHomeClicked(object sender, TappedEventArgs e)
     {
         NavigateTo<MainPage>("Home");
     }
 
-    private void OnTrainingClicked(object sender, EventArgs e)
+    private void OnTrainingClicked(object sender, TappedEventArgs e)
     {
         NavigateTo<ExerciseSelectionPage>("Training");
     }
 
-    private void OnStatisticsClicked(object sender, EventArgs e)
+    private void OnStatisticsClicked(object sender, TappedEventArgs e)
     {
         NavigateTo<SelectionStatisticsPage>("Statistics");
     }
 
-    private void OnProfileClicked(object sender, EventArgs e)
+    private void OnProfileClicked(object sender, TappedEventArgs e)
     {
         NavigateTo<ProfilePage>("Profile");
     }
@@ -92,7 +92,7 @@ public partial class BottomNavigationBar : ContentView
 
     private void ApplyActiveState()
     {
-        if (HomeButton == null)
+        if (HomeTab == null)
         {
             return;
         }
@@ -101,22 +101,27 @@ public partial class BottomNavigationBar : ContentView
         var activeBackground = isDark ? Color.FromArgb("#93C5FD") : Color.FromArgb("#2563EB");
         var activeText = isDark ? Color.FromArgb("#111827") : Colors.White;
         var inactiveText = isDark ? Color.FromArgb("#D1D5DB") : Color.FromArgb("#6B7280");
+        var inactiveBackground = Colors.Transparent;
 
-        ApplyButtonState(HomeButton, ActiveTab == "Home", activeBackground, activeText, inactiveText);
-        ApplyButtonState(TrainingButton, ActiveTab == "Training", activeBackground, activeText, inactiveText);
-        ApplyButtonState(StatisticsButton, ActiveTab == "Statistics", activeBackground, activeText, inactiveText);
-        ApplyButtonState(ProfileButton, ActiveTab == "Profile", activeBackground, activeText, inactiveText);
+        ApplyTabState(HomeTab, HomeIcon, HomeLabel, ActiveTab == "Home", activeBackground, inactiveBackground, activeText, inactiveText);
+        ApplyTabState(TrainingTab, TrainingIcon, TrainingLabel, ActiveTab == "Training", activeBackground, inactiveBackground, activeText, inactiveText);
+        ApplyTabState(StatisticsTab, StatisticsIcon, StatisticsLabel, ActiveTab == "Statistics", activeBackground, inactiveBackground, activeText, inactiveText);
+        ApplyTabState(ProfileTab, ProfileIcon, ProfileLabel, ActiveTab == "Profile", activeBackground, inactiveBackground, activeText, inactiveText);
     }
 
-    private static void ApplyButtonState(Button button, bool isActive, Color activeBackground, Color activeText, Color inactiveText)
+    private static void ApplyTabState(
+        Border tab,
+        Microsoft.Maui.Controls.Shapes.Path icon,
+        Label label,
+        bool isActive,
+        Color activeBackground,
+        Color inactiveBackground,
+        Color activeText,
+        Color inactiveText)
     {
-        button.BackgroundColor = isActive ? activeBackground : Colors.Transparent;
-        button.TextColor = isActive ? activeText : inactiveText;
-        button.BorderColor = Colors.Transparent;
-        button.BorderWidth = 0;
-        button.CornerRadius = 8;
-        button.FontSize = 13;
-        button.MinimumHeightRequest = 42;
-        button.Padding = new Thickness(10, 8);
+        var foreground = isActive ? activeText : inactiveText;
+        tab.BackgroundColor = isActive ? activeBackground : inactiveBackground;
+        label.TextColor = foreground;
+        icon.Stroke = new SolidColorBrush(foreground);
     }
 }

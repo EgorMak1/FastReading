@@ -104,12 +104,8 @@
                     </Border>
                 </Grid>
 
-                <Grid
-                    ColumnDefinitions="*,*"
-                    ColumnSpacing="14"
-                    RowDefinitions="Auto">
+                <VerticalStackLayout Spacing="14">
                     <Border
-                        Grid.Column="0"
                         Style="{StaticResource CardBorder}">
                         <VerticalStackLayout Spacing="8">
                             <Label
@@ -126,27 +122,57 @@
                     </Border>
 
                     <Border
-                        Grid.Column="1"
                         Style="{StaticResource CardBorder}">
                         <VerticalStackLayout Spacing="10">
-                            <Label
-                                Style="{StaticResource SectionTitle}"
-                                Text="Динамика" />
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label
+                                    Grid.Column="0"
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Ваша активность"
+                                    VerticalOptions="Center" />
+                                <Border
+                                    Grid.Column="1"
+                                    Padding="10,6"
+                                    BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#111827}"
+                                    StrokeThickness="0">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnActivityPeriodTapped" />
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label
+                                            x:Name="ActivityPeriodLabel"
+                                            FontAttributes="Bold"
+                                            FontSize="12"
+                                            Text="7 дней"
+                                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="12"
+                                            Text="⌄"
+                                            TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                                            VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </Grid>
                             <Grid
+                                x:Name="ActivityChartContainer"
                                 HeightRequest="96"
                                 BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#111827}">
+                                <Grid
+                                    x:Name="ActivityChartGrid"
+                                    Padding="8,12"
+                                    ColumnSpacing="6" />
                                 <Label
+                                    x:Name="ActivityEmptyLabel"
                                     HorizontalOptions="Center"
                                     Style="{StaticResource MutedText}"
                                     Text="Нет данных"
                                     VerticalOptions="Center" />
                             </Grid>
-                            <Button
-                                Text="Статистика"
-                                Clicked="OnViewStatisticsClicked" />
                         </VerticalStackLayout>
                     </Border>
-                </Grid>
+                </VerticalStackLayout>
             </VerticalStackLayout>
         </Grid>
     </ScrollView>
