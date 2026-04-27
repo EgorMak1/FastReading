@@ -29,6 +29,8 @@ namespace MauiApp1.Services
 
     public class UserProfileDto
     {
+        public string? Username { get; set; }
+        public string? DisplayName { get; set; }
         public double OverallScore { get; set; }
         public double TodayPoints { get; set; }
         public int TotalSessions { get; set; }

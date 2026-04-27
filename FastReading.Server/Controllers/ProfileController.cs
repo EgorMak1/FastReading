@@ -31,6 +31,11 @@ namespace FastReading.Server.Controllers
                 .OrderByDescending(x => x.LastPlayedAt)
                 .ToListAsync();
 
+            var user = await _db.Users
+                .Where(x => x.Id == userId)
+                .Select(x => new { x.Username })
+                .FirstOrDefaultAsync();
+
             var todayStart = DateTime.UtcNow.Date;
             var todayPoints = progresses.Sum(x => x.LastPlayedAt >= todayStart ? x.LastScore : 0);
             var totalSessions = progresses.Sum(x => x.SessionsCount);
@@ -50,6 +55,8 @@ namespace FastReading.Server.Controllers
 
             return Ok(new
             {
+                username = user?.Username,
+                displayName = (string?)null,
                 overallScore,
                 todayPoints,
                 totalSessions,

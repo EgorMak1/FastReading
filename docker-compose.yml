@@ -33,6 +33,7 @@ services:
       Jwt__Key: ${JWT_KEY:-CHANGE_ME_FASTREADING_JWT_KEY_MIN_32_CHARS}
       Jwt__Issuer: FastReading.Server
       Jwt__Audience: FastReading.Client
+      Jwt__ExpiresMinutes: ${JWT_EXPIRES_MINUTES:-43200}
     ports:
       - "8080:8080"
 

@@ -1,4 +1,5 @@
-﻿using MauiApp1.Services;
+using MauiApp1.Services;
+using Microsoft.Maui.Controls.Shapes;
 
 namespace MauiApp1.Profile
 {
@@ -46,7 +47,7 @@ namespace MauiApp1.Profile
                     return;
                 }
 
-                SummaryLabel.Text = "Система оценивает накопленный прогресс, устойчивость выполнения и подбирает следующее направление тренировки.";
+                SummaryLabel.Text = "Сводка аккаунта, долгосрочного прогресса и текущих зон роста.";
                 OverallScoreLabel.Text = $"{profile.OverallScore:F1}";
                 TodayPointsLabel.Text = $"{profile.TodayPoints:F1}";
                 TotalSessionsLabel.Text = profile.TotalSessions.ToString();
@@ -87,43 +88,53 @@ namespace MauiApp1.Profile
 
         private static View CreateExerciseCard(ExerciseProgressDto exercise)
         {
+            bool isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
+            Color primaryText = isDark ? Color.FromArgb("#F9FAFB") : Color.FromArgb("#1F2937");
+            Color secondaryText = isDark ? Color.FromArgb("#D1D5DB") : Color.FromArgb("#6B7280");
+
             return new Border
             {
-                Stroke = Color.FromArgb("#D0D0D0"),
+                BackgroundColor = isDark ? Color.FromArgb("#1F2937") : Color.FromArgb("#FFFFFF"),
+                Stroke = isDark ? Color.FromArgb("#374151") : Color.FromArgb("#E5E7EB"),
+                StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(8) },
                 StrokeThickness = 1,
-                Padding = 12,
+                Padding = 16,
                 Content = new VerticalStackLayout
                 {
-                    Spacing = 6,
+                    Spacing = 8,
                     Children =
                     {
                         new Label
                         {
                             Text = ToDisplayName(exercise.ExerciseType),
                             FontAttributes = FontAttributes.Bold,
-                            FontSize = 18
+                            FontSize = 18,
+                            TextColor = primaryText
                         },
                         new Label
                         {
-                            Text = $"Уровень: {exercise.CurrentLevel} | Последний score: {exercise.LastScore:F1} | Средний score: {exercise.AverageScore:F1}"
+                            Text = $"Уровень: {exercise.CurrentLevel} | Последний score: {exercise.LastScore:F1} | Средний score: {exercise.AverageScore:F1}",
+                            TextColor = secondaryText
                         },
                         new Label
                         {
-                            Text = $"Лучший score: {exercise.BestScore:F1} | Сессий: {exercise.SessionsCount}"
+                            Text = $"Лучший score: {exercise.BestScore:F1} | Сессий: {exercise.SessionsCount}",
+                            TextColor = secondaryText
                         },
                         new Label
                         {
-                            Text = $"Серия успехов: {exercise.SuccessStreak} | Серия неудач: {exercise.FailStreak}"
+                            Text = $"Серия успехов: {exercise.SuccessStreak} | Серия неудач: {exercise.FailStreak}",
+                            TextColor = secondaryText
                         },
                         new Label
                         {
                             Text = $"Тренд: {exercise.Trend} | Статус: {exercise.Status}",
-                            TextColor = Color.FromArgb("#5C6BC0")
+                            TextColor = Color.FromArgb("#2563EB")
                         },
                         new Label
                         {
                             Text = $"Последняя тренировка: {exercise.LastPlayedAt.ToLocalTime():dd.MM.yyyy HH:mm}",
-                            TextColor = Colors.Gray,
+                            TextColor = isDark ? Color.FromArgb("#9CA3AF") : Color.FromArgb("#6B7280"),
                             FontSize = 13
                         }
                     }

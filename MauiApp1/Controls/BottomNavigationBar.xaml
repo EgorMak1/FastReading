@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="MauiApp1.Controls.BottomNavigationBar"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Border
+        Padding="10"
+        BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+        Stroke="{AppThemeBinding Light={StaticResource StrokeLight}, Dark={StaticResource StrokeDark}}"
+        StrokeShape="RoundRectangle 8">
+        <Grid
+            ColumnDefinitions="*,*,*,*"
+            ColumnSpacing="8">
+            <Button
+                x:Name="HomeButton"
+                Grid.Column="0"
+                Clicked="OnHomeClicked"
+                Text="Главная" />
+            <Button
+                x:Name="TrainingButton"
+                Grid.Column="1"
+                Clicked="OnTrainingClicked"
+                Text="Тренировки" />
+            <Button
+                x:Name="StatisticsButton"
+                Grid.Column="2"
+                Clicked="OnStatisticsClicked"
+                Text="Статистика" />
+            <Button
+                x:Name="ProfileButton"
+                Grid.Column="3"
+                Clicked="OnProfileClicked"
+                Text="Профиль" />
+        </Grid>
+    </Border>
+</ContentView>

@@ -1,34 +1,96 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp1.Statistics.SelectionStatisticsPage"
-             Title="Статистика">
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Statistics.SelectionStatisticsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:controls="clr-namespace:MauiApp1.Controls"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Статистика">
 
-    <VerticalStackLayout Padding="20" Spacing="15">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <Grid
+                Padding="24"
+                HorizontalOptions="Center"
+                MaximumWidthRequest="980">
 
-        <Label Text="Выберите упражнение"
-               FontSize="24"
-               HorizontalOptions="Center" />
+                <VerticalStackLayout Spacing="18">
+                    <VerticalStackLayout Spacing="6">
+                        <Label
+                            Style="{StaticResource Headline}"
+                            Text="Статистика" />
+                        <Label
+                            Style="{StaticResource SubHeadline}"
+                            Text="Выберите упражнение, чтобы посмотреть динамику и последние результаты." />
+                    </VerticalStackLayout>
 
-        <Button Text="Таблица Шульте"
-                FontSize="18"
-                HorizontalOptions="Fill"
-                Clicked="OnShulteStatisticsClicked" />
+                    <VerticalStackLayout Spacing="14">
+                        <Border
+                            Style="{StaticResource CardBorder}">
+                            <VerticalStackLayout Spacing="10">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Бегущие слова" />
+                                <Label
+                                    Style="{StaticResource MutedText}"
+                                    Text="Точность, скорость показа и история ответов." />
+                                <Button
+                                    Text="Открыть"
+                                    Clicked="OnRunningWordsStatisticsClicked" />
+                            </VerticalStackLayout>
+                        </Border>
 
-        <Button Text="Бегущие слова"
-                FontSize="18"
-                HorizontalOptions="Fill"
-                Clicked="OnRunningWordsStatisticsClicked" />
+                        <Border
+                            Style="{StaticResource CardBorder}">
+                            <VerticalStackLayout Spacing="10">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Таблица Шульте" />
+                                <Label
+                                    Style="{StaticResource MutedText}"
+                                    Text="Уровни, ошибки и скорость прохождения." />
+                                <Button
+                                    Text="Открыть"
+                                    Clicked="OnShulteStatisticsClicked" />
+                            </VerticalStackLayout>
+                        </Border>
 
-        <Button Text="Поле зрения"
-                FontSize="18"
-                HorizontalOptions="Fill"
-                Clicked="OnFieldOfViewStatisticsClicked" />
+                        <Border
+                            Style="{StaticResource CardBorder}">
+                            <VerticalStackLayout Spacing="10">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Поле зрения" />
+                                <Label
+                                    Style="{StaticResource MutedText}"
+                                    Text="Раунды, пропуски, ложные ответы и интервал." />
+                                <Button
+                                    Text="Открыть"
+                                    Clicked="OnFieldOfViewStatisticsClicked" />
+                            </VerticalStackLayout>
+                        </Border>
 
-        <Button Text="Затирание слов"
-                FontSize="18"
-                HorizontalOptions="Fill"
-                Clicked="OnWordErasingStatisticsClicked" />
+                        <Border
+                            Style="{StaticResource CardBorder}">
+                            <VerticalStackLayout Spacing="10">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Стирание слов" />
+                                <Label
+                                    Style="{StaticResource MutedText}"
+                                    Text="Скорость чтения, понимание и тип завершения." />
+                                <Button
+                                    Text="Открыть"
+                                    Clicked="OnWordErasingStatisticsClicked" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Grid>
+        </ScrollView>
 
-    </VerticalStackLayout>
+        <controls:BottomNavigationBar
+            Grid.Row="1"
+            ActiveTab="Statistics"
+            Margin="24,0,24,16" />
+    </Grid>
 </ContentPage>

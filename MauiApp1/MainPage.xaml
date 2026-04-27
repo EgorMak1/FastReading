@@ -1,54 +1,151 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
+    x:Class="MauiApp1.MainPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    x:Class="MauiApp1.MainPage">
+    xmlns:controls="clr-namespace:MauiApp1.Controls"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <Grid>
-        <VerticalStackLayout
+    <Grid RowDefinitions="*,Auto">
+    <ScrollView Grid.Row="0">
+        <Grid
+            Padding="24"
             HorizontalOptions="Center"
-            VerticalOptions="Center"
-            Spacing="20">
+            MaximumWidthRequest="1040">
 
-            <!-- Заголовок страницы -->
-            <Label Text="Главная страница"
-                FontSize="32"
-                HorizontalOptions="Center"
-                VerticalOptions="Center" />
+            <VerticalStackLayout Spacing="18">
+                <Border
+                    Padding="24"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+                    Stroke="{AppThemeBinding Light={StaticResource StrokeLight}, Dark={StaticResource StrokeDark}}"
+                    StrokeShape="RoundRectangle 8">
+                    <Grid RowDefinitions="Auto,Auto,Auto">
+                        <VerticalStackLayout
+                            Grid.RowSpan="3"
+                            Spacing="8"
+                            VerticalOptions="Center">
+                            <Label
+                                x:Name="GreetingLabel"
+                                Style="{StaticResource Headline}"
+                                Text="Привет" />
+                            <Label
+                                x:Name="DashboardStatusLabel"
+                                Style="{StaticResource MutedText}"
+                                Text="Загрузка..." />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
 
-            <!-- Кнопка для начала тренировки -->
-            <Button Text="Начать тренировку"
-                BackgroundColor="DodgerBlue"
-                TextColor="White"
-                Clicked="OnStartTrainingClicked"/>
+                <Grid
+                    ColumnDefinitions="*,*,*,*"
+                    ColumnSpacing="12"
+                    RowDefinitions="Auto">
+                    <Border
+                        Grid.Column="0"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                Style="{StaticResource MutedText}"
+                                Text="Сегодня" />
+                            <Label
+                                x:Name="TodayPointsLabel"
+                                Style="{StaticResource MetricValue}"
+                                Text="Нет данных" />
+                        </VerticalStackLayout>
+                    </Border>
 
-            <!-- Кнопка для перехода к статистике -->
-            <Button Text="Статистика"
-                BackgroundColor="Green"
-                TextColor="White"
-                Clicked="OnViewStatisticsClicked"/>
+                    <Border
+                        Grid.Column="1"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                Style="{StaticResource MutedText}"
+                                Text="Сессии" />
+                            <Label
+                                x:Name="TotalSessionsLabel"
+                                Style="{StaticResource MetricValue}"
+                                Text="Нет данных" />
+                        </VerticalStackLayout>
+                    </Border>
 
-            <Button Text="Профиль"
-                BackgroundColor="#5C6BC0"
-                TextColor="White"
-                Clicked="OnViewProfileClicked"/>
+                    <Border
+                        Grid.Column="2"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                Style="{StaticResource MutedText}"
+                                Text="Последняя" />
+                            <Label
+                                x:Name="LastExerciseLabel"
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                Text="Нет данных" />
+                        </VerticalStackLayout>
+                    </Border>
 
-            <!-- Кнопка для выхода -->
-            <Button Text="Выйти"
-                BackgroundColor="Red"
-                TextColor="White"
-                Clicked="OnExitClicked"/>
+                    <Border
+                        Grid.Column="3"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                Style="{StaticResource MutedText}"
+                                Text="Точность" />
+                            <Label
+                                x:Name="AccuracyLabel"
+                                Style="{StaticResource MetricValue}"
+                                Text="Нет данных" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
 
-            <!-- Кнопка "Регистрация" в верхнем правом углу -->
-            <Button x:Name="RegisterButton"
-                Text="Регистрация"
-                HorizontalOptions="End"
-                VerticalOptions="Start"
-                BackgroundColor="Blue"
-                TextColor="White"
-                Clicked="OnRegisterButtonClicked"
-                Margin="10"/>
-        </VerticalStackLayout>
+                <Grid
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="14"
+                    RowDefinitions="Auto">
+                    <Border
+                        Grid.Column="0"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                Style="{StaticResource SectionTitle}"
+                                Text="Рекомендация" />
+                            <Label
+                                x:Name="RecommendationLabel"
+                                Style="{StaticResource MutedText}"
+                                Text="Нет данных" />
+                            <Button
+                                Text="Профиль"
+                                Clicked="OnViewProfileClicked" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border
+                        Grid.Column="1"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="10">
+                            <Label
+                                Style="{StaticResource SectionTitle}"
+                                Text="Динамика" />
+                            <Grid
+                                HeightRequest="96"
+                                BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#111827}">
+                                <Label
+                                    HorizontalOptions="Center"
+                                    Style="{StaticResource MutedText}"
+                                    Text="Нет данных"
+                                    VerticalOptions="Center" />
+                            </Grid>
+                            <Button
+                                Text="Статистика"
+                                Clicked="OnViewStatisticsClicked" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </VerticalStackLayout>
+        </Grid>
+    </ScrollView>
+    <controls:BottomNavigationBar
+        Grid.Row="1"
+        ActiveTab="Home"
+        Margin="24,0,24,16" />
     </Grid>
-
 </ContentPage>

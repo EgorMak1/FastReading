@@ -2,37 +2,257 @@
 <ContentPage
     x:Class="MauiApp1.Trainings.ExerciseSelectionPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:controls="clr-namespace:MauiApp1.Controls"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Упражнения">
+    Title="Тренировки">
 
-    <VerticalStackLayout
-        HorizontalOptions="Center"
-        Padding="20"
-        Spacing="20"
-        VerticalOptions="Center">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <Grid
+                Padding="24"
+                HorizontalOptions="Center"
+                MaximumWidthRequest="1040">
 
-        <Label
-            FontSize="32"
-            HorizontalOptions="Center"
-            Text="Выберите упражнение"
-            VerticalOptions="Center" />
+                <VerticalStackLayout Spacing="14">
+                    <Border
+                        Padding="24"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+                        Stroke="{AppThemeBinding Light={StaticResource StrokeLight}, Dark={StaticResource StrokeDark}}"
+                        StrokeShape="RoundRectangle 8">
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                Style="{StaticResource Headline}"
+                                Text="Тренировки" />
+                            <Label
+                                Style="{StaticResource SubHeadline}"
+                                Text="Выберите упражнение. В карточках показана точность по последним 10 попыткам и лучший результат." />
+                        </VerticalStackLayout>
+                    </Border>
 
-        <Button
-            BackgroundColor="DodgerBlue"
-            Clicked="OnShulteTableClicked"
-            Text="Таблица Шульте"
-            TextColor="White" />
+                    <Border
+                        HeightRequest="{OnIdiom Phone=132, Tablet=132, Desktop=-1}"
+                        Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=#EFF6FF, Dark=#172554}"
+                        Stroke="{AppThemeBinding Light=#BFDBFE, Dark=#1D4ED8}"
+                        StrokeShape="RoundRectangle 8">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRunningWordsTapped" />
+                        </Border.GestureRecognizers>
+                        <Grid
+                            ColumnDefinitions="*,Auto"
+                            ColumnSpacing="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Бегущие слова" />
+                                <Label
+                                    LineBreakMode="TailTruncation"
+                                    MaxLines="2"
+                                    Style="{StaticResource MutedText}"
+                                    Text="Удержание последовательности и быстрый выбор последнего слова." />
+                            </VerticalStackLayout>
 
-        <Button
-            Clicked="OnRunningWordsClicked"
-            Text="Бегущие слова" />
+                            <Grid
+                                Grid.Column="1"
+                                ColumnDefinitions="Auto,Auto"
+                                ColumnSpacing="22"
+                                VerticalOptions="Center">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label
+                                        Style="{StaticResource MutedText}"
+                                        Text="Точность" />
+                                    <Label
+                                        x:Name="RunningWordsAccuracyLabel"
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        Text="Нет данных" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout
+                                    Grid.Column="1"
+                                    Spacing="2">
+                                    <Label
+                                        Style="{StaticResource MutedText}"
+                                        Text="Рекорд" />
+                                    <Label
+                                        x:Name="RunningWordsRecordLabel"
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        Text="Нет данных" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </Border>
 
-        <Button
-            Clicked="OnFieldOfViewClicked"
-            Text="Поле зрения" />
+                    <Border
+                        HeightRequest="{OnIdiom Phone=132, Tablet=132, Desktop=-1}"
+                        Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#052E2B}"
+                        Stroke="{AppThemeBinding Light=#A7F3D0, Dark=#047857}"
+                        StrokeShape="RoundRectangle 8">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnShulteTableTapped" />
+                        </Border.GestureRecognizers>
+                        <Grid
+                            ColumnDefinitions="*,Auto"
+                            ColumnSpacing="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Таблица Шульте" />
+                                <Label
+                                    LineBreakMode="TailTruncation"
+                                    MaxLines="2"
+                                    Style="{StaticResource MutedText}"
+                                    Text="Концентрация, устойчивость взгляда и скорость поиска чисел." />
+                            </VerticalStackLayout>
 
-        <Button
-            Clicked="OnWordErasingClicked"
-            Text="Затирание слов" />
-    </VerticalStackLayout>
+                            <Grid
+                                Grid.Column="1"
+                                ColumnDefinitions="Auto,Auto"
+                                ColumnSpacing="22"
+                                VerticalOptions="Center">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label
+                                        Style="{StaticResource MutedText}"
+                                        Text="Точность" />
+                                    <Label
+                                        x:Name="ShulteAccuracyLabel"
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        Text="Нет данных" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout
+                                    Grid.Column="1"
+                                    Spacing="2">
+                                    <Label
+                                        Style="{StaticResource MutedText}"
+                                        Text="Рекорд" />
+                                    <Label
+                                        x:Name="ShulteRecordLabel"
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        Text="Нет данных" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Border
+                        HeightRequest="{OnIdiom Phone=132, Tablet=132, Desktop=-1}"
+                        Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#1E293B}"
+                        Stroke="{AppThemeBinding Light=#CBD5E1, Dark=#475569}"
+                        StrokeShape="RoundRectangle 8">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnFieldOfViewTapped" />
+                        </Border.GestureRecognizers>
+                        <Grid
+                            ColumnDefinitions="*,Auto"
+                            ColumnSpacing="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Поле зрения" />
+                                <Label
+                                    LineBreakMode="TailTruncation"
+                                    MaxLines="2"
+                                    Style="{StaticResource MutedText}"
+                                    Text="Периферическое восприятие и реакция на отличия в сетке." />
+                            </VerticalStackLayout>
+
+                            <Grid
+                                Grid.Column="1"
+                                ColumnDefinitions="Auto,Auto"
+                                ColumnSpacing="22"
+                                VerticalOptions="Center">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label
+                                        Style="{StaticResource MutedText}"
+                                        Text="Точность" />
+                                    <Label
+                                        x:Name="FieldOfViewAccuracyLabel"
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        Text="Нет данных" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout
+                                    Grid.Column="1"
+                                    Spacing="2">
+                                    <Label
+                                        Style="{StaticResource MutedText}"
+                                        Text="Рекорд" />
+                                    <Label
+                                        x:Name="FieldOfViewRecordLabel"
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        Text="Нет данных" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Border
+                        HeightRequest="{OnIdiom Phone=132, Tablet=132, Desktop=-1}"
+                        Padding="18"
+                        BackgroundColor="{AppThemeBinding Light=#FFF7ED, Dark=#431407}"
+                        Stroke="{AppThemeBinding Light=#FED7AA, Dark=#C2410C}"
+                        StrokeShape="RoundRectangle 8">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnWordErasingTapped" />
+                        </Border.GestureRecognizers>
+                        <Grid
+                            ColumnDefinitions="*,Auto"
+                            ColumnSpacing="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Label
+                                    LineBreakMode="WordWrap"
+                                    MaxLines="2"
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Стирание слов" />
+                                <Label
+                                    LineBreakMode="TailTruncation"
+                                    MaxLines="2"
+                                    Style="{StaticResource MutedText}"
+                                    Text="Чтение исчезающего текста с проверкой понимания." />
+                            </VerticalStackLayout>
+
+                            <Grid
+                                Grid.Column="1"
+                                ColumnDefinitions="Auto,Auto"
+                                ColumnSpacing="22"
+                                VerticalOptions="Center">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label
+                                        Style="{StaticResource MutedText}"
+                                        Text="Точность" />
+                                    <Label
+                                        x:Name="WordErasingAccuracyLabel"
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        Text="Нет данных" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout
+                                    Grid.Column="1"
+                                    Spacing="2">
+                                    <Label
+                                        Style="{StaticResource MutedText}"
+                                        Text="Рекорд" />
+                                    <Label
+                                        x:Name="WordErasingRecordLabel"
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        Text="Нет данных" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+        </ScrollView>
+
+        <controls:BottomNavigationBar
+            Grid.Row="1"
+            ActiveTab="Training"
+            Margin="24,0,24,16" />
+    </Grid>
 </ContentPage>
