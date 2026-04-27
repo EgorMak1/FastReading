@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:controls="clr-namespace:MauiApp1.Controls"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    NavigationPage.HasNavigationBar="False"
     Title="Профиль">
 
     <Grid RowDefinitions="*,Auto">
@@ -14,17 +15,6 @@
             MaximumWidthRequest="980">
 
             <VerticalStackLayout Spacing="18">
-                <Border Style="{StaticResource CardBorder}">
-                    <VerticalStackLayout Spacing="8">
-                        <Label
-                            Style="{StaticResource Headline}"
-                            Text="Профиль" />
-                        <Label
-                            x:Name="SummaryLabel"
-                            Style="{StaticResource SubHeadline}" />
-                    </VerticalStackLayout>
-                </Border>
-
                 <Grid
                     ColumnDefinitions="*,*"
                     ColumnSpacing="14"

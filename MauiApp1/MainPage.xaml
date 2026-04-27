@@ -3,7 +3,8 @@
     x:Class="MauiApp1.MainPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:controls="clr-namespace:MauiApp1.Controls"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="*,Auto">
     <ScrollView Grid.Row="0">
@@ -36,63 +37,69 @@
                 </Border>
 
                 <Grid
-                    ColumnDefinitions="*,*,*,*"
-                    ColumnSpacing="12"
+                    ColumnDefinitions="*,*,*"
+                    ColumnSpacing="8"
                     RowDefinitions="Auto">
                     <Border
                         Grid.Column="0"
+                        Padding="12"
                         Style="{StaticResource CardBorder}">
                         <VerticalStackLayout Spacing="6">
                             <Label
+                                FontSize="12"
+                                LineBreakMode="TailTruncation"
+                                MaxLines="1"
                                 Style="{StaticResource MutedText}"
                                 Text="Сегодня" />
                             <Label
                                 x:Name="TodayPointsLabel"
+                                FontSize="{OnIdiom Phone=19, Tablet=22, Desktop=26}"
+                                LineBreakMode="NoWrap"
+                                MaxLines="1"
                                 Style="{StaticResource MetricValue}"
-                                Text="Нет данных" />
+                                Text="—" />
                         </VerticalStackLayout>
                     </Border>
 
                     <Border
                         Grid.Column="1"
+                        Padding="12"
                         Style="{StaticResource CardBorder}">
                         <VerticalStackLayout Spacing="6">
                             <Label
+                                FontSize="12"
+                                LineBreakMode="TailTruncation"
+                                MaxLines="1"
                                 Style="{StaticResource MutedText}"
                                 Text="Сессии" />
                             <Label
                                 x:Name="TotalSessionsLabel"
+                                FontSize="{OnIdiom Phone=19, Tablet=22, Desktop=26}"
+                                LineBreakMode="NoWrap"
+                                MaxLines="1"
                                 Style="{StaticResource MetricValue}"
-                                Text="Нет данных" />
+                                Text="—" />
                         </VerticalStackLayout>
                     </Border>
 
                     <Border
                         Grid.Column="2"
+                        Padding="12"
                         Style="{StaticResource CardBorder}">
                         <VerticalStackLayout Spacing="6">
                             <Label
-                                Style="{StaticResource MutedText}"
-                                Text="Последняя" />
-                            <Label
-                                x:Name="LastExerciseLabel"
-                                FontAttributes="Bold"
-                                FontSize="18"
-                                Text="Нет данных" />
-                        </VerticalStackLayout>
-                    </Border>
-
-                    <Border
-                        Grid.Column="3"
-                        Style="{StaticResource CardBorder}">
-                        <VerticalStackLayout Spacing="6">
-                            <Label
+                                FontSize="12"
+                                LineBreakMode="TailTruncation"
+                                MaxLines="1"
                                 Style="{StaticResource MutedText}"
                                 Text="Точность" />
                             <Label
                                 x:Name="AccuracyLabel"
+                                FontSize="{OnIdiom Phone=19, Tablet=22, Desktop=26}"
+                                LineBreakMode="NoWrap"
+                                MaxLines="1"
                                 Style="{StaticResource MetricValue}"
-                                Text="Нет данных" />
+                                Text="—" />
                         </VerticalStackLayout>
                     </Border>
                 </Grid>

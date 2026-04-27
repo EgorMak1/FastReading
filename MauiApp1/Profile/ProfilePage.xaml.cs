@@ -43,11 +43,10 @@ namespace MauiApp1.Profile
 
                 if (profile == null)
                 {
-                    SummaryLabel.Text = "Не удалось загрузить профиль.";
+                    ReadinessLabel.Text = "Не удалось загрузить профиль.";
                     return;
                 }
 
-                SummaryLabel.Text = "Сводка аккаунта, долгосрочного прогресса и текущих зон роста.";
                 OverallScoreLabel.Text = $"{profile.OverallScore:F1}";
                 TodayPointsLabel.Text = $"{profile.TodayPoints:F1}";
                 TotalSessionsLabel.Text = profile.TotalSessions.ToString();

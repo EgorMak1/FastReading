@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:controls="clr-namespace:MauiApp1.Controls"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    NavigationPage.HasNavigationBar="False"
     Title="Тренировки">
 
     <Grid RowDefinitions="*,Auto">
@@ -14,21 +15,6 @@
                 MaximumWidthRequest="1040">
 
                 <VerticalStackLayout Spacing="14">
-                    <Border
-                        Padding="24"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
-                        Stroke="{AppThemeBinding Light={StaticResource StrokeLight}, Dark={StaticResource StrokeDark}}"
-                        StrokeShape="RoundRectangle 8">
-                        <VerticalStackLayout Spacing="8">
-                            <Label
-                                Style="{StaticResource Headline}"
-                                Text="Тренировки" />
-                            <Label
-                                Style="{StaticResource SubHeadline}"
-                                Text="Выберите упражнение. В карточках показана точность по последним 10 попыткам и лучший результат." />
-                        </VerticalStackLayout>
-                    </Border>
-
                     <Border
                         HeightRequest="{OnIdiom Phone=132, Tablet=132, Desktop=-1}"
                         Padding="18"

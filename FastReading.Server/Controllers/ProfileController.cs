@@ -126,7 +126,7 @@ namespace FastReading.Server.Controllers
 
             if (attention.FailStreak >= 2 || attention.AverageScore < 55)
             {
-                return $"Рекомендуется вернуться к упражнению {attention.ExerciseType} и закрепить текущий уровень.";
+                return $"Рекомендуется вернуться к упражнению {ToDisplayName(attention.ExerciseType)} и закрепить текущий уровень.";
             }
 
             var strongest = progresses
@@ -134,7 +134,19 @@ namespace FastReading.Server.Controllers
                 .ThenByDescending(x => x.AverageScore)
                 .First();
 
-            return $"Рекомендуется продолжить упражнение {strongest.ExerciseType}: по нему сейчас лучшая динамика.";
+            return $"Рекомендуется продолжить упражнение {ToDisplayName(strongest.ExerciseType)}: по нему сейчас лучшая динамика.";
+        }
+
+        private static string ToDisplayName(string exerciseType)
+        {
+            return exerciseType switch
+            {
+                "ShulteTable" => "Таблица Шульте",
+                "RunningWords" => "Бегущие слова",
+                "FieldOfView" => "Поле зрения",
+                "WordErasing" => "Стирание слов",
+                _ => exerciseType
+            };
         }
 
         private static string BuildTrend(FastReading.Server.Models.UserExerciseProgress progress)

@@ -49,21 +49,13 @@ namespace MauiApp1
                     ? "Данные профиля загружены."
                     : profile.Readiness;
 
-                TodayPointsLabel.Text = profile.TodayPoints > 0 ? $"{profile.TodayPoints:F1}" : "Нет данных";
-                TotalSessionsLabel.Text = profile.TotalSessions > 0 ? profile.TotalSessions.ToString() : "Нет данных";
+                TodayPointsLabel.Text = profile.TodayPoints > 0 ? $"{profile.TodayPoints:F1}" : "—";
+                TotalSessionsLabel.Text = profile.TotalSessions > 0 ? profile.TotalSessions.ToString() : "—";
                 RecommendationLabel.Text = string.IsNullOrWhiteSpace(profile.Recommendation)
                     ? "Нет данных"
-                    : profile.Recommendation;
+                    : LocalizeExerciseNames(profile.Recommendation);
 
-                var lastExercise = profile.ExerciseProgress
-                    .OrderByDescending(x => x.LastPlayedAt)
-                    .FirstOrDefault();
-
-                LastExerciseLabel.Text = lastExercise == null
-                    ? "Нет данных"
-                    : ToDisplayName(lastExercise.ExerciseType);
-
-                AccuracyLabel.Text = "Нет данных";
+                AccuracyLabel.Text = "—";
             }
             catch (OperationCanceledException)
             {
@@ -78,10 +70,9 @@ namespace MauiApp1
         {
             GreetingLabel.Text = "Привет";
             DashboardStatusLabel.Text = "Нет данных";
-            TodayPointsLabel.Text = "Нет данных";
-            TotalSessionsLabel.Text = "Нет данных";
-            LastExerciseLabel.Text = "Нет данных";
-            AccuracyLabel.Text = "Нет данных";
+            TodayPointsLabel.Text = "—";
+            TotalSessionsLabel.Text = "—";
+            AccuracyLabel.Text = "—";
             RecommendationLabel.Text = "Нет данных";
         }
 
@@ -119,6 +110,15 @@ namespace MauiApp1
                 null or "" => "Нет данных",
                 _ => exerciseType
             };
+        }
+
+        private static string LocalizeExerciseNames(string text)
+        {
+            return text
+                .Replace("ShulteTable", "Таблица Шульте")
+                .Replace("RunningWords", "Бегущие слова")
+                .Replace("FieldOfView", "Поле зрения")
+                .Replace("WordErasing", "Стирание слов");
         }
 
         private static string GetProfileName(UserProfileDto profile)

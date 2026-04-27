@@ -12,25 +12,45 @@ public partial class SelectionStatisticsPage : ContentPage
         _statisticsService = statisticsService;
     }
 
-    private async void OnShulteStatisticsClicked(object sender, EventArgs e)
+    private async void OnShulteStatisticsTapped(object sender, TappedEventArgs e)
+    {
+        await OpenShulteStatisticsAsync();
+    }
+
+    private async void OnRunningWordsStatisticsTapped(object sender, TappedEventArgs e)
+    {
+        await OpenRunningWordsStatisticsAsync();
+    }
+
+    private async void OnFieldOfViewStatisticsTapped(object sender, TappedEventArgs e)
+    {
+        await OpenFieldOfViewStatisticsAsync();
+    }
+
+    private async void OnWordErasingStatisticsTapped(object sender, TappedEventArgs e)
+    {
+        await OpenWordErasingStatisticsAsync();
+    }
+
+    private async Task OpenShulteStatisticsAsync()
     {
         var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<ShulteStatisticsPage>();
         await Navigation.PushAsync(page);
     }
 
-    private async void OnRunningWordsStatisticsClicked(object sender, EventArgs e)
+    private async Task OpenRunningWordsStatisticsAsync()
     {
         var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<RunningWordsStatisticsPage>();
         await Navigation.PushAsync(page);
     }
 
-    private async void OnFieldOfViewStatisticsClicked(object sender, EventArgs e)
+    private async Task OpenFieldOfViewStatisticsAsync()
     {
         var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<FieldOfViewStatisticsPage>();
         await Navigation.PushAsync(page);
     }
 
-    private async void OnWordErasingStatisticsClicked(object sender, EventArgs e)
+    private async Task OpenWordErasingStatisticsAsync()
     {
         var page = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<WordErasingStatisticsPage>();
         await Navigation.PushAsync(page);
