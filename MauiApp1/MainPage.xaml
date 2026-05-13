@@ -37,7 +37,7 @@
                 </Border>
 
                 <Grid
-                    ColumnDefinitions="*,*,*"
+                    ColumnDefinitions="*,*"
                     ColumnSpacing="8"
                     RowDefinitions="Auto">
                     <Border
@@ -82,26 +82,6 @@
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border
-                        Grid.Column="2"
-                        Padding="12"
-                        Style="{StaticResource CardBorder}">
-                        <VerticalStackLayout Spacing="6">
-                            <Label
-                                FontSize="12"
-                                LineBreakMode="TailTruncation"
-                                MaxLines="1"
-                                Style="{StaticResource MutedText}"
-                                Text="Точность" />
-                            <Label
-                                x:Name="AccuracyLabel"
-                                FontSize="{OnIdiom Phone=19, Tablet=22, Desktop=26}"
-                                LineBreakMode="NoWrap"
-                                MaxLines="1"
-                                Style="{StaticResource MetricValue}"
-                                Text="—" />
-                        </VerticalStackLayout>
-                    </Border>
                 </Grid>
 
                 <VerticalStackLayout Spacing="14">
@@ -116,8 +96,9 @@
                                 Style="{StaticResource MutedText}"
                                 Text="Нет данных" />
                             <Button
-                                Text="Профиль"
-                                Clicked="OnViewProfileClicked" />
+                                x:Name="RecommendationActionButton"
+                                Clicked="OnRecommendationClicked"
+                                Text="Выбрать упражнение" />
                         </VerticalStackLayout>
                     </Border>
 

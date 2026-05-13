@@ -1,5 +1,7 @@
 ﻿using MauiApp1.Services;
 
+using System.Net.Mail;
+
 namespace MauiApp1.Auth
 {
     public partial class RegisterPage : ContentPage
@@ -23,6 +25,12 @@ namespace MauiApp1.Auth
                 return;
             }
 
+            if (!IsValidEmail(email))
+            {
+                await DisplayAlert("Ошибка", "Введите корректный email.", "ОК");
+                return;
+            }
+
             try
             {
                 var result = await _auth.RegisterAsync(email, password);
@@ -39,6 +47,19 @@ namespace MauiApp1.Auth
             catch (Exception ex)
             {
                 await DisplayAlert("Ошибка", ex.Message, "ОК");
+            }
+        }
+
+        private static bool IsValidEmail(string email)
+        {
+            try
+            {
+                var address = new MailAddress(email);
+                return string.Equals(address.Address, email, StringComparison.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                return false;
             }
         }
     }

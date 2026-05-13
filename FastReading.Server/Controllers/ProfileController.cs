@@ -37,18 +37,18 @@ namespace FastReading.Server.Controllers
                 .FirstOrDefaultAsync();
 
             var todayStart = DateTime.UtcNow.Date;
-            var todayPoints = progresses.Sum(x => x.LastPlayedAt >= todayStart ? x.LastScore : 0);
+            var todayPoints = progresses.Sum(x => x.LastPlayedAt >= todayStart ? SafeNumber(x.LastScore) : 0);
             var totalSessions = progresses.Sum(x => x.SessionsCount);
-            var overallScore = progresses.Count == 0 ? 0 : progresses.Average(x => x.AverageScore);
-            var strongest = progresses.OrderByDescending(x => x.AverageScore).FirstOrDefault();
-            var weakest = progresses.OrderBy(x => x.AverageScore).FirstOrDefault();
+            var overallScore = progresses.Count == 0 ? 0 : progresses.Average(x => SafeNumber(x.AverageScore));
+            var strongest = progresses.OrderByDescending(x => SafeNumber(x.AverageScore)).FirstOrDefault();
+            var weakest = progresses.OrderBy(x => SafeNumber(x.AverageScore)).FirstOrDefault();
             var mostStable = progresses
                 .OrderByDescending(x => x.SuccessStreak)
-                .ThenByDescending(x => x.AverageScore)
+                .ThenByDescending(x => SafeNumber(x.AverageScore))
                 .FirstOrDefault();
             var needsAttention = progresses
                 .OrderByDescending(x => x.FailStreak)
-                .ThenBy(x => x.AverageScore)
+                .ThenBy(x => SafeNumber(x.AverageScore))
                 .FirstOrDefault();
             var recommendation = BuildRecommendation(progresses);
             var readiness = BuildReadinessStatus(overallScore, progresses.Count);
@@ -73,9 +73,9 @@ namespace FastReading.Server.Controllers
                 {
                     x.ExerciseType,
                     x.CurrentLevel,
-                    x.LastScore,
-                    x.AverageScore,
-                    x.BestScore,
+                    LastScore = SafeNumber(x.LastScore),
+                    AverageScore = SafeNumber(x.AverageScore),
+                    BestScore = SafeNumber(x.BestScore),
                     x.SessionsCount,
                     x.SuccessStreak,
                     x.FailStreak,
@@ -143,7 +143,7 @@ namespace FastReading.Server.Controllers
                     x => x.Key,
                     x => new
                     {
-                        Points = x.Sum(y => y.Points),
+                        Points = x.Sum(y => SafeNumber(y.Points)),
                         Sessions = x.Count()
                     });
 
@@ -184,17 +184,17 @@ namespace FastReading.Server.Controllers
 
             var attention = progresses
                 .OrderByDescending(x => x.FailStreak)
-                .ThenBy(x => x.AverageScore)
+                .ThenBy(x => SafeNumber(x.AverageScore))
                 .First();
 
-            if (attention.FailStreak >= 2 || attention.AverageScore < 55)
+            if (attention.FailStreak >= 2 || SafeNumber(attention.AverageScore) < 55)
             {
                 return $"Рекомендуется вернуться к упражнению {ToDisplayName(attention.ExerciseType)} и закрепить текущий уровень.";
             }
 
             var strongest = progresses
                 .OrderByDescending(x => x.SuccessStreak)
-                .ThenByDescending(x => x.AverageScore)
+                .ThenByDescending(x => SafeNumber(x.AverageScore))
                 .First();
 
             return $"Рекомендуется продолжить упражнение {ToDisplayName(strongest.ExerciseType)}: по нему сейчас лучшая динамика.";
@@ -214,12 +214,15 @@ namespace FastReading.Server.Controllers
 
         private static string BuildTrend(FastReading.Server.Models.UserExerciseProgress progress)
         {
-            if (progress.LastScore >= progress.AverageScore + 8)
+            var lastScore = SafeNumber(progress.LastScore);
+            var averageScore = SafeNumber(progress.AverageScore);
+
+            if (lastScore >= averageScore + 8)
             {
                 return "Рост";
             }
 
-            if (progress.LastScore <= progress.AverageScore - 8)
+            if (lastScore <= averageScore - 8)
             {
                 return "Спад";
             }
@@ -239,13 +242,19 @@ namespace FastReading.Server.Controllers
                 return "Требует закрепления";
             }
 
-            if (progress.AverageScore >= 75)
+            if (SafeNumber(progress.AverageScore) >= 75)
             {
                 return "Устойчиво выполняется";
             }
 
             return "В процессе освоения";
         }
+
+        private static double SafeNumber(double value)
+        {
+            return double.IsFinite(value) ? value : 0;
+        }
+
         private sealed class ActivityPoint
         {
             public DateTime CompletedAt { get; set; }

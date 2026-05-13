@@ -55,11 +55,13 @@ namespace MauiApp1.Profile
                 ExercisesTrackedLabel.Text = profile.ExercisesTracked.ToString();
                 ReadinessLabel.Text = profile.Readiness;
 
-                InsightsLabel.Text = BuildInsights(profile);
+                var exerciseProgress = profile.ExerciseProgress ?? [];
+
+                InsightsLabel.Text = BuildInsights(profile, exerciseProgress);
                 RecommendationLabel.Text = profile.Recommendation;
                 ExerciseProgressContainer.Children.Clear();
 
-                foreach (var exercise in profile.ExerciseProgress.OrderByDescending(x => x.LastPlayedAt))
+                foreach (var exercise in exerciseProgress.OrderByDescending(x => x.LastPlayedAt))
                 {
                     if (!_isActive || cancellationToken.IsCancellationRequested)
                     {
@@ -72,11 +74,23 @@ namespace MauiApp1.Profile
             catch (OperationCanceledException)
             {
             }
+            catch (Exception ex)
+            {
+                if (!_isActive || cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                ReadinessLabel.Text = "Не удалось загрузить профиль.";
+                InsightsLabel.Text = GetDisplayError(ex);
+                RecommendationLabel.Text = string.Empty;
+                ExerciseProgressContainer.Children.Clear();
+            }
         }
 
-        private static string BuildInsights(UserProfileDto profile)
+        private static string BuildInsights(UserProfileDto profile, IReadOnlyCollection<ExerciseProgressDto> exerciseProgress)
         {
-            if (profile.ExerciseProgress.Count == 0)
+            if (exerciseProgress.Count == 0)
             {
                 return "Пока нет данных для аналитики. Выполните хотя бы одну тренировку.";
             }
@@ -138,12 +152,12 @@ namespace MauiApp1.Profile
                         },
                         new Label
                         {
-                            Text = $"Уровень: {exercise.CurrentLevel} | Последний score: {exercise.LastScore:F1} | Средний score: {exercise.AverageScore:F1}",
+                            Text = $"Уровень: {exercise.CurrentLevel} | Последний балл: {SafeScore(exercise.LastScore):F1} | Средний балл: {SafeScore(exercise.AverageScore):F1}",
                             TextColor = secondaryText
                         },
                         new Label
                         {
-                            Text = $"Лучший score: {exercise.BestScore:F1} | Сессий: {exercise.SessionsCount}",
+                            Text = $"Лучший балл: {SafeScore(exercise.BestScore):F1} | Сессий: {exercise.SessionsCount}",
                             TextColor = secondaryText
                         },
                         new Label
@@ -158,7 +172,7 @@ namespace MauiApp1.Profile
                         },
                         new Label
                         {
-                            Text = $"Последняя тренировка: {exercise.LastPlayedAt.ToLocalTime():dd.MM.yyyy HH:mm}",
+                            Text = $"Последняя тренировка: {FormatDate(exercise.LastPlayedAt)}",
                             TextColor = isDark ? Color.FromArgb("#9CA3AF") : Color.FromArgb("#6B7280"),
                             FontSize = 13
                         }
@@ -178,6 +192,36 @@ namespace MauiApp1.Profile
                 null or "" => "Нет данных",
                 _ => exerciseType
             };
+        }
+
+        private static double SafeScore(double value)
+        {
+            return double.IsFinite(value) ? value : 0;
+        }
+
+        private static string FormatDate(DateTime value)
+        {
+            try
+            {
+                return value == default
+                    ? "Нет данных"
+                    : value.ToLocalTime().ToString("dd.MM.yyyy HH:mm");
+            }
+            catch
+            {
+                return "Нет данных";
+            }
+        }
+
+        private static string GetDisplayError(Exception exception)
+        {
+            var root = exception;
+            while (root.InnerException != null)
+            {
+                root = root.InnerException;
+            }
+
+            return $"Ошибка загрузки данных профиля: {root.Message}";
         }
     }
 }

@@ -27,7 +27,7 @@
                         <VerticalStackLayout Spacing="6">
                             <Label
                                 Style="{StaticResource MutedText}"
-                                Text="Общий score" />
+                                Text="Общий балл" />
                             <Label
                                 x:Name="OverallScoreLabel"
                                 Style="{StaticResource MetricValue}" />
@@ -108,6 +108,14 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <Label
+                    Style="{StaticResource SectionTitle}"
+                    Text="Прогресс по упражнениям" />
+
+                <VerticalStackLayout
+                    x:Name="ExerciseProgressContainer"
+                    Spacing="12" />
+
                 <Border Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="8">
                         <Label
@@ -121,14 +129,6 @@
                             TextColor="{StaticResource White}" />
                     </VerticalStackLayout>
                 </Border>
-
-                <Label
-                    Style="{StaticResource SectionTitle}"
-                    Text="Прогресс по упражнениям" />
-
-                <VerticalStackLayout
-                    x:Name="ExerciseProgressContainer"
-                    Spacing="12" />
             </VerticalStackLayout>
         </Grid>
     </ScrollView>

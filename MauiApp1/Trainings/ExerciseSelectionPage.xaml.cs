@@ -154,7 +154,7 @@ public partial class ExerciseSelectionPage : ContentPage
 
         WordErasingRecordLabel.Text = results.Count == 0
             ? "Нет данных"
-            : $"{results.Max(x => x.SpeedAfterWpm)} слов/мин";
+            : $"{results.Max(x => x.SpeedAfterWpm)} сл/мин";
     }
 
     private static double CalculateShulteAccuracy(ShulteResultDto result)

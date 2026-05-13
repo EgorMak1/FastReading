@@ -97,7 +97,7 @@ namespace FastReading.Server.Controllers
                 userId,
                 "RunningWords",
                 request.FinalLevel,
-                CalculateRunningWordsScore(request),
+                NormalizeScore(CalculateRunningWordsScore(request)),
                 result.CompletedAt);
 
             return Ok(new { result.Id, result.CompletedAt });
@@ -163,7 +163,7 @@ namespace FastReading.Server.Controllers
                 userId,
                 "ShulteTable",
                 request.LevelAfter,
-                request.Score,
+                NormalizeScore(request.Score),
                 result.CompletedAt);
 
             return Ok(new { result.Id, result.CompletedAt });
@@ -232,7 +232,7 @@ namespace FastReading.Server.Controllers
                 userId,
                 "FieldOfView",
                 request.FinalLevel,
-                CalculateFieldOfViewScore(request),
+                NormalizeScore(CalculateFieldOfViewScore(request)),
                 result.CompletedAt);
 
             return Ok(new { result.Id, result.CompletedAt });
@@ -306,7 +306,7 @@ namespace FastReading.Server.Controllers
                 userId,
                 "WordErasing",
                 CalculateWordErasingLevel(request.SpeedAfterWpm),
-                CalculateWordErasingScore(request),
+                NormalizeScore(CalculateWordErasingScore(request)),
                 result.CompletedAt);
 
             return Ok(new { result.Id, result.CompletedAt });
@@ -355,6 +355,8 @@ namespace FastReading.Server.Controllers
 
         private async Task UpdateExerciseProgressAsync(Guid userId, string exerciseType, int currentLevel, double score, DateTime playedAt)
         {
+            score = NormalizeScore(score);
+
             var progress = await _db.UserExerciseProgresses
                 .FirstOrDefaultAsync(x => x.UserId == userId && x.ExerciseType == exerciseType);
 
@@ -381,9 +383,11 @@ namespace FastReading.Server.Controllers
             {
                 progress.CurrentLevel = currentLevel;
                 progress.LastScore = score;
-                progress.AverageScore = ((progress.AverageScore * progress.SessionsCount) + score) / (progress.SessionsCount + 1);
-                progress.BestScore = Math.Max(progress.BestScore, score);
-                progress.SessionsCount++;
+                var previousAverage = NormalizeScore(progress.AverageScore);
+                var sessionsCount = Math.Max(0, progress.SessionsCount);
+                progress.AverageScore = NormalizeScore(((previousAverage * sessionsCount) + score) / (sessionsCount + 1));
+                progress.BestScore = Math.Max(NormalizeScore(progress.BestScore), score);
+                progress.SessionsCount = sessionsCount + 1;
                 progress.LastPlayedAt = playedAt;
 
                 if (score >= 80)
@@ -418,6 +422,11 @@ namespace FastReading.Server.Controllers
             };
 
             return Math.Clamp(request.AccuracyPercent * 0.8 + speedBonus, 0, 100);
+        }
+
+        private static double NormalizeScore(double score)
+        {
+            return double.IsFinite(score) ? Math.Clamp(score, 0, 100) : 0;
         }
 
         private static double CalculateFieldOfViewScore(FieldOfViewResultRequest request)
