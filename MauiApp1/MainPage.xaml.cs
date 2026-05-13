@@ -1,3 +1,4 @@
+using MauiApp1.Controls;
 using MauiApp1.Profile;
 using MauiApp1.Services;
 using MauiApp1.Statistics;
@@ -130,49 +131,32 @@ namespace MauiApp1
 
             ActivityChartGrid.Children.Clear();
             ActivityChartGrid.ColumnDefinitions.Clear();
+            ActivityChartGrid.RowDefinitions.Clear();
 
             var points = _dailyActivity
                 .TakeLast(_activityPeriodDays)
+                .Select(x => new LineChartPoint(
+                    x.Date,
+                    x.Sessions > 0 ? Math.Clamp(x.Points / x.Sessions, 0, 100) : 0))
                 .ToList();
-            var maxPoints = points.Count == 0 ? 0 : points.Max(x => x.Points);
+            var hasData = points.Any(x => x.Value > 0);
 
-            ActivityEmptyLabel.IsVisible = maxPoints <= 0;
-            if (maxPoints <= 0)
+            ActivityEmptyLabel.IsVisible = !hasData;
+            if (!hasData)
             {
                 return;
             }
 
             var isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
-            var barColor = isDark ? Color.FromArgb("#93C5FD") : Color.FromArgb("#2563EB");
-            const double maxBarHeight = 72;
-
-            for (var i = 0; i < points.Count; i++)
+            var chart = new GraphicsView
             {
-                ActivityChartGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+                Drawable = new StyledLineChartDrawable(points, isDark, "%", 0, 100),
+                HeightRequest = 132,
+                HorizontalOptions = LayoutOptions.Fill,
+                VerticalOptions = LayoutOptions.Fill
+            };
 
-                var barHeight = Math.Max(6, maxBarHeight * points[i].Points / maxPoints);
-                var bar = new Border
-                {
-                    BackgroundColor = barColor,
-                    HeightRequest = barHeight,
-                    StrokeThickness = 0,
-                    StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
-                    {
-                        CornerRadius = new CornerRadius(4)
-                    },
-                    VerticalOptions = LayoutOptions.End
-                };
-
-                var column = new Grid
-                {
-                    HeightRequest = maxBarHeight,
-                    VerticalOptions = LayoutOptions.End
-                };
-                column.Children.Add(bar);
-
-                ActivityChartGrid.Children.Add(column);
-                Grid.SetColumn(column, i);
-            }
+            ActivityChartGrid.Children.Add(chart);
         }
 
         private void OnExitClicked(object sender, EventArgs e)

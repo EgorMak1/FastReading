@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1200" viewBox="0 0 1800 1200" role="img" aria-labelledby="title desc">
+  <title id="title">ERD базы данных FastReading</title>
+  <desc id="desc">Диаграмма сущность-связь базы данных приложения FastReading в табличном формате.</desc>
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .tbl { fill: #ffffff; stroke: #222222; stroke-width: 1.6; }
+      .hdr { fill: #f3f4f6; stroke: #222222; stroke-width: 1.2; }
+      .grid { stroke: #a3a3a3; stroke-width: 1; }
+      .name { font: 700 16px Arial, sans-serif; fill: #111111; }
+      .cell { font: 400 13px Arial, sans-serif; fill: #111111; }
+      .small { font: 400 12px Arial, sans-serif; fill: #111111; }
+      .title { font: 700 30px Arial, sans-serif; fill: #111111; }
+      .subtitle { font: 400 16px Arial, sans-serif; fill: #444444; }
+      .rel { stroke: #444444; stroke-width: 1.6; fill: none; }
+      .note { font: 400 13px Arial, sans-serif; fill: #444444; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1800" height="1200" />
+
+  <text class="title" x="60" y="55">ERD базы данных FastReading</text>
+  <text class="subtitle" x="60" y="85">Построено по [AppDbContext](C:/Users/makar/Desktop/FastReading/FastReading.Server/Data/AppDbContext.cs) и моделям из [FastReading.Server/Models](C:/Users/makar/Desktop/FastReading/FastReading.Server/Models).</text>
+
+  <!-- Users -->
+  <g transform="translate(720,120)">
+    <rect class="tbl" x="0" y="0" width="360" height="190" />
+    <rect class="hdr" x="0" y="0" width="360" height="30" />
+    <line class="grid" x1="50" y1="30" x2="50" y2="190" />
+    <line class="grid" x1="225" y1="30" x2="225" y2="190" />
+    <line class="grid" x1="0" y1="62" x2="360" y2="62" />
+    <line class="grid" x1="0" y1="94" x2="360" y2="94" />
+    <line class="grid" x1="0" y1="126" x2="360" y2="126" />
+    <line class="grid" x1="0" y1="158" x2="360" y2="158" />
+    <text class="name" x="165" y="20">users</text>
+    <text class="cell" x="12" y="52">PK</text>
+    <text class="cell" x="62" y="52">id</text>
+    <text class="cell" x="238" y="52">uuid</text>
+    <text class="cell" x="62" y="84">username</text>
+    <text class="cell" x="238" y="84">varchar(50)</text>
+    <text class="cell" x="62" y="116">email</text>
+    <text class="cell" x="238" y="116">varchar(255)</text>
+    <text class="cell" x="62" y="148">password_hash</text>
+    <text class="cell" x="238" y="148">text</text>
+    <text class="cell" x="62" y="180">created_at</text>
+    <text class="cell" x="238" y="180">timestamp</text>
+  </g>
+
+  <!-- TrainingResults -->
+  <g transform="translate(70,390)">
+    <rect class="tbl" x="0" y="0" width="360" height="220" />
+    <rect class="hdr" x="0" y="0" width="360" height="30" />
+    <line class="grid" x1="50" y1="30" x2="50" y2="220" />
+    <line class="grid" x1="225" y1="30" x2="225" y2="220" />
+    <line class="grid" x1="0" y1="62" x2="360" y2="62" />
+    <line class="grid" x1="0" y1="94" x2="360" y2="94" />
+    <line class="grid" x1="0" y1="126" x2="360" y2="126" />
+    <line class="grid" x1="0" y1="158" x2="360" y2="158" />
+    <line class="grid" x1="0" y1="190" x2="360" y2="190" />
+    <text class="name" x="120" y="20">training_results</text>
+    <text class="cell" x="12" y="52">PK</text>
+    <text class="cell" x="62" y="52">id</text>
+    <text class="cell" x="238" y="52">uuid</text>
+    <text class="cell" x="12" y="84">FK</text>
+    <text class="cell" x="62" y="84">user_id</text>
+    <text class="cell" x="238" y="84">uuid</text>
+    <text class="cell" x="62" y="116">exercise_type</text>
+    <text class="cell" x="238" y="116">varchar(50)</text>
+    <text class="cell" x="62" y="148">duration_seconds</text>
+    <text class="cell" x="238" y="148">integer</text>
+    <text class="cell" x="62" y="180">completed_at</text>
+    <text class="cell" x="238" y="180">timestamp</text>
+  </g>
+
+  <!-- RunningWordsResults -->
+  <g transform="translate(480,390)">
+    <rect class="tbl" x="0" y="0" width="360" height="285" />
+    <rect class="hdr" x="0" y="0" width="360" height="30" />
+    <line class="grid" x1="50" y1="30" x2="50" y2="285" />
+    <line class="grid" x1="225" y1="30" x2="225" y2="285" />
+    <line class="grid" x1="0" y1="62" x2="360" y2="62" />
+    <line class="grid" x1="0" y1="94" x2="360" y2="94" />
+    <line class="grid" x1="0" y1="126" x2="360" y2="126" />
+    <line class="grid" x1="0" y1="158" x2="360" y2="158" />
+    <line class="grid" x1="0" y1="190" x2="360" y2="190" />
+    <line class="grid" x1="0" y1="222" x2="360" y2="222" />
+    <line class="grid" x1="0" y1="254" x2="360" y2="254" />
+    <text class="name" x="96" y="20">running_words_results</text>
+    <text class="cell" x="12" y="52">PK</text>
+    <text class="cell" x="62" y="52">id</text>
+    <text class="cell" x="238" y="52">uuid</text>
+    <text class="cell" x="12" y="84">FK</text>
+    <text class="cell" x="62" y="84">user_id</text>
+    <text class="cell" x="238" y="84">uuid</text>
+    <text class="cell" x="62" y="116">total_attempts</text>
+    <text class="cell" x="238" y="116">integer</text>
+    <text class="cell" x="62" y="148">correct_answers</text>
+    <text class="cell" x="238" y="148">integer</text>
+    <text class="cell" x="62" y="180">wrong_answers</text>
+    <text class="cell" x="238" y="180">integer</text>
+    <text class="cell" x="62" y="212">accuracy_percent</text>
+    <text class="cell" x="238" y="212">double</text>
+    <text class="cell" x="62" y="244">final_level</text>
+    <text class="cell" x="238" y="244">integer</text>
+    <text class="cell" x="62" y="276">final_speed_ms</text>
+    <text class="cell" x="238" y="276">integer</text>
+  </g>
+
+  <!-- ShulteResults -->
+  <g transform="translate(890,390)">
+    <rect class="tbl" x="0" y="0" width="360" height="285" />
+    <rect class="hdr" x="0" y="0" width="360" height="30" />
+    <line class="grid" x1="50" y1="30" x2="50" y2="285" />
+    <line class="grid" x1="225" y1="30" x2="225" y2="285" />
+    <line class="grid" x1="0" y1="62" x2="360" y2="62" />
+    <line class="grid" x1="0" y1="94" x2="360" y2="94" />
+    <line class="grid" x1="0" y1="126" x2="360" y2="126" />
+    <line class="grid" x1="0" y1="158" x2="360" y2="158" />
+    <line class="grid" x1="0" y1="190" x2="360" y2="190" />
+    <line class="grid" x1="0" y1="222" x2="360" y2="222" />
+    <line class="grid" x1="0" y1="254" x2="360" y2="254" />
+    <text class="name" x="124" y="20">shulte_results</text>
+    <text class="cell" x="12" y="52">PK</text>
+    <text class="cell" x="62" y="52">id</text>
+    <text class="cell" x="238" y="52">uuid</text>
+    <text class="cell" x="12" y="84">FK</text>
+    <text class="cell" x="62" y="84">user_id</text>
+    <text class="cell" x="238" y="84">uuid</text>
+    <text class="cell" x="62" y="116">grid_size</text>
+    <text class="cell" x="238" y="116">integer</text>
+    <text class="cell" x="62" y="148">numbers_count</text>
+    <text class="cell" x="238" y="148">integer</text>
+    <text class="cell" x="62" y="180">level_before</text>
+    <text class="cell" x="238" y="180">integer</text>
+    <text class="cell" x="62" y="212">level_after</text>
+    <text class="cell" x="238" y="212">integer</text>
+    <text class="cell" x="62" y="244">errors_count</text>
+    <text class="cell" x="238" y="244">integer</text>
+    <text class="cell" x="62" y="276">score</text>
+    <text class="cell" x="238" y="276">double</text>
+  </g>
+
+  <!-- FieldOfViewResults -->
+  <g transform="translate(1300,390)">
+    <rect class="tbl" x="0" y="0" width="360" height="315" />
+    <rect class="hdr" x="0" y="0" width="360" height="30" />
+    <line class="grid" x1="50" y1="30" x2="50" y2="315" />
+    <line class="grid" x1="225" y1="30" x2="225" y2="315" />
+    <line class="grid" x1="0" y1="62" x2="360" y2="62" />
+    <line class="grid" x1="0" y1="94" x2="360" y2="94" />
+    <line class="grid" x1="0" y1="126" x2="360" y2="126" />
+    <line class="grid" x1="0" y1="158" x2="360" y2="158" />
+    <line class="grid" x1="0" y1="190" x2="360" y2="190" />
+    <line class="grid" x1="0" y1="222" x2="360" y2="222" />
+    <line class="grid" x1="0" y1="254" x2="360" y2="254" />
+    <line class="grid" x1="0" y1="286" x2="360" y2="286" />
+    <text class="name" x="100" y="20">field_of_view_results</text>
+    <text class="cell" x="12" y="52">PK</text>
+    <text class="cell" x="62" y="52">id</text>
+    <text class="cell" x="238" y="52">uuid</text>
+    <text class="cell" x="12" y="84">FK</text>
+    <text class="cell" x="62" y="84">user_id</text>
+    <text class="cell" x="238" y="84">uuid</text>
+    <text class="cell" x="62" y="116">grid_size</text>
+    <text class="cell" x="238" y="116">integer</text>
+    <text class="cell" x="62" y="148">total_rounds</text>
+    <text class="cell" x="238" y="148">integer</text>
+    <text class="cell" x="62" y="180">correct_rounds</text>
+    <text class="cell" x="238" y="180">integer</text>
+    <text class="cell" x="62" y="212">detected_mismatch_count</text>
+    <text class="cell" x="238" y="212">integer</text>
+    <text class="cell" x="62" y="244">missed_mismatch_count</text>
+    <text class="cell" x="238" y="244">integer</text>
+    <text class="cell" x="62" y="276">false_alarm_count</text>
+    <text class="cell" x="238" y="276">integer</text>
+    <text class="cell" x="62" y="308">accuracy_percent</text>
+    <text class="cell" x="238" y="308">double</text>
+  </g>
+
+  <!-- Progress -->
+  <g transform="translate(420,800)">
+    <rect class="tbl" x="0" y="0" width="390" height="255" />
+    <rect class="hdr" x="0" y="0" width="390" height="30" />
+    <line class="grid" x1="50" y1="30" x2="50" y2="255" />
+    <line class="grid" x1="250" y1="30" x2="250" y2="255" />
+    <line class="grid" x1="0" y1="62" x2="390" y2="62" />
+    <line class="grid" x1="0" y1="94" x2="390" y2="94" />
+    <line class="grid" x1="0" y1="126" x2="390" y2="126" />
+    <line class="grid" x1="0" y1="158" x2="390" y2="158" />
+    <line class="grid" x1="0" y1="190" x2="390" y2="190" />
+    <line class="grid" x1="0" y1="222" x2="390" y2="222" />
+    <text class="name" x="112" y="20">user_exercise_progresses</text>
+    <text class="cell" x="12" y="52">PK</text>
+    <text class="cell" x="62" y="52">id</text>
+    <text class="cell" x="262" y="52">uuid</text>
+    <text class="cell" x="12" y="84">FK</text>
+    <text class="cell" x="62" y="84">user_id</text>
+    <text class="cell" x="262" y="84">uuid</text>
+    <text class="cell" x="62" y="116">exercise_type</text>
+    <text class="cell" x="262" y="116">varchar(50)</text>
+    <text class="cell" x="62" y="148">current_level</text>
+    <text class="cell" x="262" y="148">integer</text>
+    <text class="cell" x="62" y="180">last_score</text>
+    <text class="cell" x="262" y="180">double</text>
+    <text class="cell" x="62" y="212">average_score</text>
+    <text class="cell" x="262" y="212">double</text>
+    <text class="cell" x="62" y="244">best_score</text>
+    <text class="cell" x="262" y="244">double</text>
+  </g>
+
+  <!-- WordErasing -->
+  <g transform="translate(940,800)">
+    <rect class="tbl" x="0" y="0" width="390" height="285" />
+    <rect class="hdr" x="0" y="0" width="390" height="30" />
+    <line class="grid" x1="50" y1="30" x2="50" y2="285" />
+    <line class="grid" x1="250" y1="30" x2="250" y2="285" />
+    <line class="grid" x1="0" y1="62" x2="390" y2="62" />
+    <line class="grid" x1="0" y1="94" x2="390" y2="94" />
+    <line class="grid" x1="0" y1="126" x2="390" y2="126" />
+    <line class="grid" x1="0" y1="158" x2="390" y2="158" />
+    <line class="grid" x1="0" y1="190" x2="390" y2="190" />
+    <line class="grid" x1="0" y1="222" x2="390" y2="222" />
+    <line class="grid" x1="0" y1="254" x2="390" y2="254" />
+    <text class="name" x="120" y="20">word_erasing_results</text>
+    <text class="cell" x="12" y="52">PK</text>
+    <text class="cell" x="62" y="52">id</text>
+    <text class="cell" x="262" y="52">uuid</text>
+    <text class="cell" x="12" y="84">FK</text>
+    <text class="cell" x="62" y="84">user_id</text>
+    <text class="cell" x="262" y="84">uuid</text>
+    <text class="cell" x="62" y="116">text_id</text>
+    <text class="cell" x="262" y="116">varchar(100)</text>
+    <text class="cell" x="62" y="148">text_title</text>
+    <text class="cell" x="262" y="148">varchar(200)</text>
+    <text class="cell" x="62" y="180">speed_before_wpm</text>
+    <text class="cell" x="262" y="180">integer</text>
+    <text class="cell" x="62" y="212">speed_after_wpm</text>
+    <text class="cell" x="262" y="212">integer</text>
+    <text class="cell" x="62" y="244">speed_delta</text>
+    <text class="cell" x="262" y="244">integer</text>
+    <text class="cell" x="62" y="276">completion_type</text>
+    <text class="cell" x="262" y="276">varchar(20)</text>
+  </g>
+
+  <!-- Relationships -->
+  <path class="rel" d="M 720 210 L 430 210 L 430 480" />
+  <path class="rel" d="M 790 310 L 790 360 L 660 360 L 660 390" />
+  <path class="rel" d="M 900 310 L 900 360 L 1070 360 L 1070 390" />
+  <path class="rel" d="M 950 210 L 1210 210 L 1210 390" />
+  <path class="rel" d="M 760 310 L 760 760 L 615 760 L 615 800" />
+  <path class="rel" d="M 930 310 L 930 760 L 1135 760 L 1135 800" />
+
+  <text class="rel" x="438" y="472">1 : N</text>
+  <text class="rel" x="666" y="383">1 : N</text>
+  <text class="rel" x="1030" y="383">1 : N</text>
+  <text class="rel" x="1190" y="382">1 : N</text>
+  <text class="rel" x="625" y="792">1 : N</text>
+  <text class="rel" x="1145" y="792">1 : N</text>
+
+  <text class="note" x="60" y="1125">Уникальные ограничения: users.username, users.email, user_exercise_progresses (user_id, exercise_type).</text>
+  <text class="note" x="60" y="1150">Во всех дочерних таблицах внешний ключ user_id ссылается на users.id и использует каскадное удаление.</text>
+</svg>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1450" height="620" viewBox="0 0 1450 620" role="img" aria-labelledby="title desc">
+  <title id="title">Структура серверной части FastReading</title>
+  <desc id="desc">Схема серверной части проекта FastReading с разделением на клиент, ASP.NET Core API, контроллеры, слой доступа к данным и базу данных.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .group { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .client { fill: #e0f2fe; stroke: #0369a1; stroke-width: 2; }
+      .api { fill: #eef2ff; stroke: #4f46e5; stroke-width: 2; }
+      .ctrl { fill: #ecfdf5; stroke: #047857; stroke-width: 2; }
+      .data { fill: #fff7ed; stroke: #c2410c; stroke-width: 2; }
+      .db { fill: #fef2f2; stroke: #b91c1c; stroke-width: 2; }
+      .title { font: 700 34px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 400 18px Arial, sans-serif; fill: #475569; }
+      .section { font: 700 22px Arial, sans-serif; fill: #111827; }
+      .label { font: 700 19px Arial, sans-serif; fill: #111827; }
+      .small { font: 400 15px Arial, sans-serif; fill: #334155; }
+      .tiny { font: 400 13px Arial, sans-serif; fill: #475569; }
+      .arrow { stroke: #334155; stroke-width: 2.6; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#334155" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1450" height="620" />
+
+  <text class="title" x="60" y="68">Структура серверной части FastReading</text>
+  <text class="subtitle" x="60" y="100">Схема отражает фактические компоненты проекта и их роли без привязки к отдельному пользовательскому сценарию.</text>
+
+  <rect class="group" x="50" y="140" width="1350" height="420" rx="12" />
+  <text class="section" x="80" y="178">Компоненты серверной части</text>
+
+  <rect class="client" x="90" y="260" width="220" height="120" rx="8" />
+  <text class="label" x="140" y="298">Клиент</text>
+  <text class="small" x="140" y="330">.NET MAUI</text>
+  <text class="small" x="140" y="354">HTTP-запросы к API</text>
+
+  <rect class="api" x="390" y="260" width="230" height="120" rx="8" />
+  <text class="label" x="430" y="298">ASP.NET Core API</text>
+  <text class="small" x="430" y="330">Program.cs</text>
+  <text class="small" x="430" y="354">JWT, маршрутизация, DI</text>
+
+  <rect class="ctrl" x="700" y="230" width="250" height="180" rx="8" />
+  <text class="label" x="775" y="268">Контроллеры</text>
+  <text class="small" x="730" y="302">AuthController</text>
+  <text class="small" x="730" y="328">ProfileController</text>
+  <text class="small" x="730" y="354">StatisticsController</text>
+  <text class="small" x="730" y="380">HealthController</text>
+
+  <rect class="data" x="1030" y="230" width="250" height="180" rx="8" />
+  <text class="label" x="1060" y="268">Слой доступа к данным</text>
+  <text class="small" x="1060" y="302">AppDbContext</text>
+  <text class="small" x="1060" y="328">Entity Framework Core</text>
+  <text class="small" x="1060" y="354">DbSet и конфигурация</text>
+  <text class="small" x="1060" y="380">операций с данными</text>
+
+  <rect class="db" x="1030" y="450" width="250" height="80" rx="8" />
+  <text class="label" x="1105" y="495">База данных</text>
+  <text class="small" x="1115" y="520">PostgreSQL</text>
+
+  <path class="arrow" d="M 310 320 L 382 320" />
+  <text class="tiny" x="326" y="306">HTTP / JSON</text>
+
+  <path class="arrow" d="M 620 320 L 692 320" />
+  <text class="tiny" x="640" y="300">вызов API</text>
+
+  <path class="arrow" d="M 950 320 L 1022 320" />
+  <text class="tiny" x="952" y="300">доступ к данным</text>
+
+  <path class="arrow" d="M 1155 410 L 1155 442" />
+  <text class="tiny" x="1172" y="430">SQL</text>
+
+  <text class="tiny" x="80" y="590">Схема отражает текущую структуру серверной части проекта: контроллеры обрабатывают запросы, AppDbContext реализует доступ к данным, а PostgreSQL обеспечивает их хранение.</text>
+</svg>
