@@ -6,13 +6,15 @@ namespace MauiApp1.Profile
     public partial class ProfilePage : ContentPage
     {
         private readonly ProfileService _profileService;
+        private readonly AuthService _authService;
         private CancellationTokenSource? _loadCancellation;
         private bool _isActive;
 
-        public ProfilePage(ProfileService profileService)
+        public ProfilePage(ProfileService profileService, AuthService authService)
         {
             InitializeComponent();
             _profileService = profileService;
+            _authService = authService;
         }
 
         protected override async void OnAppearing()
@@ -83,6 +85,30 @@ namespace MauiApp1.Profile
                    $"Наиболее стабильное упражнение: {ToDisplayName(profile.MostStableExercise)}. " +
                    $"Зона роста: {ToDisplayName(profile.WeakestExercise)}. " +
                    $"Требует внимания: {ToDisplayName(profile.NeedsAttentionExercise)}.";
+        }
+
+        private async void OnLogoutClicked(object sender, EventArgs e)
+        {
+            LogoutButton.IsEnabled = false;
+
+            try
+            {
+                _isActive = false;
+                _loadCancellation?.Cancel();
+
+                await _authService.LogoutAsync();
+
+                var services = App.Current!.Handler!.MauiContext!.Services;
+                var loginPage = services.GetRequiredService<Auth.LoginPage>();
+                var window = Window ?? Application.Current!.Windows[0];
+
+                window.Page = new NavigationPage(loginPage);
+            }
+            catch (Exception ex)
+            {
+                LogoutButton.IsEnabled = true;
+                await DisplayAlert("Ошибка", ex.Message, "ОК");
+            }
         }
 
         private static View CreateExerciseCard(ExerciseProgressDto exercise)

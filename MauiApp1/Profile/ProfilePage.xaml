@@ -108,6 +108,20 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label
+                            Style="{StaticResource SectionTitle}"
+                            Text="Аккаунт" />
+                        <Button
+                            x:Name="LogoutButton"
+                            BackgroundColor="{StaticResource Danger}"
+                            Clicked="OnLogoutClicked"
+                            Text="Выход"
+                            TextColor="{StaticResource White}" />
+                    </VerticalStackLayout>
+                </Border>
+
                 <Label
                     Style="{StaticResource SectionTitle}"
                     Text="Прогресс по упражнениям" />
