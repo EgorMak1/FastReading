@@ -21,30 +21,6 @@
                 HorizontalTextAlignment="Center"
                 TextColor="Gray" />
 
-            <VerticalStackLayout
-                x:Name="DebugActionsLayout"
-                Spacing="8">
-                <Label
-                    FontAttributes="Bold"
-                    FontSize="15"
-                    Text="Инструменты разработки"
-                    TextColor="#5C6BC0" />
-                <HorizontalStackLayout Spacing="8">
-                    <Button
-                        BackgroundColor="#43A047"
-                        Clicked="OnSimulateLevelUpClicked"
-                        HorizontalOptions="Fill"
-                        Text="Повышение"
-                        TextColor="White" />
-                    <Button
-                        BackgroundColor="#E53935"
-                        Clicked="OnSimulateLevelDownClicked"
-                        HorizontalOptions="Fill"
-                        Text="Понижение"
-                        TextColor="White" />
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
-
             <Grid
                 ColumnDefinitions="*,*"
                 ColumnSpacing="10">
