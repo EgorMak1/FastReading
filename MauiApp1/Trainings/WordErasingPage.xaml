@@ -8,6 +8,7 @@
     <Grid Padding="16">
         <VerticalStackLayout
             x:Name="PreparationLayout"
+            IsVisible="False"
             Spacing="14">
             <Label
                 FontAttributes="Bold"

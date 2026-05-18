@@ -1,70 +1,140 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp1.Profile.ProfilePage"
-             Title="Профиль">
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="14">
-            <Label Text="Профиль пользователя"
-                   FontSize="28"
-                   HorizontalOptions="Center" />
+<ContentPage
+    x:Class="MauiApp1.Profile.ProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:controls="clr-namespace:MauiApp1.Controls"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    NavigationPage.HasNavigationBar="False"
+    Title="Профиль">
 
-            <Label x:Name="SummaryLabel"
-                   FontSize="16"
-                   HorizontalTextAlignment="Center"
-                   TextColor="Gray" />
+    <Grid RowDefinitions="*,Auto">
+    <ScrollView Grid.Row="0">
+        <Grid
+            Padding="24"
+            HorizontalOptions="Center"
+            MaximumWidthRequest="980">
 
-            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
-                <Border Grid.Row="0" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
-                    <VerticalStackLayout>
-                        <Label Text="Общий score" FontAttributes="Bold" />
-                        <Label x:Name="OverallScoreLabel" FontSize="22" />
+            <VerticalStackLayout Spacing="18">
+                <Grid
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="14"
+                    RowDefinitions="Auto,Auto,Auto"
+                    RowSpacing="14">
+                    <Border
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                Style="{StaticResource MutedText}"
+                                Text="Общий балл" />
+                            <Label
+                                x:Name="OverallScoreLabel"
+                                Style="{StaticResource MetricValue}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                Style="{StaticResource MutedText}"
+                                Text="Очки сегодня" />
+                            <Label
+                                x:Name="TodayPointsLabel"
+                                Style="{StaticResource MetricValue}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                Style="{StaticResource MutedText}"
+                                Text="Всего сессий" />
+                            <Label
+                                x:Name="TotalSessionsLabel"
+                                Style="{StaticResource MetricValue}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                Style="{StaticResource MutedText}"
+                                Text="Упражнений" />
+                            <Label
+                                x:Name="ExercisesTrackedLabel"
+                                Style="{StaticResource MetricValue}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border
+                        Grid.Row="2"
+                        Grid.ColumnSpan="2"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                Style="{StaticResource MutedText}"
+                                Text="Состояние обучения" />
+                            <Label
+                                x:Name="ReadinessLabel"
+                                FontAttributes="Bold"
+                                FontSize="22"
+                                TextColor="{StaticResource Primary}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label
+                            Style="{StaticResource SectionTitle}"
+                            Text="Аналитика" />
+                        <Label
+                            x:Name="InsightsLabel"
+                            Style="{StaticResource MutedText}" />
+                        <Label
+                            x:Name="RecommendationLabel"
+                            TextColor="{StaticResource Primary}"
+                            FontSize="15" />
                     </VerticalStackLayout>
                 </Border>
-                <Border Grid.Row="0" Grid.Column="1" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
-                    <VerticalStackLayout>
-                        <Label Text="Очки за сегодня" FontAttributes="Bold" />
-                        <Label x:Name="TodayPointsLabel" FontSize="22" />
-                    </VerticalStackLayout>
-                </Border>
-                <Border Grid.Row="1" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
-                    <VerticalStackLayout>
-                        <Label Text="Всего сессий" FontAttributes="Bold" />
-                        <Label x:Name="TotalSessionsLabel" FontSize="22" />
-                    </VerticalStackLayout>
-                </Border>
-                <Border Grid.Row="1" Grid.Column="1" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
-                    <VerticalStackLayout>
-                        <Label Text="Упражнений отслеживается" FontAttributes="Bold" />
-                        <Label x:Name="ExercisesTrackedLabel" FontSize="22" />
-                    </VerticalStackLayout>
-                </Border>
-                <Border Grid.Row="2" Grid.ColumnSpan="2" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
-                    <VerticalStackLayout>
-                        <Label Text="Состояние обучения" FontAttributes="Bold" />
-                        <Label x:Name="ReadinessLabel" FontSize="20" TextColor="#5C6BC0" />
-                    </VerticalStackLayout>
-                </Border>
-            </Grid>
 
-            <Border Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
-                <VerticalStackLayout Spacing="6">
-                    <Label Text="Аналитика" FontSize="20" FontAttributes="Bold" />
-                    <Label x:Name="InsightsLabel"
-                           FontSize="15"
-                           TextColor="#5C6BC0" />
-                    <Label x:Name="RecommendationLabel"
-                           FontSize="15"
-                           TextColor="#455A64" />
-                </VerticalStackLayout>
-            </Border>
+                <Label
+                    Style="{StaticResource SectionTitle}"
+                    Text="Прогресс по упражнениям" />
 
-            <Label Text="Прогресс по упражнениям"
-                   FontSize="20"
-                   FontAttributes="Bold" />
+                <VerticalStackLayout
+                    x:Name="ExerciseProgressContainer"
+                    Spacing="12" />
 
-            <VerticalStackLayout x:Name="ExerciseProgressContainer"
-                                 Spacing="10" />
-        </VerticalStackLayout>
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label
+                            Style="{StaticResource SectionTitle}"
+                            Text="Аккаунт" />
+                        <Button
+                            x:Name="LogoutButton"
+                            BackgroundColor="{StaticResource Danger}"
+                            Clicked="OnLogoutClicked"
+                            Text="Выход"
+                            TextColor="{StaticResource White}" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </Grid>
     </ScrollView>
+    <controls:BottomNavigationBar
+        Grid.Row="1"
+        ActiveTab="Profile"
+        Margin="24,0,24,16" />
+    </Grid>
 </ContentPage>

@@ -5,6 +5,7 @@ using FastReading.Server.Contracts.Auth;
 using FastReading.Server.Data;
 using FastReading.Server.Models;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -49,6 +50,11 @@ namespace FastReading.Server.Controllers
             // - приводим к нижнему регистру
             // Это нужно, чтобы не было дублей вида Test@Mail.com и test@mail.com
             var email = request.Email.Trim().ToLowerInvariant();
+
+            if (!IsValidEmail(email))
+            {
+                return BadRequest("Введите корректный email.");
+            }
 
             // Проверяем, нет ли уже пользователя с таким Email
             // (Email — уникальный бизнес-идентификатор)
@@ -188,6 +194,19 @@ namespace FastReading.Server.Controllers
 
         // Внутренний helper для хеширования пароля через PBKDF2
         // Формат хранения: base64(salt):base64(hash)
+        private static bool IsValidEmail(string email)
+        {
+            try
+            {
+                var address = new MailAddress(email);
+                return string.Equals(address.Address, email, StringComparison.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private static class PasswordHashing
         {
             public static string HashPassword(string password)

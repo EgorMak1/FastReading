@@ -30,10 +30,6 @@ namespace MauiApp1.Trainings
         {
             InitializeComponent();
             _statisticsService = statisticsService;
-
-#if !DEBUG
-            DebugActionsLayout.IsVisible = false;
-#endif
         }
 
         protected override async void OnAppearing()
@@ -284,30 +280,6 @@ namespace MauiApp1.Trainings
         private async void OnFinishTrainingClicked(object sender, EventArgs e)
         {
             await FinishTrainingAsync();
-        }
-
-        private async void OnSimulateLevelUpClicked(object sender, EventArgs e)
-        {
-            int simulatedDuration = Math.Max(1, _currentConfig.TargetDurationSeconds - 8);
-            await FinishTrainingAsync(
-                overrideDurationSeconds: simulatedDuration,
-                overrideErrorsCount: 0,
-                overrideScore: 92,
-                overrideLevelAfter: ClampLevel(_sessionLevelBefore + 1),
-                stayOnPage: true,
-                alertTitle: "Смоделировано повышение");
-        }
-
-        private async void OnSimulateLevelDownClicked(object sender, EventArgs e)
-        {
-            int simulatedDuration = _currentConfig.TargetDurationSeconds + 25;
-            await FinishTrainingAsync(
-                overrideDurationSeconds: simulatedDuration,
-                overrideErrorsCount: 5,
-                overrideScore: 35,
-                overrideLevelAfter: ClampLevel(_sessionLevelBefore - 1),
-                stayOnPage: true,
-                alertTitle: "Смоделировано понижение");
         }
 
         private sealed record ShulteDifficultyConfig(

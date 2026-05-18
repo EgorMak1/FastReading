@@ -20,7 +20,7 @@ namespace MauiApp1
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            builder.Services.AddSingleton<MainPage>();
+            builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<ExerciseSelectionPage>();
             builder.Services.AddTransient<SelectionStatisticsPage>();
             builder.Services.AddTransient<ShulteStatisticsPage>();

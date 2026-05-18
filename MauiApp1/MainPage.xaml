@@ -1,54 +1,164 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
+    x:Class="MauiApp1.MainPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:controls="clr-namespace:MauiApp1.Controls"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    x:Class="MauiApp1.MainPage">
+    NavigationPage.HasNavigationBar="False">
 
-    <Grid>
-        <VerticalStackLayout
+    <Grid RowDefinitions="*,Auto">
+    <ScrollView Grid.Row="0">
+        <Grid
+            Padding="24"
             HorizontalOptions="Center"
-            VerticalOptions="Center"
-            Spacing="20">
+            MaximumWidthRequest="1040">
 
-            <!-- Заголовок страницы -->
-            <Label Text="Главная страница"
-                FontSize="32"
-                HorizontalOptions="Center"
-                VerticalOptions="Center" />
+            <VerticalStackLayout Spacing="18">
+                <Border
+                    Padding="24"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+                    Stroke="{AppThemeBinding Light={StaticResource StrokeLight}, Dark={StaticResource StrokeDark}}"
+                    StrokeShape="RoundRectangle 8">
+                    <Grid RowDefinitions="Auto,Auto,Auto">
+                        <VerticalStackLayout
+                            Grid.RowSpan="3"
+                            Spacing="8"
+                            VerticalOptions="Center">
+                            <Label
+                                x:Name="GreetingLabel"
+                                Style="{StaticResource Headline}"
+                                Text="Привет" />
+                            <Label
+                                x:Name="DashboardStatusLabel"
+                                Style="{StaticResource MutedText}"
+                                Text="Загрузка..." />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
 
-            <!-- Кнопка для начала тренировки -->
-            <Button Text="Начать тренировку"
-                BackgroundColor="DodgerBlue"
-                TextColor="White"
-                Clicked="OnStartTrainingClicked"/>
+                <Grid
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="8"
+                    RowDefinitions="Auto">
+                    <Border
+                        Grid.Column="0"
+                        Padding="12"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                FontSize="12"
+                                LineBreakMode="TailTruncation"
+                                MaxLines="1"
+                                Style="{StaticResource MutedText}"
+                                Text="Сегодня" />
+                            <Label
+                                x:Name="TodayPointsLabel"
+                                FontSize="{OnIdiom Phone=19, Tablet=22, Desktop=26}"
+                                LineBreakMode="NoWrap"
+                                MaxLines="1"
+                                Style="{StaticResource MetricValue}"
+                                Text="—" />
+                        </VerticalStackLayout>
+                    </Border>
 
-            <!-- Кнопка для перехода к статистике -->
-            <Button Text="Статистика"
-                BackgroundColor="Green"
-                TextColor="White"
-                Clicked="OnViewStatisticsClicked"/>
+                    <Border
+                        Grid.Column="1"
+                        Padding="12"
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                FontSize="12"
+                                LineBreakMode="TailTruncation"
+                                MaxLines="1"
+                                Style="{StaticResource MutedText}"
+                                Text="Сессии" />
+                            <Label
+                                x:Name="TotalSessionsLabel"
+                                FontSize="{OnIdiom Phone=19, Tablet=22, Desktop=26}"
+                                LineBreakMode="NoWrap"
+                                MaxLines="1"
+                                Style="{StaticResource MetricValue}"
+                                Text="—" />
+                        </VerticalStackLayout>
+                    </Border>
 
-            <Button Text="Профиль"
-                BackgroundColor="#5C6BC0"
-                TextColor="White"
-                Clicked="OnViewProfileClicked"/>
+                </Grid>
 
-            <!-- Кнопка для выхода -->
-            <Button Text="Выйти"
-                BackgroundColor="Red"
-                TextColor="White"
-                Clicked="OnExitClicked"/>
+                <VerticalStackLayout Spacing="14">
+                    <Border
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label
+                                Style="{StaticResource SectionTitle}"
+                                Text="Рекомендация" />
+                            <Label
+                                x:Name="RecommendationLabel"
+                                Style="{StaticResource MutedText}"
+                                Text="Нет данных" />
+                            <Button
+                                x:Name="RecommendationActionButton"
+                                Clicked="OnRecommendationClicked"
+                                Text="Выбрать упражнение" />
+                        </VerticalStackLayout>
+                    </Border>
 
-            <!-- Кнопка "Регистрация" в верхнем правом углу -->
-            <Button x:Name="RegisterButton"
-                Text="Регистрация"
-                HorizontalOptions="End"
-                VerticalOptions="Start"
-                BackgroundColor="Blue"
-                TextColor="White"
-                Clicked="OnRegisterButtonClicked"
-                Margin="10"/>
-        </VerticalStackLayout>
+                    <Border
+                        Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label
+                                    Grid.Column="0"
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Ваша активность"
+                                    VerticalOptions="Center" />
+                                <Border
+                                    Grid.Column="1"
+                                    Padding="10,6"
+                                    BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#111827}"
+                                    StrokeThickness="0">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnActivityPeriodTapped" />
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label
+                                            x:Name="ActivityPeriodLabel"
+                                            FontAttributes="Bold"
+                                            FontSize="12"
+                                            Text="7 дней"
+                                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                                            VerticalOptions="Center" />
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="12"
+                                            Text="⌄"
+                                            TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                                            VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </Grid>
+                            <Grid
+                                x:Name="ActivityChartContainer"
+                                HeightRequest="152"
+                                BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#111827}">
+                                <Grid
+                                    x:Name="ActivityChartGrid"
+                                    Padding="8,10" />
+                                <Label
+                                    x:Name="ActivityEmptyLabel"
+                                    HorizontalOptions="Center"
+                                    Style="{StaticResource MutedText}"
+                                    Text="Нет данных"
+                                    VerticalOptions="Center" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Grid>
+    </ScrollView>
+    <controls:BottomNavigationBar
+        Grid.Row="1"
+        ActiveTab="Home"
+        Margin="24,0,24,16" />
     </Grid>
-
 </ContentPage>

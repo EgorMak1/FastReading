@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="MauiApp1.Controls.BottomNavigationBar"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:shapes="clr-namespace:Microsoft.Maui.Controls.Shapes;assembly=Microsoft.Maui.Controls">
+
+    <Border
+        Padding="8"
+        BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+        Stroke="{AppThemeBinding Light={StaticResource StrokeLight}, Dark={StaticResource StrokeDark}}"
+        StrokeShape="RoundRectangle 8">
+        <Grid
+            ColumnDefinitions="*,*,*,*"
+            ColumnSpacing="4">
+            <Border
+                x:Name="HomeTab"
+                Grid.Column="0"
+                Padding="4,6"
+                StrokeThickness="0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnHomeClicked" />
+                </Border.GestureRecognizers>
+                <VerticalStackLayout
+                    HorizontalOptions="Center"
+                    Spacing="2">
+                    <shapes:Path
+                        x:Name="HomeIcon"
+                        Aspect="Uniform"
+                        Data="M3,10 L12,3 L21,10 M5,10 V21 H10 V15 H14 V21 H19 V10"
+                        HeightRequest="18"
+                        StrokeLineCap="Round"
+                        StrokeLineJoin="Round"
+                        StrokeThickness="2"
+                        WidthRequest="18" />
+                    <Label
+                        x:Name="HomeLabel"
+                        FontAttributes="Bold"
+                        FontSize="10"
+                        HorizontalTextAlignment="Center"
+                        LineBreakMode="NoWrap"
+                        MaxLines="1"
+                        Text="Главная" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border
+                x:Name="TrainingTab"
+                Grid.Column="1"
+                Padding="4,6"
+                StrokeThickness="0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnTrainingClicked" />
+                </Border.GestureRecognizers>
+                <VerticalStackLayout
+                    HorizontalOptions="Center"
+                    Spacing="2">
+                    <shapes:Path
+                        x:Name="TrainingIcon"
+                        Aspect="Uniform"
+                        Data="M4,6 H20 M4,12 H20 M4,18 H14 M7,4 V8 M13,10 V14 M19,4 V8"
+                        HeightRequest="18"
+                        StrokeLineCap="Round"
+                        StrokeLineJoin="Round"
+                        StrokeThickness="2"
+                        WidthRequest="18" />
+                    <Label
+                        x:Name="TrainingLabel"
+                        FontAttributes="Bold"
+                        FontSize="10"
+                        HorizontalTextAlignment="Center"
+                        LineBreakMode="NoWrap"
+                        MaxLines="1"
+                        Text="Тренировки" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border
+                x:Name="StatisticsTab"
+                Grid.Column="2"
+                Padding="4,6"
+                StrokeThickness="0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnStatisticsClicked" />
+                </Border.GestureRecognizers>
+                <VerticalStackLayout
+                    HorizontalOptions="Center"
+                    Spacing="2">
+                    <shapes:Path
+                        x:Name="StatisticsIcon"
+                        Aspect="Uniform"
+                        Data="M5,20 V12 M12,20 V5 M19,20 V9"
+                        HeightRequest="18"
+                        StrokeLineCap="Round"
+                        StrokeLineJoin="Round"
+                        StrokeThickness="2"
+                        WidthRequest="18" />
+                    <Label
+                        x:Name="StatisticsLabel"
+                        FontAttributes="Bold"
+                        FontSize="10"
+                        HorizontalTextAlignment="Center"
+                        LineBreakMode="NoWrap"
+                        MaxLines="1"
+                        Text="Статистика" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border
+                x:Name="ProfileTab"
+                Grid.Column="3"
+                Padding="4,6"
+                StrokeThickness="0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnProfileClicked" />
+                </Border.GestureRecognizers>
+                <VerticalStackLayout
+                    HorizontalOptions="Center"
+                    Spacing="2">
+                    <shapes:Path
+                        x:Name="ProfileIcon"
+                        Aspect="Uniform"
+                        Data="M12,12 A4,4 0,1 0,12 4 A4,4 0,1 0,12 12 M4,21 C5,17 8,15 12,15 C16,15 19,17 20,21"
+                        HeightRequest="18"
+                        StrokeLineCap="Round"
+                        StrokeLineJoin="Round"
+                        StrokeThickness="2"
+                        WidthRequest="18" />
+                    <Label
+                        x:Name="ProfileLabel"
+                        FontAttributes="Bold"
+                        FontSize="10"
+                        HorizontalTextAlignment="Center"
+                        LineBreakMode="NoWrap"
+                        MaxLines="1"
+                        Text="Профиль" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Border>
+</ContentView>

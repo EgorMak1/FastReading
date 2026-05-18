@@ -5,11 +5,29 @@ namespace MauiApp1.Auth
     public partial class LoginPage : ContentPage
     {
         private readonly AuthService _auth;
+        private bool _savedTokenChecked;
 
         public LoginPage(AuthService auth)
         {
             InitializeComponent();
             _auth = auth;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            if (_savedTokenChecked)
+            {
+                return;
+            }
+
+            _savedTokenChecked = true;
+
+            if (await _auth.TryApplySavedTokenAsync())
+            {
+                NavigateToMainPage();
+            }
         }
 
         private async void OnLoginClicked(object sender, EventArgs e)
@@ -33,11 +51,7 @@ namespace MauiApp1.Auth
                     return;
                 }
 
-                var services = App.Current!.Handler!.MauiContext!.Services;
-                var mainPage = services.GetRequiredService<MainPage>();
-
-                var window = Window ?? Application.Current!.Windows[0];
-                window.Page = new NavigationPage(mainPage);
+                NavigateToMainPage();
             }
             catch (Exception ex)
             {
@@ -50,6 +64,15 @@ namespace MauiApp1.Auth
             await Navigation.PushAsync(
                 App.Current!.Handler!.MauiContext!.Services
                     .GetRequiredService<RegisterPage>());
+        }
+
+        private void NavigateToMainPage()
+        {
+            var services = App.Current!.Handler!.MauiContext!.Services;
+            var mainPage = services.GetRequiredService<MainPage>();
+
+            var window = Window ?? Application.Current!.Windows[0];
+            window.Page = new NavigationPage(mainPage);
         }
     }
 }

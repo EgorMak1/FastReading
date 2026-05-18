@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MauiApp1.Services
@@ -81,6 +83,33 @@ namespace MauiApp1.Services
                 new AuthenticationHeaderValue("Bearer", token);
         }
 
+        public async Task<bool> TryApplySavedTokenAsync()
+        {
+            try
+            {
+                var token = await GetAccessTokenAsync();
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return false;
+                }
+
+                if (IsJwtExpired(token))
+                {
+                    await LogoutAsync();
+                    return false;
+                }
+
+                _api.Http.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task LogoutAsync()
         {
             SecureStorage.Default.Remove(TokenKey);
@@ -91,6 +120,44 @@ namespace MauiApp1.Services
         private sealed class LoginResponse
         {
             public string AccessToken { get; set; } = string.Empty;
+        }
+
+        private static bool IsJwtExpired(string token)
+        {
+            try
+            {
+                var parts = token.Split('.');
+                if (parts.Length < 2)
+                {
+                    return true;
+                }
+
+                var payloadJson = Encoding.UTF8.GetString(Base64UrlDecode(parts[1]));
+                using var payload = JsonDocument.Parse(payloadJson);
+
+                if (!payload.RootElement.TryGetProperty("exp", out var expiresAtElement) ||
+                    !expiresAtElement.TryGetInt64(out var expiresAt))
+                {
+                    return false;
+                }
+
+                return DateTimeOffset.FromUnixTimeSeconds(expiresAt) <= DateTimeOffset.UtcNow.AddMinutes(1);
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
+        private static byte[] Base64UrlDecode(string value)
+        {
+            var padded = value
+                .Replace('-', '+')
+                .Replace('_', '/');
+
+            padded = padded.PadRight(padded.Length + (4 - padded.Length % 4) % 4, '=');
+
+            return Convert.FromBase64String(padded);
         }
 
         public async Task<RegisterResponse?> RegisterAsync(string email, string password)

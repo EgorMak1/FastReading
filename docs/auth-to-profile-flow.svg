@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="560" viewBox="0 0 1500 560" role="img" aria-labelledby="title desc">
+  <title id="title">Схема обработки запроса авторизации в серверной части</title>
+  <desc id="desc">Схема движения информации от клиентского приложения MAUI через ASP.NET Core, контроллеры API, AppDbContext и PostgreSQL с обратным HTTP-ответом в формате JSON.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .phase { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .client { fill: #e0f2fe; stroke: #0369a1; stroke-width: 2; }
+      .api { fill: #eef2ff; stroke: #4f46e5; stroke-width: 2; }
+      .controller { fill: #ecfdf5; stroke: #047857; stroke-width: 2; }
+      .data { fill: #fff7ed; stroke: #c2410c; stroke-width: 2; }
+      .db { fill: #fef2f2; stroke: #b91c1c; stroke-width: 2; }
+      .title { font: 700 34px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 400 18px Arial, sans-serif; fill: #475569; }
+      .phase-title { font: 700 22px Arial, sans-serif; fill: #111827; }
+      .label { font: 700 19px Arial, sans-serif; fill: #111827; }
+      .small { font: 400 15px Arial, sans-serif; fill: #334155; }
+      .tiny { font: 400 13px Arial, sans-serif; fill: #475569; }
+      .step { font: 700 15px Arial, sans-serif; fill: #ffffff; }
+      .arrow { stroke: #334155; stroke-width: 2.6; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#334155" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1500" height="560" />
+
+  <text class="title" x="70" y="68">Схема обработки запроса авторизации</text>
+  <text class="subtitle" x="70" y="100">Сценарий: пользователь отправляет учетные данные, сервер проверяет их и возвращает JWT-токен.</text>
+
+  <rect class="phase" x="60" y="140" width="1380" height="330" rx="12" />
+  <text class="phase-title" x="90" y="180">Авторизация пользователя в серверной части</text>
+
+  <rect class="client" x="90" y="235" width="220" height="120" rx="8" />
+  <circle cx="115" cy="260" r="15" fill="#0369a1" />
+  <text class="step" x="111" y="265">1</text>
+  <text class="label" x="135" y="265">Клиент MAUI</text>
+  <text class="small" x="115" y="300">Учетные данные</text>
+  <text class="small" x="115" y="324">POST /api/auth/login</text>
+
+  <rect class="api" x="390" y="235" width="230" height="120" rx="8" />
+  <circle cx="415" cy="260" r="15" fill="#4f46e5" />
+  <text class="step" x="411" y="265">2</text>
+  <text class="label" x="435" y="265">ASP.NET Core</text>
+  <text class="small" x="415" y="300">JSON десериализуется</text>
+  <text class="small" x="415" y="324">в LoginRequest DTO</text>
+
+  <rect class="controller" x="700" y="220" width="230" height="150" rx="8" />
+  <circle cx="725" cy="245" r="15" fill="#047857" />
+  <text class="step" x="721" y="250">3</text>
+  <text class="label" x="745" y="250">Контроллеры API</text>
+  <text class="small" x="725" y="282">AuthController</text>
+  <text class="small" x="725" y="306">ProfileController</text>
+  <text class="small" x="725" y="330">StatisticsController</text>
+  <text class="small" x="725" y="354">HealthController</text>
+
+  <rect class="data" x="1010" y="235" width="210" height="120" rx="8" />
+  <circle cx="1035" cy="260" r="15" fill="#c2410c" />
+  <text class="step" x="1031" y="265">4</text>
+  <text class="label" x="1055" y="265">AppDbContext</text>
+  <text class="small" x="1035" y="300">Запрос пользователя</text>
+  <text class="small" x="1035" y="324">по email / username</text>
+
+  <rect class="db" x="1280" y="235" width="130" height="120" rx="8" />
+  <circle cx="1305" cy="260" r="15" fill="#b91c1c" />
+  <text class="step" x="1301" y="265">5</text>
+  <text class="label" x="1304" y="265">База данных</text>
+  <text class="small" x="1305" y="300">PostgreSQL</text>
+  <text class="small" x="1305" y="324">таблица Users</text>
+
+  <path class="arrow" d="M 310 295 L 382 295" />
+  <text class="tiny" x="296" y="278">HTTP-запрос / JSON</text>
+  <path class="arrow" d="M 620 295 L 692 295" />
+  <text class="tiny" x="610" y="278">LoginRequest DTO</text>
+  <path class="arrow" d="M 930 295 L 1002 295" />
+  <text class="tiny" x="940" y="278">LINQ-запрос</text>
+  <path class="arrow" d="M 1220 295 L 1272 295" />
+  <text class="tiny" x="1210" y="278">SQL-запрос</text>
+
+  <path class="arrow" d="M 1280 340 L 1228 340" />
+  <text class="tiny" x="1202" y="376">запись пользователя</text>
+  <path class="arrow" d="M 1010 340 L 938 340" />
+  <text class="tiny" x="936" y="376">экземпляр User</text>
+  <path class="arrow" d="M 700 340 L 628 340" />
+  <text class="tiny" x="584" y="376">ответ с JWT-токеном</text>
+  <path class="arrow" d="M 390 340 L 314 340" />
+  <text class="tiny" x="242" y="376">HTTP-ответ в формате JSON</text>
+
+  <text class="tiny" x="90" y="505">В сценарии авторизации используется AuthController: он получает LoginRequest, проверяет пароль, формирует JWT-токен и возвращает результат авторизации.</text>
+</svg>

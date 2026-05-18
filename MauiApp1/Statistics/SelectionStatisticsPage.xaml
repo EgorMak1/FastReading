@@ -1,34 +1,88 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp1.Statistics.SelectionStatisticsPage"
-             Title="Статистика">
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Statistics.SelectionStatisticsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:controls="clr-namespace:MauiApp1.Controls"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    NavigationPage.HasNavigationBar="False"
+    Title="Статистика">
 
-    <VerticalStackLayout Padding="20" Spacing="15">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <Grid
+                Padding="24"
+                HorizontalOptions="Center"
+                MaximumWidthRequest="980">
 
-        <Label Text="Выберите упражнение"
-               FontSize="24"
-               HorizontalOptions="Center" />
+                <VerticalStackLayout Spacing="14">
+                    <VerticalStackLayout Spacing="14">
+                        <Border
+                            Style="{StaticResource CardBorder}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnRunningWordsStatisticsTapped" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="10">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Бегущие слова" />
+                                <Label
+                                    Style="{StaticResource MutedText}"
+                                    Text="Точность, скорость показа и история ответов." />
+                            </VerticalStackLayout>
+                        </Border>
 
-        <Button Text="Таблица Шульте"
-                FontSize="18"
-                HorizontalOptions="Fill"
-                Clicked="OnShulteStatisticsClicked" />
+                        <Border
+                            Style="{StaticResource CardBorder}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnShulteStatisticsTapped" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="10">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Таблица Шульте" />
+                                <Label
+                                    Style="{StaticResource MutedText}"
+                                    Text="Уровни, ошибки и скорость прохождения." />
+                            </VerticalStackLayout>
+                        </Border>
 
-        <Button Text="Бегущие слова"
-                FontSize="18"
-                HorizontalOptions="Fill"
-                Clicked="OnRunningWordsStatisticsClicked" />
+                        <Border
+                            Style="{StaticResource CardBorder}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnFieldOfViewStatisticsTapped" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="10">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Поле зрения" />
+                                <Label
+                                    Style="{StaticResource MutedText}"
+                                    Text="Раунды, пропуски, ложные ответы и интервал." />
+                            </VerticalStackLayout>
+                        </Border>
 
-        <Button Text="Поле зрения"
-                FontSize="18"
-                HorizontalOptions="Fill"
-                Clicked="OnFieldOfViewStatisticsClicked" />
+                        <Border
+                            Style="{StaticResource CardBorder}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnWordErasingStatisticsTapped" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="10">
+                                <Label
+                                    Style="{StaticResource SectionTitle}"
+                                    Text="Стирание слов" />
+                                <Label
+                                    Style="{StaticResource MutedText}"
+                                    Text="Скорость чтения, понимание и тип завершения." />
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Grid>
+        </ScrollView>
 
-        <Button Text="Затирание слов"
-                FontSize="18"
-                HorizontalOptions="Fill"
-                Clicked="OnWordErasingStatisticsClicked" />
-
-    </VerticalStackLayout>
+        <controls:BottomNavigationBar
+            Grid.Row="1"
+            ActiveTab="Statistics"
+            Margin="24,0,24,16" />
+    </Grid>
 </ContentPage>

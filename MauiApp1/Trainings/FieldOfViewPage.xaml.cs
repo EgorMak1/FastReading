@@ -6,6 +6,7 @@ namespace MauiApp1.Trainings;
 public partial class FieldOfViewPage : ContentPage
 {
     private const int SafeRoundsWithoutMismatch = 2;
+    private const int MaxConsecutiveRoundsWithoutMismatch = 2;
     private const int AllowedMistakesOnSevenBySeven = 3;
     private const int SevenBySevenSlowdownStepMilliseconds = 150;
     private const int MaximumSevenBySevenRecoveryIntervalMilliseconds = 1400;
@@ -13,11 +14,11 @@ public partial class FieldOfViewPage : ContentPage
 
     private static readonly IReadOnlyList<FieldOfViewDifficultyConfig> DifficultyLevels =
     [
-        new(1, 5, 1800, 0.20, 1, 4, false),
-        new(2, 5, 1450, 0.28, 1, 4, false),
-        new(3, 7, 1100, 0.35, 2, 3, false),
-        new(4, 7, 850, 0.42, 2, 3, true),
-        new(5, 7, 650, 0.50, 3, 2, true)
+        new(1, 5, 1800, 0.40, 1, 4, false),
+        new(2, 5, 1450, 0.45, 1, 4, false),
+        new(3, 7, 1100, 0.50, 2, 3, false),
+        new(4, 7, 850, 0.55, 2, 3, true),
+        new(5, 7, 650, 0.60, 3, 2, true)
     ];
 
     private static readonly char[] EasyLetters = "АБВГДЕЖЗИКЛМНОПРСТУФХ".ToCharArray();
@@ -44,6 +45,7 @@ public partial class FieldOfViewPage : ContentPage
     private int _falseAlarmCount;
     private int _consecutiveCorrectRounds;
     private int _roundsSinceGridSetup;
+    private int _roundsWithoutMismatch;
     private int _mistakesOnSevenBySeven;
 
     private char _currentBaseLetter;
@@ -316,6 +318,7 @@ public partial class FieldOfViewPage : ContentPage
         _gridConfirmationSource = new TaskCompletionSource<bool>();
         _currentRoundScored = true;
         _roundsSinceGridSetup = 0;
+        _roundsWithoutMismatch = 0;
 
         ClearFillerLetters();
 
@@ -361,6 +364,7 @@ public partial class FieldOfViewPage : ContentPage
         _awaitingGridConfirmation = false;
         _gridConfirmationSource = null;
         _roundsSinceGridSetup = 0;
+        _roundsWithoutMismatch = 0;
         _mistakesOnSevenBySeven = 0;
 
         ApplyLevel(_recommendedLevel);
@@ -398,8 +402,9 @@ public partial class FieldOfViewPage : ContentPage
         _currentBaseLetter = GetRandomLetter();
 
         bool allowMismatch = _roundsSinceGridSetup >= SafeRoundsWithoutMismatch;
+        bool forceMismatch = allowMismatch && _roundsWithoutMismatch >= MaxConsecutiveRoundsWithoutMismatch;
 
-        if (allowMismatch && _random.NextDouble() < _currentConfig.MismatchChance)
+        if (allowMismatch && (forceMismatch || _random.NextDouble() < _currentConfig.MismatchChance))
         {
             int mismatchCount = _random.Next(1, _currentConfig.MaxMismatchCount + 1);
 
@@ -410,6 +415,9 @@ public partial class FieldOfViewPage : ContentPage
         }
 
         _roundsSinceGridSetup++;
+        _roundsWithoutMismatch = _currentMismatchIndexes.Count == 0
+            ? allowMismatch ? _roundsWithoutMismatch + 1 : 0
+            : 0;
 
         for (int i = 0; i < _edgeLabels.Length; i++)
         {

@@ -60,7 +60,7 @@
                    FontAttributes="Bold" />
 
             <GraphicsView x:Name="ChartView"
-                          HeightRequest="300"
+                          HeightRequest="180"
                           HorizontalOptions="Fill" />
 
             <Label x:Name="LastSessionLabel"

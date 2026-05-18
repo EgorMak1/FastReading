@@ -4,7 +4,10 @@ namespace MauiApp1.Trainings;
 
 public partial class ExerciseSelectionPage : ContentPage
 {
+    private const int AccuracySampleSize = 10;
+
     private readonly StatisticsService _statisticsService;
+    private CancellationTokenSource? _loadCancellation;
 
     public ExerciseSelectionPage(StatisticsService statisticsService)
     {
@@ -12,7 +15,190 @@ public partial class ExerciseSelectionPage : ContentPage
         _statisticsService = statisticsService;
     }
 
-    private async void OnShulteTableClicked(object sender, EventArgs e)
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        _loadCancellation?.Cancel();
+        _loadCancellation = new CancellationTokenSource();
+        await LoadExerciseSummaryAsync(_loadCancellation.Token);
+    }
+
+    protected override void OnDisappearing()
+    {
+        _loadCancellation?.Cancel();
+        base.OnDisappearing();
+    }
+
+    private async Task LoadExerciseSummaryAsync(CancellationToken cancellationToken)
+    {
+        SetSummaryLoading();
+
+        try
+        {
+            var runningWordsTask = _statisticsService.GetRunningWordsResultsAsync();
+            var shulteTask = _statisticsService.GetShulteResultsAsync();
+            var fieldOfViewTask = _statisticsService.GetFieldOfViewResultsAsync();
+            var wordErasingTask = _statisticsService.GetWordErasingResultsAsync();
+
+            await Task.WhenAll(runningWordsTask, shulteTask, fieldOfViewTask, wordErasingTask);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            ApplyRunningWordsSummary(runningWordsTask.Result);
+            ApplyShulteSummary(shulteTask.Result);
+            ApplyFieldOfViewSummary(fieldOfViewTask.Result);
+            ApplyWordErasingSummary(wordErasingTask.Result);
+        }
+        catch
+        {
+            SetSummaryEmpty();
+        }
+    }
+
+    private void SetSummaryLoading()
+    {
+        RunningWordsAccuracyLabel.Text = "Загрузка...";
+        RunningWordsRecordLabel.Text = "Загрузка...";
+        ShulteAccuracyLabel.Text = "Загрузка...";
+        ShulteRecordLabel.Text = "Загрузка...";
+        FieldOfViewAccuracyLabel.Text = "Загрузка...";
+        FieldOfViewRecordLabel.Text = "Загрузка...";
+        WordErasingAccuracyLabel.Text = "Загрузка...";
+        WordErasingRecordLabel.Text = "Загрузка...";
+    }
+
+    private void SetSummaryEmpty()
+    {
+        RunningWordsAccuracyLabel.Text = "Нет данных";
+        RunningWordsRecordLabel.Text = "Нет данных";
+        ShulteAccuracyLabel.Text = "Нет данных";
+        ShulteRecordLabel.Text = "Нет данных";
+        FieldOfViewAccuracyLabel.Text = "Нет данных";
+        FieldOfViewRecordLabel.Text = "Нет данных";
+        WordErasingAccuracyLabel.Text = "Нет данных";
+        WordErasingRecordLabel.Text = "Нет данных";
+    }
+
+    private void ApplyRunningWordsSummary(List<RunningWordsResultDto> results)
+    {
+        RunningWordsAccuracyLabel.Text = FormatAccuracy(
+            results
+                .OrderByDescending(x => x.CompletedAt)
+                .Take(AccuracySampleSize)
+                .Select(x => x.AccuracyPercent));
+
+        RunningWordsRecordLabel.Text = results.Count == 0
+            ? "Нет данных"
+            : $"{results.Min(x => x.FinalSpeedMilliseconds)} мс";
+    }
+
+    private void ApplyShulteSummary(List<ShulteResultDto> results)
+    {
+        ShulteAccuracyLabel.Text = FormatAccuracy(
+            results
+                .OrderByDescending(x => x.CompletedAt)
+                .Take(AccuracySampleSize)
+                .Select(CalculateShulteAccuracy));
+
+        var validResults = results
+            .Where(x => x.DurationSeconds > 0)
+            .ToList();
+
+        var hardestAttempt = validResults
+            .OrderByDescending(x => x.LevelAfter)
+            .ThenByDescending(x => x.GridSize)
+            .ThenByDescending(x => x.NumbersCount)
+            .FirstOrDefault();
+
+        if (hardestAttempt == null)
+        {
+            ShulteRecordLabel.Text = "Нет данных";
+            return;
+        }
+
+        var recordSeconds = validResults
+            .Where(x =>
+                x.LevelAfter == hardestAttempt.LevelAfter &&
+                x.GridSize == hardestAttempt.GridSize &&
+                x.NumbersCount == hardestAttempt.NumbersCount)
+            .Min(x => x.DurationSeconds);
+
+        ShulteRecordLabel.Text = recordSeconds <= 0
+            ? "Нет данных"
+            : $"{recordSeconds} сек";
+    }
+
+    private void ApplyFieldOfViewSummary(List<FieldOfViewResultDto> results)
+    {
+        FieldOfViewAccuracyLabel.Text = FormatAccuracy(
+            results
+                .OrderByDescending(x => x.CompletedAt)
+                .Take(AccuracySampleSize)
+                .Select(x => x.AccuracyPercent));
+
+        FieldOfViewRecordLabel.Text = results.Count == 0
+            ? "Нет данных"
+            : $"{results.Max(x => x.FinalLevel)} ур.";
+    }
+
+    private void ApplyWordErasingSummary(List<WordErasingResultDto> results)
+    {
+        WordErasingAccuracyLabel.Text = FormatAccuracy(
+            results
+                .OrderByDescending(x => x.CompletedAt)
+                .Take(AccuracySampleSize)
+                .Select(x => x.AccuracyPercent));
+
+        WordErasingRecordLabel.Text = results.Count == 0
+            ? "Нет данных"
+            : $"{results.Max(x => x.SpeedAfterWpm)} сл/мин";
+    }
+
+    private static double CalculateShulteAccuracy(ShulteResultDto result)
+    {
+        if (result.NumbersCount <= 0)
+        {
+            return 0;
+        }
+
+        return Math.Clamp(
+            (result.NumbersCount - result.ErrorsCount) / (double)result.NumbersCount * 100,
+            0,
+            100);
+    }
+
+    private static string FormatAccuracy(IEnumerable<double> values)
+    {
+        var sample = values.ToList();
+        return sample.Count == 0
+            ? "Нет данных"
+            : $"{sample.Average():F0}%";
+    }
+
+    private async void OnShulteTableTapped(object sender, TappedEventArgs e)
+    {
+        await OpenShulteTableAsync();
+    }
+
+    private async void OnRunningWordsTapped(object sender, TappedEventArgs e)
+    {
+        await OpenRunningWordsAsync();
+    }
+
+    private async void OnFieldOfViewTapped(object sender, TappedEventArgs e)
+    {
+        await OpenFieldOfViewAsync();
+    }
+
+    private async void OnWordErasingTapped(object sender, TappedEventArgs e)
+    {
+        await OpenWordErasingAsync();
+    }
+
+    private async Task OpenShulteTableAsync()
     {
         var page = new ExerciseIntroPage(
             title: "Таблица Шульте",
@@ -29,7 +215,7 @@ public partial class ExerciseSelectionPage : ContentPage
         await Navigation.PushAsync(page);
     }
 
-    private async void OnRunningWordsClicked(object sender, EventArgs e)
+    private async Task OpenRunningWordsAsync()
     {
         var page = new ExerciseIntroPage(
             title: "Бегущие слова",
@@ -46,7 +232,7 @@ public partial class ExerciseSelectionPage : ContentPage
         await Navigation.PushAsync(page);
     }
 
-    private async void OnFieldOfViewClicked(object sender, EventArgs e)
+    private async Task OpenFieldOfViewAsync()
     {
         var page = new ExerciseIntroPage(
             title: "Поле зрения",
@@ -63,10 +249,10 @@ public partial class ExerciseSelectionPage : ContentPage
         await Navigation.PushAsync(page);
     }
 
-    private async void OnWordErasingClicked(object sender, EventArgs e)
+    private async Task OpenWordErasingAsync()
     {
         var page = new ExerciseIntroPage(
-            title: "Затирание слов",
+            title: "Стирание слов",
             subtitle: "Упражнение на чтение с постепенно исчезающим текстом и проверкой понимания.",
             instructions:
             [
