@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -35,7 +36,12 @@ namespace MauiApp1.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return null;
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        return null;
+                    }
+
+                    throw await ApiError.FromResponseAsync(response, "Не удалось выполнить вход.");
                 }
 
                 var data = await response.Content.ReadFromJsonAsync<LoginResponse>();
@@ -52,17 +58,17 @@ namespace MauiApp1.Services
 
                 return data.AccessToken;
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                return null;
+                throw ApiError.FromException(ex, "Не удалось выполнить вход.");
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException ex)
             {
-                return null;
+                throw ApiError.FromException(ex, "Не удалось выполнить вход.");
             }
-            catch (System.Text.Json.JsonException)
+            catch (JsonException ex)
             {
-                return null;
+                throw ApiError.FromException(ex, "Не удалось выполнить вход.");
             }
         }
 
@@ -162,18 +168,33 @@ namespace MauiApp1.Services
 
         public async Task<RegisterResponse?> RegisterAsync(string email, string password)
         {
-            var response = await _api.Http.PostAsJsonAsync("api/auth/register", new
+            try
             {
-                email,
-                password
-            });
+                var response = await _api.Http.PostAsJsonAsync("api/auth/register", new
+                {
+                    email,
+                    password
+                });
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw await ApiError.FromResponseAsync(response, "Регистрация не выполнена. Повторите попытку позже.");
+                }
+
+                return await response.Content.ReadFromJsonAsync<RegisterResponse>();
             }
-
-            return await response.Content.ReadFromJsonAsync<RegisterResponse>();
+            catch (HttpRequestException ex)
+            {
+                throw ApiError.FromException(ex, "Регистрация не выполнена. Повторите попытку позже.");
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw ApiError.FromException(ex, "Регистрация не выполнена. Повторите попытку позже.");
+            }
+            catch (JsonException ex)
+            {
+                throw ApiError.FromException(ex, "Регистрация не выполнена. Повторите попытку позже.");
+            }
         }
     }
 }

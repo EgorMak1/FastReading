@@ -21,7 +21,18 @@ public partial class ShulteStatisticsPage : ContentPage
 
     private async Task LoadStatisticsAsync()
     {
-        var results = await _statisticsService.GetShulteResultsAsync();
+        List<ShulteResultDto> results;
+
+        try
+        {
+            results = await _statisticsService.GetShulteResultsAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowLoadError(ex);
+            return;
+        }
+
         var shulteResults = results.OrderBy(r => r.CompletedAt).ToList();
 
         if (shulteResults.Count == 0)
@@ -64,6 +75,20 @@ public partial class ShulteStatisticsPage : ContentPage
             "%",
             0,
             100);
+        ChartView.Invalidate();
+    }
+
+    private void ShowLoadError(Exception exception)
+    {
+        SummaryLabel.Text = ApiError.FromException(exception, "Не удалось загрузить статистику упражнения.").Message;
+        BestResultLabel.Text = "-";
+        AverageResultLabel.Text = "-";
+        BestScoreLabel.Text = "-";
+        CurrentLevelLabel.Text = "-";
+        TotalTrainingsLabel.Text = "-";
+        AverageErrorsLabel.Text = "-";
+        LastSessionLabel.Text = "Статистика временно недоступна.";
+        ChartView.Drawable = null;
         ChartView.Invalidate();
     }
 }

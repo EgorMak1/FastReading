@@ -215,13 +215,18 @@ namespace MauiApp1.Profile
 
         private static string GetDisplayError(Exception exception)
         {
+            if (exception is ApiException apiException)
+            {
+                return apiException.Message;
+            }
+
             var root = exception;
             while (root.InnerException != null)
             {
                 root = root.InnerException;
             }
 
-            return $"Ошибка загрузки данных профиля: {root.Message}";
+            return ApiError.FromException(root, "Не удалось загрузить профиль.").Message;
         }
     }
 }

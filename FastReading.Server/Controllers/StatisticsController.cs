@@ -24,7 +24,7 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             var result = new TrainingResult
@@ -47,7 +47,7 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             var results = await _db.TrainingResults
@@ -70,12 +70,12 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             if (request.TotalAttempts <= 0)
             {
-                return BadRequest("TotalAttempts must be greater than 0.");
+                return BadRequest("Количество попыток должно быть больше 0.");
             }
 
             var result = new RunningWordsResult
@@ -108,7 +108,7 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             var results = await _db.RunningWordsResults
@@ -135,12 +135,12 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             if (request.GridSize <= 0 || request.NumbersCount <= 0 || request.DurationSeconds <= 0)
             {
-                return BadRequest("GridSize, NumbersCount and DurationSeconds must be greater than 0.");
+                return BadRequest("Размер сетки, количество чисел и время должны быть больше 0.");
             }
 
             var result = new ShulteResult
@@ -174,7 +174,7 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             var results = await _db.ShulteResults
@@ -202,12 +202,12 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             if (request.GridSize <= 0 || request.TotalRounds <= 0)
             {
-                return BadRequest("GridSize and TotalRounds must be greater than 0.");
+                return BadRequest("Размер поля и количество раундов должны быть больше 0.");
             }
 
             var result = new FieldOfViewResult
@@ -243,7 +243,7 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             var results = await _db.FieldOfViewResults
@@ -273,12 +273,12 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             if (request.SpeedBeforeWpm <= 0 || request.SpeedAfterWpm <= 0)
             {
-                return BadRequest("Speed values must be greater than 0.");
+                return BadRequest("Скорость чтения должна быть больше 0.");
             }
 
             var result = new WordErasingResult
@@ -317,7 +317,7 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             var results = await _db.WordErasingResults

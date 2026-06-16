@@ -21,7 +21,18 @@ public partial class FieldOfViewStatisticsPage : ContentPage
 
     private async Task LoadStatisticsAsync()
     {
-        var results = await _statisticsService.GetFieldOfViewResultsAsync();
+        List<FieldOfViewResultDto> results;
+
+        try
+        {
+            results = await _statisticsService.GetFieldOfViewResultsAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowLoadError(ex);
+            return;
+        }
+
         var fieldOfViewResults = results.OrderBy(r => r.CompletedAt).ToList();
 
         if (fieldOfViewResults.Count == 0)
@@ -65,6 +76,20 @@ public partial class FieldOfViewStatisticsPage : ContentPage
             "%",
             0,
             100);
+        ChartView.Invalidate();
+    }
+
+    private void ShowLoadError(Exception exception)
+    {
+        SummaryLabel.Text = ApiError.FromException(exception, "Не удалось загрузить статистику упражнения.").Message;
+        BestResultLabel.Text = "-";
+        AverageResultLabel.Text = "-";
+        CurrentLevelLabel.Text = "-";
+        BestIntervalLabel.Text = "-";
+        TotalTrainingsLabel.Text = "-";
+        AverageLevelLabel.Text = "-";
+        LastSessionLabel.Text = "Статистика временно недоступна.";
+        ChartView.Drawable = null;
         ChartView.Invalidate();
     }
 }

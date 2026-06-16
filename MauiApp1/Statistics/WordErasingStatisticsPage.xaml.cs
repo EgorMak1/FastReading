@@ -21,7 +21,18 @@ public partial class WordErasingStatisticsPage : ContentPage
 
     private async Task LoadStatisticsAsync()
     {
-        var results = await _statisticsService.GetWordErasingResultsAsync();
+        List<WordErasingResultDto> results;
+
+        try
+        {
+            results = await _statisticsService.GetWordErasingResultsAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowLoadError(ex);
+            return;
+        }
+
         var orderedResults = results.OrderBy(r => r.CompletedAt).ToList();
 
         if (orderedResults.Count == 0)
@@ -62,6 +73,18 @@ public partial class WordErasingStatisticsPage : ContentPage
             string.Empty,
             min,
             max);
+        ChartView.Invalidate();
+    }
+
+    private void ShowLoadError(Exception exception)
+    {
+        CurrentSpeedLabel.Text = ApiError.FromException(exception, "Не удалось загрузить статистику упражнения.").Message;
+        CurrentBandLabel.Text = string.Empty;
+        LastAttemptLabel.Text = "Статистика временно недоступна.";
+        SpeedChangeLabel.Text = string.Empty;
+        NextSpeedLabel.Text = string.Empty;
+        TotalAttemptsLabel.Text = string.Empty;
+        ChartView.Drawable = null;
         ChartView.Invalidate();
     }
 

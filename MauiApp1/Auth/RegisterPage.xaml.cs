@@ -21,7 +21,7 @@ namespace MauiApp1.Auth
 
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
-                await DisplayAlert("Ошибка", "Введите email и пароль.", "ОК");
+                await DisplayAlert("Ошибка", "Email и пароль должны быть заполнены.", "ОК");
                 return;
             }
 
@@ -37,7 +37,7 @@ namespace MauiApp1.Auth
 
                 if (result == null)
                 {
-                    await DisplayAlert("Ошибка", "Пользователь уже существует или сервер недоступен.", "ОК");
+                    await DisplayAlert("Ошибка", "Регистрация не выполнена. Повторите попытку позже.", "ОК");
                     return;
                 }
 

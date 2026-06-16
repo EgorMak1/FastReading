@@ -20,7 +20,7 @@ namespace MauiApp1.Services
             var response = await _api.Http.GetAsync("api/profile", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
-                return null;
+                throw await ApiError.FromResponseAsync(response, "Не удалось загрузить профиль.", cancellationToken);
             }
 
             return await response.Content.ReadFromJsonAsync<UserProfileDto>(cancellationToken: cancellationToken);

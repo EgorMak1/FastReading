@@ -23,7 +23,7 @@ namespace FastReading.Server.Controllers
         {
             if (!TryGetCurrentUserId(out var userId))
             {
-                return Unauthorized();
+                return Unauthorized("Сессия истекла. Войдите снова.");
             }
 
             var progresses = await _db.UserExerciseProgresses

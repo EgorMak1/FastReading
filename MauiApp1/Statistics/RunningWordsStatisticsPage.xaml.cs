@@ -21,7 +21,18 @@ public partial class RunningWordsStatisticsPage : ContentPage
 
     private async Task LoadStatisticsAsync()
     {
-        var results = await _statisticsService.GetRunningWordsResultsAsync();
+        List<RunningWordsResultDto> results;
+
+        try
+        {
+            results = await _statisticsService.GetRunningWordsResultsAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowLoadError(ex);
+            return;
+        }
+
         var runningWordsResults = results.OrderBy(r => r.CompletedAt).ToList();
 
         if (runningWordsResults.Count == 0)
@@ -62,6 +73,20 @@ public partial class RunningWordsStatisticsPage : ContentPage
             "%",
             0,
             100);
+        ChartView.Invalidate();
+    }
+
+    private void ShowLoadError(Exception exception)
+    {
+        SummaryLabel.Text = ApiError.FromException(exception, "Не удалось загрузить статистику упражнения.").Message;
+        BestResultLabel.Text = "-";
+        AverageResultLabel.Text = "-";
+        CurrentSpeedLabel.Text = "-";
+        BestSpeedLabel.Text = "-";
+        TotalTrainingsLabel.Text = "-";
+        AverageSpeedLabel.Text = "-";
+        LastSessionLabel.Text = "Статистика временно недоступна.";
+        ChartView.Drawable = null;
         ChartView.Invalidate();
     }
 }

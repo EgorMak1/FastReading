@@ -52,9 +52,9 @@ public partial class ExerciseSelectionPage : ContentPage
             ApplyFieldOfViewSummary(fieldOfViewTask.Result);
             ApplyWordErasingSummary(wordErasingTask.Result);
         }
-        catch
+        catch (Exception ex)
         {
-            SetSummaryEmpty();
+            SetSummaryError(ex);
         }
     }
 
@@ -80,6 +80,20 @@ public partial class ExerciseSelectionPage : ContentPage
         FieldOfViewRecordLabel.Text = "Нет данных";
         WordErasingAccuracyLabel.Text = "Нет данных";
         WordErasingRecordLabel.Text = "Нет данных";
+    }
+
+    private void SetSummaryError(Exception exception)
+    {
+        var message = ApiError.FromException(exception, "Не удалось загрузить сводку упражнений.").Message;
+
+        RunningWordsAccuracyLabel.Text = message;
+        RunningWordsRecordLabel.Text = "Ошибка загрузки";
+        ShulteAccuracyLabel.Text = message;
+        ShulteRecordLabel.Text = "Ошибка загрузки";
+        FieldOfViewAccuracyLabel.Text = message;
+        FieldOfViewRecordLabel.Text = "Ошибка загрузки";
+        WordErasingAccuracyLabel.Text = message;
+        WordErasingRecordLabel.Text = "Ошибка загрузки";
     }
 
     private void ApplyRunningWordsSummary(List<RunningWordsResultDto> results)

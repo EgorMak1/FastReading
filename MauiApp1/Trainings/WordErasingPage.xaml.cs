@@ -325,7 +325,18 @@ public partial class WordErasingPage : ContentPage
             TotalWords = GetTotalWordCount()
         };
 
-        await _statisticsService.SaveWordErasingResultAsync(request);
+        try
+        {
+            await _statisticsService.SaveWordErasingResultAsync(request);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert(
+                "Ошибка сохранения",
+                $"Тренировка завершена, но результат не удалось сохранить: {ApiError.FromException(ex, "Не удалось сохранить результат тренировки.").Message}",
+                "ОК");
+        }
+
         _currentWpm = speedAfter;
 
         var statisticsPage = App.Current!.Handler!.MauiContext!.Services.GetRequiredService<WordErasingStatisticsPage>();

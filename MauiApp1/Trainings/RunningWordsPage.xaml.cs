@@ -255,7 +255,15 @@ public partial class RunningWordsPage : ContentPage
             FinalSpeedMilliseconds = _wordDisplayMilliseconds
         };
 
-        _statisticsSaved = await _statisticsService.SaveRunningWordsResultAsync(request);
+        try
+        {
+            _statisticsSaved = await _statisticsService.SaveRunningWordsResultAsync(request);
+        }
+        catch (Exception ex)
+        {
+            _statisticsSaved = false;
+            UpdateStatusText($"Тренировка завершена, но результат не удалось сохранить: {ApiError.FromException(ex, "Не удалось сохранить результат тренировки.").Message}");
+        }
     }
 
     private void RecordUnansweredAttemptAsWrong()

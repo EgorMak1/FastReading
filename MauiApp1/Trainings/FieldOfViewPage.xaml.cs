@@ -652,7 +652,15 @@ public partial class FieldOfViewPage : ContentPage
             FinalIntervalMilliseconds = _currentIntervalMilliseconds
         };
 
-        _statisticsSaved = await _statisticsService.SaveFieldOfViewResultAsync(request);
+        try
+        {
+            _statisticsSaved = await _statisticsService.SaveFieldOfViewResultAsync(request);
+        }
+        catch (Exception ex)
+        {
+            _statisticsSaved = false;
+            StatusLabel.Text = $"Тренировка завершена, но результат не удалось сохранить: {ApiError.FromException(ex, "Не удалось сохранить результат тренировки.").Message}";
+        }
     }
 
     private async Task StopAndSaveAsync(string message)

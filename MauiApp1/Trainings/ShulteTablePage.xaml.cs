@@ -221,21 +221,38 @@ namespace MauiApp1.Trainings
             int levelAfter = overrideLevelAfter ?? CalculateNextLevel(score, errorsCount, _sessionLevelBefore);
             _recommendedLevel = levelAfter;
 
-            await _statisticsService.SaveResultAsync("ShulteTable", durationSeconds);
-            await _statisticsService.SaveShulteResultAsync(new ShulteResultRequest
+            string? saveError = null;
+
+            try
             {
-                GridSize = _currentConfig.GridSize,
-                NumbersCount = _currentConfig.NumbersCount,
-                LevelBefore = _sessionLevelBefore,
-                LevelAfter = levelAfter,
-                DurationSeconds = durationSeconds,
-                ErrorsCount = errorsCount,
-                Score = score
-            });
+                await _statisticsService.SaveResultAsync("ShulteTable", durationSeconds);
+                await _statisticsService.SaveShulteResultAsync(new ShulteResultRequest
+                {
+                    GridSize = _currentConfig.GridSize,
+                    NumbersCount = _currentConfig.NumbersCount,
+                    LevelBefore = _sessionLevelBefore,
+                    LevelAfter = levelAfter,
+                    DurationSeconds = durationSeconds,
+                    ErrorsCount = errorsCount,
+                    Score = score
+                });
+            }
+            catch (Exception ex)
+            {
+                saveError = ApiError.FromException(ex, "Не удалось сохранить результат тренировки.").Message;
+            }
+
+            var resultMessage =
+                $"Время: {timeSpent:mm\\:ss}\nОшибки: {errorsCount}\nScore: {score:F0}\nСледующий уровень: {levelAfter}";
+
+            if (!string.IsNullOrWhiteSpace(saveError))
+            {
+                resultMessage += $"\n\nТренировка завершена, но результат не удалось сохранить: {saveError}";
+            }
 
             await DisplayAlert(
                 alertTitle ?? "Тренировка завершена",
-                $"Время: {timeSpent:mm\\:ss}\nОшибки: {errorsCount}\nScore: {score:F0}\nСледующий уровень: {levelAfter}",
+                resultMessage,
                 "OK");
 
             if (stayOnPage)

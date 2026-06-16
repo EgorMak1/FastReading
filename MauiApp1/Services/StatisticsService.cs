@@ -23,7 +23,12 @@ namespace MauiApp1.Services
                 DurationSeconds = durationSeconds
             });
 
-            return response.IsSuccessStatusCode;
+            if (!response.IsSuccessStatusCode)
+            {
+                throw await ApiError.FromResponseAsync(response, "Не удалось сохранить результат тренировки.");
+            }
+
+            return true;
         }
 
         public async Task<List<TrainingResultDto>> GetResultsAsync()
@@ -34,7 +39,7 @@ namespace MauiApp1.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new List<TrainingResultDto>();
+                throw await ApiError.FromResponseAsync(response, "Не удалось загрузить статистику.");
             }
 
             var results = await response.Content.ReadFromJsonAsync<List<TrainingResultDto>>();
@@ -48,7 +53,12 @@ namespace MauiApp1.Services
 
             var response = await _api.Http.PostAsJsonAsync("api/statistics/running-words", result);
 
-            return response.IsSuccessStatusCode;
+            if (!response.IsSuccessStatusCode)
+            {
+                throw await ApiError.FromResponseAsync(response, "Не удалось сохранить результат тренировки.");
+            }
+
+            return true;
         }
 
         public async Task<List<RunningWordsResultDto>> GetRunningWordsResultsAsync()
@@ -59,7 +69,7 @@ namespace MauiApp1.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new List<RunningWordsResultDto>();
+                throw await ApiError.FromResponseAsync(response, "Не удалось загрузить статистику упражнения.");
             }
 
             var results = await response.Content.ReadFromJsonAsync<List<RunningWordsResultDto>>();
@@ -73,7 +83,12 @@ namespace MauiApp1.Services
 
             var response = await _api.Http.PostAsJsonAsync("api/statistics/shulte", result);
 
-            return response.IsSuccessStatusCode;
+            if (!response.IsSuccessStatusCode)
+            {
+                throw await ApiError.FromResponseAsync(response, "Не удалось сохранить результат тренировки.");
+            }
+
+            return true;
         }
 
         public async Task<List<ShulteResultDto>> GetShulteResultsAsync()
@@ -84,7 +99,7 @@ namespace MauiApp1.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new List<ShulteResultDto>();
+                throw await ApiError.FromResponseAsync(response, "Не удалось загрузить статистику упражнения.");
             }
 
             var results = await response.Content.ReadFromJsonAsync<List<ShulteResultDto>>();
@@ -98,7 +113,12 @@ namespace MauiApp1.Services
 
             var response = await _api.Http.PostAsJsonAsync("api/statistics/field-of-view", result);
 
-            return response.IsSuccessStatusCode;
+            if (!response.IsSuccessStatusCode)
+            {
+                throw await ApiError.FromResponseAsync(response, "Не удалось сохранить результат тренировки.");
+            }
+
+            return true;
         }
 
         public async Task<List<FieldOfViewResultDto>> GetFieldOfViewResultsAsync()
@@ -109,7 +129,7 @@ namespace MauiApp1.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new List<FieldOfViewResultDto>();
+                throw await ApiError.FromResponseAsync(response, "Не удалось загрузить статистику упражнения.");
             }
 
             var results = await response.Content.ReadFromJsonAsync<List<FieldOfViewResultDto>>();
@@ -123,7 +143,12 @@ namespace MauiApp1.Services
 
             var response = await _api.Http.PostAsJsonAsync("api/statistics/word-erasing", result);
 
-            return response.IsSuccessStatusCode;
+            if (!response.IsSuccessStatusCode)
+            {
+                throw await ApiError.FromResponseAsync(response, "Не удалось сохранить результат тренировки.");
+            }
+
+            return true;
         }
 
         public async Task<List<WordErasingResultDto>> GetWordErasingResultsAsync()
@@ -134,7 +159,7 @@ namespace MauiApp1.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new List<WordErasingResultDto>();
+                throw await ApiError.FromResponseAsync(response, "Не удалось загрузить статистику упражнения.");
             }
 
             var results = await response.Content.ReadFromJsonAsync<List<WordErasingResultDto>>();
