@@ -30,7 +30,7 @@
                 </Border>
                 <Border Grid.Row="1" Grid.Column="0" Stroke="#D0D0D0" StrokeThickness="1" Padding="12">
                     <VerticalStackLayout>
-                        <Label Text="Лучший score" FontAttributes="Bold" />
+                        <Label Text="Лучший результат" FontAttributes="Bold" />
                         <Label x:Name="BestScoreLabel" FontSize="20" />
                     </VerticalStackLayout>
                 </Border>
@@ -54,7 +54,7 @@
                 </Border>
             </Grid>
 
-            <Label Text="Динамика score по попыткам"
+            <Label Text="Динамика результата по попыткам"
                    FontSize="18"
                    FontAttributes="Bold" />
 
