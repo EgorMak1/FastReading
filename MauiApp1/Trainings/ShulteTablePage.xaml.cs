@@ -156,6 +156,7 @@ namespace MauiApp1.Trainings
 
             double contentWidth = Math.Min(ContentMaxWidth, scrollWidth);
             ShulteContentContainer.WidthRequest = contentWidth;
+            ShulteContentContainer.MinimumHeightRequest = Math.Max(0, ShulteScroll.Height);
 
             double availableTableWidth = Math.Max(0, contentWidth - ContentHorizontalPadding);
             double tableSize = Math.Min(GetMaxTableSize(_currentConfig.GridSize), availableTableWidth);
