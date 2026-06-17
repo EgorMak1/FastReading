@@ -176,6 +176,10 @@ public partial class WordErasingPage : ContentPage
     private async Task RunReadingLoopAsync(CancellationToken cancellationToken)
     {
         double msPerWord = 60000d / _currentWpm;
+        int totalWordCount = GetTotalWordCount();
+        int totalWordLetters = GetTotalWordLetters();
+        double averageLettersPerWord = totalWordCount == 0 ? 1d : totalWordLetters / (double)totalWordCount;
+        double msPerLetter = msPerWord / Math.Max(1d, averageLettersPerWord);
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -184,9 +188,7 @@ public partial class WordErasingPage : ContentPage
             TimerLabel.Text = FormatRemainingTime(remainingSeconds);
             TimerProgressBar.Progress = Math.Clamp(1d - elapsedMs / (SessionDurationSeconds * 1000d), 0d, 1d);
 
-            double wordProgress = elapsedMs / msPerWord;
-            int fullWordsErased = Math.Min((int)Math.Floor(wordProgress), GetTotalWordCount());
-            int partialLetters = CalculatePartialLetters(wordProgress, fullWordsErased);
+            var (fullWordsErased, partialLetters) = CalculateErasureProgress(elapsedMs / msPerLetter);
 
             if (fullWordsErased != _fullWordsErased || partialLetters != _lastRenderedPartialLetters)
             {
@@ -367,19 +369,37 @@ public partial class WordErasingPage : ContentPage
         return _tokens.Count(token => token.IsWord);
     }
 
-    private int CalculatePartialLetters(double wordProgress, int fullWordsErased)
+    private int GetTotalWordLetters()
     {
-        if (fullWordsErased >= GetTotalWordCount())
+        return _tokens
+            .Where(token => token.IsWord)
+            .Sum(token => token.Text.Length);
+    }
+
+    private (int FullWordsErased, int PartialLetters) CalculateErasureProgress(double erasedLetters)
+    {
+        if (erasedLetters <= 0)
         {
-            return 0;
+            return (0, 0);
         }
 
-        double fraction = wordProgress - Math.Floor(wordProgress);
-        var currentWord = _tokens.FirstOrDefault(token => token.IsWord && token.WordIndex == fullWordsErased);
+        int fullWordsErased = 0;
+        double remainingLetters = erasedLetters;
 
-        return currentWord == null
-            ? 0
-            : Math.Min(currentWord.Text.Length, (int)Math.Floor(fraction * currentWord.Text.Length));
+        foreach (var token in _tokens.Where(token => token.IsWord))
+        {
+            if (remainingLetters >= token.Text.Length)
+            {
+                fullWordsErased++;
+                remainingLetters -= token.Text.Length;
+                continue;
+            }
+
+            int partialLetters = Math.Min(token.Text.Length, (int)Math.Floor(remainingLetters));
+            return (fullWordsErased, partialLetters);
+        }
+
+        return (fullWordsErased, 0);
     }
 
     private string BuildRenderedText(int fullWordsErased, int partialLetters)
