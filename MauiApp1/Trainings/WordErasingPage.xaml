@@ -3,7 +3,7 @@
     x:Class="MauiApp1.Trainings.WordErasingPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Затирание слов">
+    Title="Стирание слов">
 
     <Grid Padding="16">
         <VerticalStackLayout
@@ -14,7 +14,7 @@
                 FontAttributes="Bold"
                 FontSize="24"
                 HorizontalOptions="Center"
-                Text="Затирание слов" />
+                Text="Стирание слов" />
 
             <Label
                 x:Name="PreparationTitleLabel"
@@ -82,9 +82,17 @@
                 Scrolled="OnTextScrolled">
                 <Label
                     x:Name="ReadingTextLabel"
-                    FontFamily="Courier New"
                     FontSize="17"
-                    LineBreakMode="WordWrap" />
+                    LineBreakMode="WordWrap">
+                    <Label.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String">
+                            <On Platform="Android" Value="monospace" />
+                            <On Platform="WinUI" Value="Courier New" />
+                            <On Platform="iOS" Value="Courier New" />
+                            <On Platform="MacCatalyst" Value="Courier New" />
+                        </OnPlatform>
+                    </Label.FontFamily>
+                </Label>
             </ScrollView>
 
             <Label

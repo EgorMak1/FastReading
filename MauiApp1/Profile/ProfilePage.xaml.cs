@@ -188,7 +188,7 @@ namespace MauiApp1.Profile
                 "ShulteTable" => "Таблица Шульте",
                 "RunningWords" => "Бегущие слова",
                 "FieldOfView" => "Поле зрения",
-                "WordErasing" => "Затирание слов",
+                "WordErasing" => "Стирание слов",
                 null or "" => "Нет данных",
                 _ => exerciseType
             };

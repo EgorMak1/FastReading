@@ -25,7 +25,7 @@ public static class WordErasingContent
 
         if (texts.Count == 0)
         {
-            throw new InvalidOperationException("Не удалось загрузить тексты упражнения \"Затирание слов\".");
+            throw new InvalidOperationException("Не удалось загрузить тексты упражнения \"Стирание слов\".");
         }
 
         _cachedTexts = texts;
