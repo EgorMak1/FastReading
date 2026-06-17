@@ -5,10 +5,16 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Поле зрения">
 
-    <ScrollView>
+    <ScrollView
+        x:Name="FieldOfViewScroll"
+        SizeChanged="OnFieldOfViewScrollSizeChanged">
         <VerticalStackLayout
+            x:Name="FieldOfViewContentContainer"
             Padding="16"
-            Spacing="12">
+            HorizontalOptions="Fill"
+            MaximumWidthRequest="720"
+            Spacing="12"
+            VerticalOptions="Center">
 
             <Label
                 x:Name="DifficultyLabel"
@@ -44,8 +50,10 @@
                 Text="Уровень: 1, поле: 5x5, интервал: 1800 мс. Раундов: 0, верных: 0." />
 
             <Grid
+                x:Name="ActionButtonsGrid"
                 ColumnDefinitions="*,*"
-                ColumnSpacing="10">
+                ColumnSpacing="10"
+                HorizontalOptions="Center">
                 <Button
                     x:Name="StartButton"
                     Grid.Column="0"
@@ -67,6 +75,7 @@
                 FontAttributes="Bold"
                 FontSize="18"
                 HeightRequest="56"
+                HorizontalOptions="Center"
                 IsEnabled="False"
                 Text="Ошибка"
                 TextColor="White" />
@@ -74,6 +83,7 @@
             <Button
                 x:Name="ReadyButton"
                 Clicked="OnReadyClicked"
+                HorizontalOptions="Center"
                 IsVisible="False"
                 Text="Готов" />
         </VerticalStackLayout>

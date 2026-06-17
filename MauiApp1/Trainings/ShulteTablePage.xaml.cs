@@ -4,6 +4,9 @@ namespace MauiApp1.Trainings
 {
     public partial class ShulteTablePage : ContentPage
     {
+        private const double ContentMaxWidth = 720;
+        private const double ContentHorizontalPadding = 32;
+
         private static readonly IReadOnlyList<ShulteDifficultyConfig> DifficultyLevels =
         [
             new(1, 4, 16, 24, 45, false),
@@ -30,6 +33,11 @@ namespace MauiApp1.Trainings
         {
             InitializeComponent();
             _statisticsService = statisticsService;
+        }
+
+        private void OnShulteScrollSizeChanged(object sender, EventArgs e)
+        {
+            UpdateTableLayoutSize();
         }
 
         protected override async void OnAppearing()
@@ -124,6 +132,7 @@ namespace MauiApp1.Trainings
             TimerLabel.Text = "Время: 00:00";
             _startTime = DateTime.Now;
             _timerRunning = true;
+            UpdateTableLayoutSize();
 
             Dispatcher.StartTimer(TimeSpan.FromSeconds(1), () =>
             {
@@ -135,6 +144,39 @@ namespace MauiApp1.Trainings
                 TimerLabel.Text = $"Время: {DateTime.Now - _startTime:mm\\:ss}";
                 return true;
             });
+        }
+
+        private void UpdateTableLayoutSize()
+        {
+            double scrollWidth = Math.Max(0, ShulteScroll.Width);
+            if (scrollWidth <= 0)
+            {
+                return;
+            }
+
+            double contentWidth = Math.Min(ContentMaxWidth, scrollWidth);
+            ShulteContentContainer.WidthRequest = contentWidth;
+
+            double availableTableWidth = Math.Max(0, contentWidth - ContentHorizontalPadding);
+            double tableSize = Math.Min(GetMaxTableSize(_currentConfig.GridSize), availableTableWidth);
+            if (tableSize <= 0)
+            {
+                return;
+            }
+
+            ShulteTableGrid.WidthRequest = tableSize;
+            ShulteTableGrid.HeightRequest = tableSize;
+            FinishButton.WidthRequest = tableSize;
+        }
+
+        private static double GetMaxTableSize(int gridSize)
+        {
+            return gridSize switch
+            {
+                <= 4 => 400,
+                5 => 480,
+                _ => 540
+            };
         }
 
         private Color GetButtonBackgroundColor(int number)

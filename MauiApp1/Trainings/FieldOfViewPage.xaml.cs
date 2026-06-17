@@ -5,6 +5,10 @@ namespace MauiApp1.Trainings;
 
 public partial class FieldOfViewPage : ContentPage
 {
+    private const double ContentMaxWidth = 720;
+    private const double ContentHorizontalPadding = 32;
+    private const double ControlsMaxWidth = 340;
+
     private const int SafeRoundsWithoutMismatch = 2;
     private const int MaxConsecutiveRoundsWithoutMismatch = 2;
     private const int AllowedMistakesOnSevenBySeven = 3;
@@ -66,6 +70,11 @@ public partial class FieldOfViewPage : ContentPage
         UpdateStatsText();
     }
 
+    private void OnFieldOfViewScrollSizeChanged(object sender, EventArgs e)
+    {
+        UpdateControlLayoutSize();
+    }
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();
@@ -80,6 +89,30 @@ public partial class FieldOfViewPage : ContentPage
         ApplyLevel(_recommendedLevel);
         UpdateDifficultyLabel();
         UpdateStatsText();
+    }
+
+    private void UpdateControlLayoutSize()
+    {
+        double scrollWidth = Math.Max(0, FieldOfViewScroll.Width);
+        if (scrollWidth <= 0)
+        {
+            return;
+        }
+
+        double contentWidth = Math.Min(ContentMaxWidth, scrollWidth);
+        FieldOfViewContentContainer.WidthRequest = contentWidth;
+        FieldOfViewContentContainer.MinimumHeightRequest = Math.Max(0, FieldOfViewScroll.Height);
+
+        double availableControlWidth = Math.Max(0, contentWidth - ContentHorizontalPadding);
+        double controlWidth = Math.Min(ControlsMaxWidth, availableControlWidth);
+        if (controlWidth <= 0)
+        {
+            return;
+        }
+
+        ActionButtonsGrid.WidthRequest = controlWidth;
+        ErrorButton.WidthRequest = controlWidth;
+        ReadyButton.WidthRequest = controlWidth;
     }
 
     private async Task InitializeDifficultyAsync()
