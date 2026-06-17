@@ -22,6 +22,8 @@ public sealed class ExerciseIntroPage : ContentPage
             {
                 Padding = 20,
                 Spacing = 16,
+                HorizontalOptions = LayoutOptions.Center,
+                MaximumWidthRequest = 1040,
                 Children =
                 {
                     new Label

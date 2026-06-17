@@ -12,6 +12,11 @@ public partial class SelectionStatisticsPage : ContentPage
         _statisticsService = statisticsService;
     }
 
+    private void OnSelectionStatisticsScrollSizeChanged(object sender, EventArgs e)
+    {
+        SelectionStatisticsContentContainer.MinimumHeightRequest = Math.Max(0, SelectionStatisticsScroll.Height);
+    }
+
     private async void OnShulteStatisticsTapped(object sender, TappedEventArgs e)
     {
         await OpenShulteStatisticsAsync();

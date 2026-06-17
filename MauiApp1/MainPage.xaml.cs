@@ -35,6 +35,11 @@ namespace MauiApp1
             base.OnDisappearing();
         }
 
+        private void OnMainScrollSizeChanged(object sender, EventArgs e)
+        {
+            MainContentContainer.MinimumHeightRequest = Math.Max(0, MainScroll.Height);
+        }
+
         private async Task LoadDashboardAsync(CancellationToken cancellationToken)
         {
             DashboardStatusLabel.Text = "Загрузка...";

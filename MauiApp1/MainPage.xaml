@@ -7,13 +7,19 @@
     NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="*,Auto">
-    <ScrollView Grid.Row="0">
+    <ScrollView
+        x:Name="MainScroll"
+        Grid.Row="0"
+        SizeChanged="OnMainScrollSizeChanged">
         <Grid
+            x:Name="MainContentContainer"
             Padding="24"
             HorizontalOptions="Center"
             MaximumWidthRequest="1040">
 
-            <VerticalStackLayout Spacing="18">
+            <VerticalStackLayout
+                Spacing="18"
+                VerticalOptions="Center">
                 <Border
                     Padding="24"
                     BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"

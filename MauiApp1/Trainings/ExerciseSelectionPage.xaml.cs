@@ -29,6 +29,11 @@ public partial class ExerciseSelectionPage : ContentPage
         base.OnDisappearing();
     }
 
+    private void OnExerciseSelectionScrollSizeChanged(object sender, EventArgs e)
+    {
+        ExerciseSelectionContentContainer.MinimumHeightRequest = Math.Max(0, ExerciseSelectionScroll.Height);
+    }
+
     private async Task LoadExerciseSummaryAsync(CancellationToken cancellationToken)
     {
         SetSummaryLoading();

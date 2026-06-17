@@ -217,8 +217,11 @@ namespace MauiApp1.Trainings
             int errorsCount = overrideErrorsCount ?? _errors;
             int durationSeconds = overrideDurationSeconds ?? Math.Max(1, (int)Math.Round((DateTime.Now - _startTime).TotalSeconds));
             var timeSpent = TimeSpan.FromSeconds(durationSeconds);
-            double score = overrideScore ?? CalculateScore(durationSeconds, errorsCount, _currentConfig);
-            int levelAfter = overrideLevelAfter ?? CalculateNextLevel(score, errorsCount, _sessionLevelBefore);
+            bool isCompleted = _currentNumber > _currentConfig.NumbersCount;
+            double score = overrideScore ?? (isCompleted ? CalculateScore(durationSeconds, errorsCount, _currentConfig) : 0);
+            int levelAfter = overrideLevelAfter ?? (isCompleted
+                ? CalculateNextLevel(score, errorsCount, durationSeconds, _currentConfig, _sessionLevelBefore)
+                : ClampLevel(_sessionLevelBefore - 1));
             _recommendedLevel = levelAfter;
 
             string? saveError = null;
@@ -243,7 +246,7 @@ namespace MauiApp1.Trainings
             }
 
             var resultMessage =
-                $"Время: {timeSpent:mm\\:ss}\nОшибки: {errorsCount}\nScore: {score:F0}\nСледующий уровень: {levelAfter}";
+                $"Время: {timeSpent:mm\\:ss}\nОшибки: {errorsCount}\nОчки: {score:F0}\nСледующий уровень: {levelAfter}";
 
             if (!string.IsNullOrWhiteSpace(saveError))
             {
@@ -274,14 +277,24 @@ namespace MauiApp1.Trainings
             return Math.Clamp(100 - timePenalty - errorPenalty + speedBonus, 0, 100);
         }
 
-        private static int CalculateNextLevel(double score, int errorsCount, int currentLevel)
+        private static int CalculateNextLevel(
+            double score,
+            int errorsCount,
+            int durationSeconds,
+            ShulteDifficultyConfig config,
+            int currentLevel)
         {
+            if (durationSeconds > config.TargetDurationSeconds)
+            {
+                return ClampLevel(currentLevel - 1);
+            }
+
             if (score >= 85 && errorsCount <= 1)
             {
                 return ClampLevel(currentLevel + 1);
             }
 
-            if (score < 55 || errorsCount >= 5)
+            if (score < 55 || errorsCount > 3)
             {
                 return ClampLevel(currentLevel - 1);
             }

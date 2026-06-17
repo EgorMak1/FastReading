@@ -40,6 +40,12 @@ public partial class RunningWordsPage : ContentPage
         SetInitialState();
     }
 
+    private void OnRunningWordsScrollSizeChanged(object sender, EventArgs e)
+    {
+        RunningWordsContentContainer.MinimumHeightRequest = Math.Max(0, RunningWordsScroll.Height);
+        RunningWordsContentContainer.WidthRequest = Math.Min(720, Math.Max(0, RunningWordsScroll.Width));
+    }
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();

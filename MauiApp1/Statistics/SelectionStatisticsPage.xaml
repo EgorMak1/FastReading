@@ -8,20 +8,29 @@
     Title="Статистика">
 
     <Grid RowDefinitions="*,Auto">
-        <ScrollView Grid.Row="0">
+        <ScrollView
+            x:Name="SelectionStatisticsScroll"
+            Grid.Row="0"
+            SizeChanged="OnSelectionStatisticsScrollSizeChanged">
             <Grid
+                x:Name="SelectionStatisticsContentContainer"
                 Padding="24"
                 HorizontalOptions="Center"
-                MaximumWidthRequest="980">
+                MaximumWidthRequest="1040">
 
-                <VerticalStackLayout Spacing="14">
+                <VerticalStackLayout
+                    Spacing="14"
+                    VerticalOptions="Center">
                     <VerticalStackLayout Spacing="14">
                         <Border
+                            HeightRequest="132"
                             Style="{StaticResource CardBorder}">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnRunningWordsStatisticsTapped" />
                             </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="10">
+                            <VerticalStackLayout
+                                Spacing="10"
+                                VerticalOptions="Center">
                                 <Label
                                     Style="{StaticResource SectionTitle}"
                                     Text="Бегущие слова" />
@@ -32,11 +41,14 @@
                         </Border>
 
                         <Border
+                            HeightRequest="132"
                             Style="{StaticResource CardBorder}">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnShulteStatisticsTapped" />
                             </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="10">
+                            <VerticalStackLayout
+                                Spacing="10"
+                                VerticalOptions="Center">
                                 <Label
                                     Style="{StaticResource SectionTitle}"
                                     Text="Таблица Шульте" />
@@ -47,11 +59,14 @@
                         </Border>
 
                         <Border
+                            HeightRequest="132"
                             Style="{StaticResource CardBorder}">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnFieldOfViewStatisticsTapped" />
                             </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="10">
+                            <VerticalStackLayout
+                                Spacing="10"
+                                VerticalOptions="Center">
                                 <Label
                                     Style="{StaticResource SectionTitle}"
                                     Text="Поле зрения" />
@@ -62,11 +77,14 @@
                         </Border>
 
                         <Border
+                            HeightRequest="132"
                             Style="{StaticResource CardBorder}">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnWordErasingStatisticsTapped" />
                             </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="10">
+                            <VerticalStackLayout
+                                Spacing="10"
+                                VerticalOptions="Center">
                                 <Label
                                     Style="{StaticResource SectionTitle}"
                                     Text="Стирание слов" />

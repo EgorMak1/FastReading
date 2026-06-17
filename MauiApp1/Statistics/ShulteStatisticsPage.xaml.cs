@@ -55,7 +55,7 @@ public partial class ShulteStatisticsPage : ContentPage
         var bestScore = shulteResults.Max(r => r.Score);
         var averageErrors = shulteResults.Average(r => r.ErrorsCount);
 
-        SummaryLabel.Text = "Статистика учитывает время, ошибки, уровень сложности и итоговый score.";
+        SummaryLabel.Text = "Статистика учитывает время, ошибки, уровень сложности и итоговые очки.";
         BestResultLabel.Text = $"{bestTime} сек";
         AverageResultLabel.Text = $"{averageTime:F1} сек";
         BestScoreLabel.Text = $"{bestScore:F1}";
@@ -66,7 +66,7 @@ public partial class ShulteStatisticsPage : ContentPage
             $"Дата: {last.CompletedAt.ToLocalTime():dd.MM.yyyy HH:mm}\n" +
             $"Время: {last.DurationSeconds} сек\n" +
             $"Ошибки: {last.ErrorsCount}\n" +
-            $"Score: {last.Score:F1}\n" +
+            $"Очки: {last.Score:F1}\n" +
             $"Уровень: {last.LevelBefore} -> {last.LevelAfter}";
 
         ChartView.Drawable = new StyledLineChartDrawable(

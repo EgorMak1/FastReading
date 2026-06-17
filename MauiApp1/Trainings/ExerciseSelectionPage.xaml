@@ -8,15 +8,21 @@
     Title="Тренировки">
 
     <Grid RowDefinitions="*,Auto">
-        <ScrollView Grid.Row="0">
+        <ScrollView
+            x:Name="ExerciseSelectionScroll"
+            Grid.Row="0"
+            SizeChanged="OnExerciseSelectionScrollSizeChanged">
             <Grid
+                x:Name="ExerciseSelectionContentContainer"
                 Padding="24"
                 HorizontalOptions="Center"
                 MaximumWidthRequest="1040">
 
-                <VerticalStackLayout Spacing="14">
+                <VerticalStackLayout
+                    Spacing="14"
+                    VerticalOptions="Center">
                     <Border
-                        HeightRequest="{OnIdiom Phone=132, Tablet=132, Desktop=-1}"
+                        HeightRequest="132"
                         Padding="18"
                         BackgroundColor="{AppThemeBinding Light=#EFF6FF, Dark=#172554}"
                         Stroke="{AppThemeBinding Light=#BFDBFE, Dark=#1D4ED8}"
@@ -77,7 +83,7 @@
                     </Border>
 
                     <Border
-                        HeightRequest="{OnIdiom Phone=132, Tablet=132, Desktop=-1}"
+                        HeightRequest="132"
                         Padding="18"
                         BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#052E2B}"
                         Stroke="{AppThemeBinding Light=#A7F3D0, Dark=#047857}"
@@ -138,7 +144,7 @@
                     </Border>
 
                     <Border
-                        HeightRequest="{OnIdiom Phone=132, Tablet=132, Desktop=-1}"
+                        HeightRequest="132"
                         Padding="18"
                         BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#1E293B}"
                         Stroke="{AppThemeBinding Light=#CBD5E1, Dark=#475569}"
@@ -199,7 +205,7 @@
                     </Border>
 
                     <Border
-                        HeightRequest="{OnIdiom Phone=132, Tablet=132, Desktop=-1}"
+                        HeightRequest="132"
                         Padding="18"
                         BackgroundColor="{AppThemeBinding Light=#FFF7ED, Dark=#431407}"
                         Stroke="{AppThemeBinding Light=#FED7AA, Dark=#C2410C}"
